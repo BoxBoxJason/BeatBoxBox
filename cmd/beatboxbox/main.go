@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	fs := http.FileServer(http.Dir("static"))
+	fs := http.FileServer(http.Dir("frontend/dist"))
 	http.Handle("/", fs)
 
 	log.Println("Server Up & Listening at https://localhost:8080")
