@@ -37,7 +37,7 @@ Facilitate users to rate music, which influences recommendations.
 Golang based backend server that serves the frontend and handles the business logic.
 
 ### Frontend
-HTMX based frontend that interacts with the backend server.
+Vue.js based frontend that interacts with the backend server.
 
 ## Getting Started
 
@@ -45,4 +45,4 @@ To get the project running locally:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repository/BeatBoxBox.git
+   git clone https://github.com/BoxBoxJason/BeatBoxBox.git
