@@ -1,17 +1,17 @@
 package main
 
 import (
-	"log"
+	"BeatBoxBox/pkg/logger"
 	"net/http"
 )
 
 func main() {
-	fs := http.FileServer(http.Dir("frontend/dist"))
+	fs := http.FileServer(http.Dir("./frontend/dist"))
 	http.Handle("/", fs)
 
-	log.Println("Server Up & Listening at https://localhost:8080")
+	logger.Info("Server Up & Listening at https://localhost:8080")
 	err := http.ListenAndServeTLS(":8080", "cert.pem", "key.pem", nil)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 	}
 }
