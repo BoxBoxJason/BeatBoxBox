@@ -8,15 +8,15 @@ import (
 )
 
 type Musics struct {
-	id       int     `gorm:"primaryKey;autoIncrement"`
-	titre    string  `gorm:"type:text;not null"`
-	auteur   string  `gorm:"type:text;not null"`
-	album    string  `gorm:"type:text"`
-	genre    string  `gorm:"type:text;not null"`
-	nbecoute int     `gorm:"type:int;not null"`
-	note     float32 `gorm:"type:float32;not null"`
-	nbnotes  int     `gorm:"type:int;not null"`
-	path     string  `gorm:"type:varchar(255);not null"`
+	id         int     `gorm:"primaryKey;autoIncrement"`
+	title      string  `gorm:"type:text;not null"`
+	author     string  `gorm:"type:text;not null"`
+	album      string  `gorm:"type:text"`
+	genre      string  `gorm:"type:text;not null"`
+	nblistened int     `gorm:"type:int;not null"`
+	rating     float32 `gorm:"type:float32;not null"`
+	nbrating   int     `gorm:"type:int;not null"`
+	path       string  `gorm:"type:varchar(255);not null"`
 }
 
 type Users struct {
@@ -29,10 +29,10 @@ type Users struct {
 }
 
 type Playlists struct {
-	titre     string `gorm:"type:text;not null"`
+	title     string `gorm:"type:text;not null"`
 	music_ids string `gorm:"type:text"`
 	id        int    `gorm:"primaryKey;autoIncrement"`
-	createur  int    `gorm:"foreignKey;autoIncrement"`
+	creator   int    `gorm:"foreignKey;autoIncrement"`
 }
 
 func CreateDB() {
