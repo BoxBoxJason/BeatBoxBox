@@ -12,10 +12,10 @@ type Musics struct {
 	title      string  `gorm:"type:text;not null"`
 	author     string  `gorm:"type:text;not null"`
 	album      string  `gorm:"type:text"`
-	genre      string  `gorm:"type:text;not null"`
-	nblistened int     `gorm:"type:int;not null"`
-	rating     float32 `gorm:"type:float32;not null"`
-	nbrating   int     `gorm:"type:int;not null"`
+	genre      string  `gorm:"type:text"`
+	nblistened int     `gorm:"type:int;default 0"`
+	rating     float32 `gorm:"type:float32;default 0"`
+	nbrating   int     `gorm:"type:int;default 0"`
 	path       string  `gorm:"type:varchar(255);not null"`
 }
 
