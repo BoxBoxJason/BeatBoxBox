@@ -4,3 +4,7 @@ FATAL: 2024/04/18 19:35:32 failed to connect database
 FATAL: 2024/04/18 19:41:09 failed to connect database
 FATAL: 2024/04/18 19:43:15 failed to connect database
 FATAL: 2024/04/18 22:20:10 failed to connect database
+INFO: 2024/04/18 23:04:04 Tables created successfully
+INFO: 2024/04/18 23:04:04 Server Up & Listening at https://localhost:8080
+INFO: 2024/04/18 23:07:58 Tables created successfully
+INFO: 2024/04/18 23:07:58 Server Up & Listening at https://localhost:8080
