@@ -44,5 +44,20 @@ Vue.js based frontend that interacts with the backend server.
 To get the project running locally:
 
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/BoxBoxJason/BeatBoxBox.git
+`git clone https://github.com/BoxBoxJason/BeatBoxBox.git`
+
+2. Install the dependencies:
+   - npm
+   - go
+   - vue-cli
+
+3. Build the frontend using vue-cli:
+   1. `cd frontend`
+   2. `npm install`
+   3. `npm run build`
+
+4. Run the backend server:
+   1. `cd backend`
+   2. `go run cmd/beatboxbox/main.go`
+
+5. Access the web interface with your web browser at `https://localhost:8080`
