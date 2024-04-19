@@ -11,8 +11,8 @@ func main() {
 	http.Handle("/", fs)
 
 	db_controller.CreateDB()
-
 	logger.Info("Server Up & Listening at https://localhost:8080")
+
 	err := http.ListenAndServeTLS(":8080", "cert.pem", "key.pem", nil)
 	if err != nil {
 		logger.Fatal(err)
