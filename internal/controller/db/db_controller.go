@@ -7,20 +7,29 @@ import (
 	"gorm.io/gorm"
 )
 
-type Users struct {
-	Pseudo                  string `gorm:"type:varchar(32);unique;not null"`
-	Subscribed_playlist_ids string `gorm:"type:varchar;not null"`
-	Liked_music_ids         string `gorm:"type:varchar;not null"`
-	Hashed_password         string `gorm:"type:varchar(64);not null"`
-	Salt                    string `gorm:"type:varchar(16);not null"`
-	Id                      int    `gorm:"primaryKey;autoIncrement"`
+type User struct {
+	Pseudo               string     `gorm:"type:varchar(32);unique;not null"`
+	Subscribed_playlists []Playlist `gorm:"foreignKey:PlaylistIds"`
+	PlaylistIds          []int
+	Liked_musics         []Music `gorm:"foreignKey:MusicIds"`
+	MusicIds             []int
+	Hashed_password      string `gorm:"type:varchar(64);not null"`
+	Salt                 string `gorm:"type:varchar(16);not null"`
+	Id                   int    `gorm:"primaryKey;autoIncrement"`
 }
 
-type Musics struct {
-	Id         int     `gorm:"primaryKey;autoIncrement"`
-	Title      string  `gorm:"type:text;unique;not null"`
-	Author     string  `gorm:"type:text;not null"`
-	Album      string  `gorm:"type:text"`
+type Artist struct {
+	Pseudo string `gorm:"type:varchar(32);unique;not null"`
+	Id     int    `gorm:"primaryKey;autoIncrement"`
+}
+
+type Music struct {
+	Id         int    `gorm:"primaryKey;autoIncrement"`
+	Title      string `gorm:"type:text;unique;not null"`
+	ArtistId   int
+	Artist     Artist `gorm:"foreignKey:ArtistId"`
+	AlbumId    int
+	Album      Album   `gorm:"foreignKey:AlbumId"`
 	Genres     string  `gorm:"type:text"`
 	Nblistened int     `gorm:"type:int;default 0"`
 	Rating     float32 `gorm:"type:float32;default 0"`
@@ -28,11 +37,22 @@ type Musics struct {
 	Path       string  `gorm:"type:varchar(255);not null"`
 }
 
-type Playlists struct {
+type Playlist struct {
 	Title     string `gorm:"type:text;unique;not null"`
-	Music_ids string `gorm:"type:text"`
-	Id        int    `gorm:"primaryKey;autoIncrement"`
-	Creator   int    `gorm:"foreignKey"`
+	MusicIds  []int
+	Musics    []Music `gorm:"foreignKey:MusicIds"`
+	Id        int     `gorm:"primaryKey;autoIncrement"`
+	CreatorId int
+	Creator   User `gorm:"foreignKey:UserId"`
+}
+
+type Album struct {
+	Title    string `gorm:"type:text;unique;not null"`
+	MusicIds []int
+	Musics   []Music `gorm:"foreignKey:MusicIds"`
+	Id       int     `gorm:"primaryKey;autoIncrement"`
+	ArtistId int
+	Artist   Artist `gorm:"foreignKey:ArtistId"`
 }
 
 func CreateDB() {
@@ -42,7 +62,7 @@ func CreateDB() {
 		logger.Fatal("failed to connect database")
 	}
 
-	db.AutoMigrate(&Users{}, &Musics{}, &Playlists{})
+	db.AutoMigrate(&User{}, &Music{}, &Playlist{})
 	logger.Info("Tables created successfully")
 
 }
