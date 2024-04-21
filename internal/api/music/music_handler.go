@@ -21,4 +21,12 @@ func init() {
 	MusicsRouter.HandleFunc("/musics/download", downloadMusicsHandler).Methods("GET")
 	MusicsRouter.HandleFunc("/musics/download/{music_id}", downloadMusicHandler).Methods("GET")
 	MusicsRouter.HandleFunc("/musics/{music_id}", getMusicHandler).Methods("GET")
+
+	// PUT requests
+	MusicsRouter.HandleFunc("/musics/{music_id}", putMusicsHandler).Methods("PUT")
+
+	// DELETE requests
+	MusicsRouter.HandleFunc("/musics/{music_id}", deleteMusicHandler).Methods("DELETE")
+	MusicsRouter.HandleFunc("/musics", deleteMusicsHandler).Methods("DELETE")
+
 }

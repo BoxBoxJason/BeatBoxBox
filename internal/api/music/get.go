@@ -44,6 +44,7 @@ func getMusicsHandler(w http.ResponseWriter, r *http.Request) {
 	// Retrieve requested music IDs from the URL
 	query_params := r.URL.Query()
 	music_ids := []int{}
+
 	if query_params.Get("music_ids") != "" {
 		music_ids_str := strings.Split(query_params.Get("music_ids"), ",")
 		for _, music_id_str := range music_ids_str {

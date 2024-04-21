@@ -5,35 +5,31 @@ package music_handler
 
 import (
 	music_controller "BeatBoxBox/internal/controller/music"
-	"encoding/json"
 	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 // putMusicsHandler is the handler for the PUT /musics endpoint
 // It updates the fields of a music in the database
 func putMusicsHandler(w http.ResponseWriter, r *http.Request) {
-	// Check if the request is a PUT request
-	if r.Method != http.MethodPut {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
 
 	// Get the music ID from the URL
-	music_id := r.URL.Path[len("/musics/"):]
-
-	// Parse the JSON body of the request
-	decoder := json.NewDecoder(r.Body)
-	var music map[string]interface{}
-	err := decoder.Decode(&music)
+	music_id_str := mux.Vars(r)["music_id"]
+	music_id, err := strconv.Atoi(music_id_str)
 	if err != nil {
-		http.Error(w, "Invalid JSON body", http.StatusBadRequest)
+		http.Error(w, "Invalid music ID provided, please use a valid integer music ID", http.StatusBadRequest)
 		return
 	}
 
+	// Parse the url parameters and retrieve only authorized ones
+	update_dict, err := parseURLParams(r.URL.Query())
+
 	// Update the music in the database
-	err = music_controller.UpdateMusic(music_id, music)
+	err = music_controller.UpdateMusic(music_id, update_dict)
 	if err != nil {
-		http.Error(w, "Internal server error when updating music", http.StatusInternalServerError)
+		http.Error(w, "Internal server error when updating music: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
