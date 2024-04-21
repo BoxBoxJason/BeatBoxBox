@@ -12,6 +12,8 @@ services:
       DATABASE_NAME: beatboxbox
     depends_on:
       - db
+    expose:
+      - "8080"
 
   db:
     image: postgres:16.2

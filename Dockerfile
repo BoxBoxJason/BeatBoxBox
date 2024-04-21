@@ -24,6 +24,8 @@ COPY ./secret ./secret/
 # Build frontend
 RUN cd /home/user/BeatBoxBox/frontend && \
     npm install && \
-    npm run build
+    npm run build && \
+    cd /home/user/BeatBoxBox && \
+    go mod tidy
 
 ENTRYPOINT ["go", "run", "/home/user/BeatBoxBox/cmd/server/main.go"]
