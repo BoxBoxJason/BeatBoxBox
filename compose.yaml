@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    image: beatboxbox:test
+    image: beatboxbox:latest
     ports:
       - "8080:8080"
     environment:
@@ -12,8 +12,8 @@ services:
       DATABASE_NAME: beatboxbox
     depends_on:
       - db
-    expose:
-      - "8080"
+    networks:
+      - beatboxbox-backend-network
 
   db:
     image: postgres:16.2
@@ -23,7 +23,12 @@ services:
       POSTGRES_DB: beatboxbox
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - beatboxbox-backend-network
 
 volumes:
   postgres_data:
 
+networks:
+  beatboxbox-backend-network:
+    driver: bridge

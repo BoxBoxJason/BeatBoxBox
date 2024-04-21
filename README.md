@@ -58,7 +58,8 @@ To get the project running locally:
 
 3. Build and run the project:
    1. `cd BeatBoxBox`
-   2. `docker compose up`
+   2. `docker build . -t beatboxbox:latest`
+   3. `docker compose up`
 
 4. Access the web interface with your web browser at `https://localhost:8080`
 
@@ -71,14 +72,17 @@ To get the project running locally:
 2. Clone the repository:
 `git clone https://github.com/BoxBoxJason/BeatBoxBox.git`
 
+3. Setup your TLS certificates (to use https):
+   1. `cd BeatBoxBox`
+   2. `mkdir secret`
+   3. `openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout secret/key.pem -out secret/cert.pem`
 
-
-3. Build the frontend using vue-cli:
+4. Build the frontend using vue-cli:
    1. `cd frontend`
    2. `npm install`
    3. `npm run build`
 
-4. Run the backend server:
+5. Run the backend server:
    1. `go run cmd/server/main.go`
 
-5. Access the web interface with your web browser at `https://localhost:8080`
+6. Access the web interface with your web browser at `https://localhost:8080`
