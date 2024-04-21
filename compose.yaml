@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  app:
+    image: beatboxbox:test
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_HOST: db
+      DATABASE_USER: admin
+      DATABASE_PASSWORD: admin
+      DATABASE_NAME: beatboxbox
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16.2
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: beatboxbox
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+
