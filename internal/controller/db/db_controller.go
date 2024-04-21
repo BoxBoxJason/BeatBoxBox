@@ -56,7 +56,8 @@ type Album struct {
 
 func CreateDB() {
 	// Connect to the database
-	db, err := gorm.Open(postgres.Open("test.db"), &gorm.Config{})
+	dsn := ""
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		logger.Fatal("failed to connect database")
 	}
