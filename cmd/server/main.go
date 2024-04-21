@@ -12,6 +12,6 @@ func main() {
 	logger.Info("Server Up & Listening at https://localhost:8080")
 	err := http.ListenAndServeTLS(":8080", "secret/cert.pem", "secret/key.pem", nil)
 	if err != nil {
-		logger.Fatal(err)
+		logger.Critical(err)
 	}
 }
