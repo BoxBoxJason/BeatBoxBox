@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-func musicExists(title string) bool {
+func musicExists(music_id int) bool { // TODO
 	return false
 }
 
@@ -41,7 +41,7 @@ func GetMusicPathFromId(music_id int) (string, error) {
 }
 
 func GetMusicsPathFromIds(music_ids []int) ([]string, error) {
-	musics, err = music_model.GetMusics(music_ids)
+	musics, err := music_model.GetMusics(music_ids)
 	if err != nil {
 		return nil, err
 	}
