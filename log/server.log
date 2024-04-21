@@ -28,3 +28,12 @@ INFO: 2024/04/19 15:41:40 Tables created successfully
 INFO: 2024/04/19 15:41:41 Server Up & Listening at https://localhost:8080
 INFO: 2024/04/19 15:42:33 Tables created successfully
 INFO: 2024/04/19 15:42:34 Server Up & Listening at https://localhost:8080
+INFO: 2024/04/19 16:31:41 Tables created successfully
+INFO: 2024/04/19 16:31:41 Server Up & Listening at https://localhost:8080
+INFO: 2024/04/19 17:06:42 Tables created successfully
+INFO: 2024/04/19 17:06:42 Server Up & Listening at https://localhost:8080
+INFO: 2024/04/21 12:02:34 Tables created successfully
+INFO: 2024/04/21 12:02:34 Server Up & Listening at https://localhost:8080
+INFO: 2024/04/21 12:04:18 Tables created successfully
+INFO: 2024/04/21 12:04:18 Server Up & Listening at https://localhost:8080
+FATAL: 2024/04/21 12:18:37 failed to connect database

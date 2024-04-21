@@ -3,7 +3,7 @@ package db_controller
 import (
 	"BeatBoxBox/pkg/logger"
 
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -25,7 +25,7 @@ type Artist struct {
 
 type Music struct {
 	Id         int    `gorm:"primaryKey;autoIncrement"`
-	Title      string `gorm:"type:text;unique;not null"`
+	Title      string `gorm:"type:text;not null"`
 	ArtistId   int
 	Artist     Artist `gorm:"foreignKey:ArtistId"`
 	AlbumId    int
@@ -39,9 +39,8 @@ type Music struct {
 
 type Playlist struct {
 	Title     string `gorm:"type:text;unique;not null"`
-	MusicIds  []int
-	Musics    []Music `gorm:"foreignKey:MusicIds"`
-	Id        int     `gorm:"primaryKey;autoIncrement"`
+	Musics    []Music
+	Id        int `gorm:"primaryKey;autoIncrement"`
 	CreatorId int
 	Creator   User `gorm:"foreignKey:UserId"`
 }
@@ -57,12 +56,12 @@ type Album struct {
 
 func CreateDB() {
 	// Connect to the database
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open("test.db"), &gorm.Config{})
 	if err != nil {
 		logger.Fatal("failed to connect database")
 	}
 
-	db.AutoMigrate(&User{}, &Music{}, &Playlist{})
+	db.AutoMigrate(&User{}, &Music{}, &Playlist{}, &Album{}, &Artist{})
 	logger.Info("Tables created successfully")
 
 }
