@@ -3,7 +3,6 @@ package music_controller
 import (
 	music_model "BeatBoxBox/internal/model/music"
 	"BeatBoxBox/pkg/utils"
-	"fmt"
 	"io"
 	"mime/multipart"
 	"os"
@@ -32,10 +31,6 @@ func PostMusic(title string, author string, genres []string, album string, file 
 	_, err = io.Copy(out_file, file)
 	if err != nil {
 		return err
-	}
-
-	if musicExists(title) {
-		return fmt.Errorf("Music already exists")
 	}
 
 	if err := music_model.CreateMusic(title, author, genres, album, file_name); err != nil {
