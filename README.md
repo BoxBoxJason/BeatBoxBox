@@ -57,7 +57,6 @@ To get the project running locally:
    3. `npm run build`
 
 4. Run the backend server:
-   1. `cd backend`
-   2. `go run cmd/beatboxbox/main.go`
+   1. `go run cmd/beatboxbox/main.go`
 
 5. Access the web interface with your web browser at `https://localhost:8080`
