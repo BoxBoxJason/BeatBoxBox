@@ -9,7 +9,7 @@ RUN apk add --no-cache \
     openssh \
     npm \
     go && \
-    npm install -g npm@latest @vue/cli && \
+    npm install -g npm@latest @vue/cli
 
 # Copy the source code
 COPY ./internal ./internal/
