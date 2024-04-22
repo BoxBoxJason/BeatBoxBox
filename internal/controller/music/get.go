@@ -1,20 +1,33 @@
 package music_controller
 
 import (
+	db_model "BeatBoxBox/internal/model"
 	music_model "BeatBoxBox/internal/model/music"
 	"encoding/json"
 	"path/filepath"
 )
 
-func musicExists(music_id int) bool { // TODO
-	return false
+// MusicExists checks if a music exists in the database
+func MusicExists(music_id int) bool {
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return false
+	}
+	defer db_model.CloseDB(db)
+	_, err = music_model.GetMusic(db, music_id)
+	return err == nil
 }
 
 // GetMusic returns a music from the database
 // Selects the music with the given music_id
 // Returns the music as a JSON object
 func GetMusic(music_id int) ([]byte, error) {
-	music, err := music_model.GetMusic(music_id)
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return nil, err
+	}
+	defer db_model.CloseDB(db)
+	music, err := music_model.GetMusic(db, music_id)
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +38,12 @@ func GetMusic(music_id int) ([]byte, error) {
 // Selects the musics with the given music_ids
 // Returns the musics as a JSON array
 func GetMusics(musics_ids []int) ([]byte, error) {
-	musics, err := music_model.GetMusics(musics_ids)
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return nil, err
+	}
+	defer db_model.CloseDB(db)
+	musics, err := music_model.GetMusics(db, musics_ids)
 	if err != nil {
 		return nil, err
 	}
@@ -33,15 +51,27 @@ func GetMusics(musics_ids []int) ([]byte, error) {
 }
 
 func GetMusicPathFromId(music_id int) (string, error) {
-	music, err := music_model.GetMusic(music_id)
+	db, err := db_model.OpenDB()
 	if err != nil {
 		return "", err
 	}
-	return music.Path, nil
+	defer db_model.CloseDB(db)
+
+	music, err := music_model.GetMusic(db, music_id)
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join("data", "musics", music.Path), nil
 }
 
 func GetMusicsPathFromIds(music_ids []int) ([]string, error) {
-	musics, err := music_model.GetMusics(music_ids)
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return nil, err
+	}
+	defer db_model.CloseDB(db)
+
+	musics, err := music_model.GetMusics(db, music_ids)
 	if err != nil {
 		return nil, err
 	}

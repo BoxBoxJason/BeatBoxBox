@@ -1,7 +1,7 @@
 package main
 
 import (
-	db_model "BeatBoxBox/internal/model"
+	"BeatBoxBox/internal/model/dbinit"
 	"BeatBoxBox/pkg/logger"
 	"net/http"
 )
@@ -10,7 +10,7 @@ func main() {
 	fs := http.FileServer(http.Dir("./frontend/dist"))
 	http.Handle("/", fs)
 
-	err := db_model.CheckDB()
+	err := dbinit.CheckDB()
 	if err != nil {
 		logger.Critical(err)
 	} else {

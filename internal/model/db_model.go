@@ -1,11 +1,6 @@
 package db_model
 
 import (
-	album_model "BeatBoxBox/internal/model/album"
-	artist_model "BeatBoxBox/internal/model/artist"
-	music_model "BeatBoxBox/internal/model/music"
-	playlist_model "BeatBoxBox/internal/model/playlist"
-	user_model "BeatBoxBox/internal/model/user"
 	"BeatBoxBox/pkg/logger"
 	"fmt"
 	"log"
@@ -16,19 +11,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// Initialize the database connection and create the tables
-func init() {
-	db, err := openDB()
-	if err != nil {
-		logger.Critical("Failed to connect database: ", err)
-	} else {
-		db.AutoMigrate(&artist_model.Artist{}, &user_model.User{}, &album_model.Album{}, &music_model.Music{}, &playlist_model.Playlist{})
-		logger.Info("Tables created successfully")
-	}
-}
-
 // Open a database connection to the PostgreSQL database
-func openDB() (*gorm.DB, error) {
+func OpenDB() (*gorm.DB, error) {
 	if err := godotenv.Load(); err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
@@ -37,7 +21,8 @@ func openDB() (*gorm.DB, error) {
 	user := os.Getenv("DB_USER")
 	password := os.Getenv("DB_PASSWORD")
 	dbname := os.Getenv("DB_NAME")
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", host, user, password, dbname, port)
+	sslmode := os.Getenv("DB_SSLMODE")
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s", host, user, password, dbname, port, sslmode)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		logger.Critical("failed to connect database")
@@ -46,19 +31,12 @@ func openDB() (*gorm.DB, error) {
 	return db, nil
 }
 
-// Checks if the database connection is alive
-func CheckDB() error {
-	db, err := openDB()
-	if err != nil {
-		return err
-	}
+// Close a database connection to the PostgreSQL database
+func CloseDB(db *gorm.DB) {
 	sqlDB, err := db.DB()
 	if err != nil {
-		return err
+		logger.Critical("failed to get database connection")
+		return
 	}
-	err = sqlDB.Ping()
-	if err != nil {
-		return err
-	}
-	return nil
+	sqlDB.Close()
 }

@@ -1,6 +1,7 @@
 package music_controller
 
 import (
+	db_model "BeatBoxBox/internal/model"
 	music_model "BeatBoxBox/internal/model/music"
 	"BeatBoxBox/pkg/utils"
 	"io"
@@ -12,7 +13,7 @@ import (
 // Checks that all fields are valid, and posts the music to the database and saves the file to the server
 // Returns an error if the music already exists or if there was an error saving the file to the server
 // Returns nil if the music was successfully saved
-func PostMusic(title string, author string, genres []string, album string, file multipart.File) error {
+func PostMusic(title string, artist_id int, genres []string, album_id int, file multipart.File) error {
 	// Generate a new file name
 	file_name, err := utils.CreateNonExistingMusicFileName()
 	if err != nil {
@@ -33,7 +34,13 @@ func PostMusic(title string, author string, genres []string, album string, file 
 		return err
 	}
 
-	if err := music_model.CreateMusic(title, author, genres, album, file_name); err != nil {
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return err
+	}
+	defer db_model.CloseDB(db)
+
+	if err := music_model.CreateMusic(db, title, artist_id, genres, album_id, file_name); err != nil {
 		return err
 	}
 	return nil

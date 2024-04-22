@@ -43,8 +43,6 @@ Vue.js based frontend that interacts with the backend server.
 
 To get the project running locally:
 
-### Using Docker Compose
-
 1. Install the dependencies:
    - Docker
 
@@ -56,33 +54,20 @@ To get the project running locally:
    2. `mkdir secret`
    3. `openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout secret/key.pem -out secret/cert.pem`
 
+4. Select your environment variables:
+   1. Create a `.env` file in the root directory of the project.
+   2. Add the following environment variables to the `.env` file:
+      ```
+      DB_USER=[USERNAME]
+      DB_PASSWORD=[PASSWORD]
+      DB_NAME=[DATABASE_NAME]
+      DB_HOST=beatboxbox-db
+      DB_PORT=5432
+      DB_SSLMODE=disable
+      ```
 3. Build and run the project:
    1. `cd BeatBoxBox`
    2. `docker build . -t beatboxbox:latest`
    3. `docker compose up`
 
 4. Access the web interface with your web browser at `https://localhost:8080`
-
-### Running on Local Machine
-
-1. Install the dependencies:
-   - npm
-   - go
-   - vue-cli
-2. Clone the repository:
-`git clone https://github.com/BoxBoxJason/BeatBoxBox.git`
-
-3. Setup your TLS certificates (to use https):
-   1. `cd BeatBoxBox`
-   2. `mkdir secret`
-   3. `openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout secret/key.pem -out secret/cert.pem`
-
-4. Build the frontend using vue-cli:
-   1. `cd frontend`
-   2. `npm install`
-   3. `npm run build`
-
-5. Run the backend server:
-   1. `go run cmd/server/main.go`
-
-6. Access the web interface with your web browser at `https://localhost:8080`
