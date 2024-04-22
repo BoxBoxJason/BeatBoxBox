@@ -7,8 +7,8 @@ import (
 
 type Playlist struct {
 	Title     string              `gorm:"type:text;unique;not null"`
-	Musics    []music_model.Music `gorm:"foreignKey:MusicIds"`
+	Musics    []music_model.Music `gorm:"many2many:playlist_musics;"`
 	Id        int                 `gorm:"primaryKey;autoIncrement"`
 	CreatorId int
-	Creator   user_model.User `gorm:"foreignKey:UserId"`
+	Creator   user_model.User `gorm:"foreignKey:CreatorId"`
 }

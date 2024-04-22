@@ -6,9 +6,8 @@ import (
 )
 
 type Album struct {
-	Title    string `gorm:"type:text;not null"`
-	MusicIds []int
-	Musics   []music_model.Music `gorm:"foreignKey:MusicIds"`
+	Title    string              `gorm:"type:text;not null"`
+	Musics   []music_model.Music `gorm:"foreignKey:Id;"`
 	Id       int                 `gorm:"primaryKey;autoIncrement"`
 	ArtistId int
 	Artist   artist_model.Artist `gorm:"foreignKey:ArtistId"`

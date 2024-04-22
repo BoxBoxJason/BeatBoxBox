@@ -17,6 +17,7 @@ COPY ./frontend ./frontend/
 COPY ./pkg ./pkg/
 COPY ./go.mod \
     ./go.sum \
+    ./.env \
     ./
 COPY ./cmd ./cmd/
 COPY ./secret ./secret/
