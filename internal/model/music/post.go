@@ -7,13 +7,14 @@ import (
 )
 
 // CreateMusic creates a new music in the database
-func CreateMusic(db *gorm.DB, title string, artist_id int, genres []string, album_id int, file_name string) error {
+func CreateMusic(db *gorm.DB, title string, artist_id int, genres []string, album_id int, file_name string, illustration_path string) error {
 	new_music := Music{
-		Title:    title,
-		ArtistId: artist_id,
-		Genres:   strings.Join(genres, ","),
-		Path:     file_name,
-		AlbumId:  album_id,
+		Title:        title,
+		ArtistId:     artist_id,
+		Genres:       strings.Join(genres, ","),
+		Path:         file_name,
+		AlbumId:      album_id,
+		Illustration: illustration_path,
 	}
 	return db.Create(&new_music).Error
 }

@@ -5,29 +5,45 @@ package music_handler
 
 import (
 	music_controller "BeatBoxBox/internal/controller/music"
+	"errors"
+	"mime/multipart"
 	"net/http"
 	"strconv"
 )
 
-const MAX_UPLOAD_SIZE = 25 * 1024 * 1024 // 25Mb
+const MAX_MUSIC_FILE_SIZE = 25 * 1024 * 1024
+const MAX_IMAGE_FILE_SIZE = 5 * 1024 * 1024
 
 // POST music handler
 // Checks that the request is under 20Mb and that the file is a valid .mp3 file
 // Saves the file to the server
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseMultipartForm(MAX_UPLOAD_SIZE + 512)
+	// Check for file(s) size(s)
+	music_file, music_file_header, err := r.FormFile("music")
 	if err != nil {
-		http.Error(w, "File too big (Max 20Mb)", http.StatusRequestEntityTooLarge)
+		http.Error(w, "No music file found for key 'music'", http.StatusBadRequest)
+		return
+	}
+	defer music_file.Close()
+	err = checkFileMeetsRequirements(*music_file_header, MAX_MUSIC_FILE_SIZE, "audio/mpeg")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	// Check that all the required fields are present
-	file, file_header, err := r.FormFile("music")
-	if err != nil {
-		http.Error(w, "No file found", http.StatusBadRequest)
-		return
+	illustration_file, illustration_file_header, err := r.FormFile("illustration")
+	if err == nil {
+		defer illustration_file.Close()
+		err = checkFileMeetsRequirements(*illustration_file_header, MAX_IMAGE_FILE_SIZE, "image/jpeg")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+	} else {
+		illustration_file = nil
 	}
-	defer file.Close()
+
+	// Check if other fields are valid
 	title := r.FormValue("title")
 	artist_id_str := r.FormValue("artist_id")
 	genres := r.Form["genres"]
@@ -53,13 +69,15 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	music_controller.PostMusic(title, artist_id, genres, album_id, music_file, illustration_file)
+}
 
-	// Check if the file is a valid .mp3 file
-	if file_header.Header.Get("Content-Type") != "audio/mpeg" {
-		http.Error(w, "Invalid file type", http.StatusBadRequest)
-		return
-	} else {
-		// Save the file to the server
-		music_controller.PostMusic(title, artist_id, genres, album_id, file)
+func checkFileMeetsRequirements(file_header multipart.FileHeader, max_size int, content_type string) error {
+	if file_header.Size > int64(max_size) {
+		return errors.New("File too big, max size for " + content_type + " is " + strconv.Itoa(max_size/1024/1024) + "Mb (Megabytes)")
 	}
+	if file_header.Header.Get("Content-Type") != content_type {
+		return errors.New("Invalid file type, should be " + content_type)
+	}
+	return nil
 }

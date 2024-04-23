@@ -5,8 +5,9 @@ import (
 )
 
 type Album struct {
-	Title    string `gorm:"type:text;not null"`
-	Id       int    `gorm:"primaryKey;autoIncrement"`
-	ArtistId int
-	Artist   artist_model.Artist `gorm:"foreignKey:ArtistId"`
+	Title        string `gorm:"type:text;not null"`
+	Id           int    `gorm:"primaryKey;autoIncrement"`
+	ArtistId     int
+	Artist       artist_model.Artist `gorm:"foreignKey:ArtistId"`
+	Illustration string              `gorm:"type:varchar(36);default:'default.jpg'"`
 }
