@@ -6,8 +6,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// POST METHODS
-
 // CreateMusic creates a new music in the database
 func CreateMusic(db *gorm.DB, title string, artist_id int, genres []string, album_id int, file_name string) error {
 	new_music := Music{
@@ -17,9 +15,5 @@ func CreateMusic(db *gorm.DB, title string, artist_id int, genres []string, albu
 		Path:     file_name,
 		AlbumId:  album_id,
 	}
-	result := db.Create(&new_music)
-	if result.Error != nil {
-		return result.Error
-	}
-	return nil
+	return db.Create(&new_music).Error
 }

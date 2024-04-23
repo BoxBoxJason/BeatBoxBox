@@ -4,8 +4,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// GET METHODS
-
 // GetMusicsFromFilters returns a list of musics from the database
 // Filters can be passed to filter the musics
 func GetMusicsFromFilters(db *gorm.DB, filters map[string]interface{}) ([]Music, error) {
