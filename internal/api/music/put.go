@@ -25,6 +25,10 @@ func putMusicsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Parse the url parameters and retrieve only authorized ones
 	update_dict, err := parseURLParams(r.URL.Query())
+	if err != nil {
+		http.Error(w, "Invalid URL parameters provided: "+err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	// Update the music in the database
 	err = music_controller.UpdateMusic(music_id, update_dict)
