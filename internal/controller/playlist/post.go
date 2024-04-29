@@ -21,11 +21,11 @@ func PostPlaylist(title string, creator_id int, illustration_file multipart.File
 	// Generate a new file name & save the illustration file if needed
 	illustration_file_name := "default.jpg"
 	if illustration_file != nil {
-		illustration_file_name, err := utils.CreateNonExistingIllustrationFileName()
+		illustration_file_name, err := utils.CreateNonExistingIllustrationFileName("playlists")
 		if err != nil {
 			return err
 		}
-		err = utils.UploadFileToServer(illustration_file, filepath.Join("data", "illustrations", illustration_file_name))
+		err = utils.UploadFileToServer(illustration_file, filepath.Join("data", "illustrations", "playlists", illustration_file_name))
 		if err != nil {
 			return err
 		}

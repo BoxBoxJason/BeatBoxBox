@@ -19,11 +19,11 @@ func PostAlbum(title string, artist_id int, illustration_file multipart.File) er
 
 	illustration_file_name := "default.jpg"
 	if illustration_file != nil {
-		illustration_file_name, err := utils.CreateNonExistingIllustrationFileName()
+		illustration_file_name, err := utils.CreateNonExistingIllustrationFileName("albums")
 		if err != nil {
 			return err
 		}
-		err = utils.UploadFileToServer(illustration_file, filepath.Join("data", "illustrations", illustration_file_name))
+		err = utils.UploadFileToServer(illustration_file, filepath.Join("data", "illustrations", "albums", illustration_file_name))
 		if err != nil {
 			return err
 		}

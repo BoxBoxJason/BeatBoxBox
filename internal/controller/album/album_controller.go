@@ -5,8 +5,7 @@ import (
 	"path/filepath"
 )
 
-// Create the music directory if it doesn't exist
+// Create the illustrations directory if it doesn't exist
 func init() {
-	go utils.CheckDirExists(filepath.Join("data", "musics"))
-	go utils.CheckDirExists(filepath.Join("data", "illustrations"))
+	go utils.CheckDirExists(filepath.Join("data", "illustrations", "albums"))
 }
