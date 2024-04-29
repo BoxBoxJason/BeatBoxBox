@@ -1,24 +1,22 @@
-package playlist_controller
+package album_controller
 
 import (
 	db_model "BeatBoxBox/internal/model"
-	playlist_model "BeatBoxBox/internal/model/playlist"
+	album_model "BeatBoxBox/internal/model/album"
 	"BeatBoxBox/pkg/utils"
 	"errors"
 	"mime/multipart"
 	"path/filepath"
 )
 
-func PostPlaylist(title string, creator_id int, illustration_file multipart.File) error {
-	// Check if the title is empty or already taken
+func PostAlbum(title string, artist_id int, illustration_file multipart.File) error {
 	if title == "" {
-		return errors.New("playlist title is empty")
+		return errors.New("title is empty")
 	}
-	if PlaylistExistsFromParams(title, creator_id) {
-		return errors.New("playlist with same name & creator already exists")
+	if AlbumExistsFromFilters(title, artist_id) {
+		return errors.New("album already exists")
 	}
 
-	// Generate a new file name & save the illustration file if needed
 	illustration_file_name := "default.jpg"
 	if illustration_file != nil {
 		illustration_file_name, err := utils.CreateNonExistingIllustrationFileName()
@@ -37,5 +35,5 @@ func PostPlaylist(title string, creator_id int, illustration_file multipart.File
 	}
 	defer db_model.CloseDB(db)
 
-	return playlist_model.CreatePlaylist(db, title, creator_id, illustration_file_name)
+	return album_model.CreateAlbum(db, title, artist_id, illustration_file_name)
 }
