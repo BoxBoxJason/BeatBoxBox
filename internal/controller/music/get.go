@@ -18,6 +18,17 @@ func MusicExists(music_id int) bool {
 	return err == nil
 }
 
+// MusicsExists checks if musics exist in the database
+func MusicsExists(music_ids []int) bool {
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return false
+	}
+	defer db_model.CloseDB(db)
+	musics, err := music_model.GetMusics(db, music_ids)
+	return err != nil && len(musics) == len(music_ids)
+}
+
 // GetMusic returns a music from the database
 // Selects the music with the given music_id
 // Returns the music as a JSON object
@@ -50,6 +61,7 @@ func GetMusics(musics_ids []int) ([]byte, error) {
 	return json.Marshal(musics)
 }
 
+// GetMusicPathFromId returns the path of a music from the database
 func GetMusicPathFromId(music_id int) (string, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
@@ -64,6 +76,7 @@ func GetMusicPathFromId(music_id int) (string, error) {
 	return filepath.Join("data", "musics", music.Path), nil
 }
 
+// GetMusicsPathFromIds returns the paths of musics from the database
 func GetMusicsPathFromIds(music_ids []int) ([]string, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {

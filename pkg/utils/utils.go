@@ -60,3 +60,11 @@ func UploadFileToServer(file multipart.File, dest_file string) error {
 	}
 	return nil
 }
+
+// Checks if a directory path exists and creates it if it does not
+func CheckDirExists(dir_path string) error {
+	if _, err := os.Stat(dir_path); os.IsNotExist(err) {
+		return os.MkdirAll(dir_path, 0755)
+	}
+	return nil
+}
