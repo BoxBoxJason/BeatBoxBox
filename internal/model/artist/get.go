@@ -37,3 +37,14 @@ func GetArtists(db *gorm.DB, artist_ids []int) ([]Artist, error) {
 	}
 	return artists, nil
 }
+
+// GetArtistByPseudo returns a artist from the database.
+// Selects the artist with the given pseudo
+func GetArtistByPseudo(db *gorm.DB, pseudo string) (Artist, error) {
+	var artist Artist
+	result := db.Where("Pseudo = ?", pseudo).First(&artist)
+	if result.Error != nil {
+		return Artist{}, result.Error
+	}
+	return artist, nil
+}
