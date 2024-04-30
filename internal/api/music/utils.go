@@ -11,7 +11,7 @@ import (
 
 // getAuthorizedMusicFields filters a list of requested fields to only return the fields that the user is authorized to see.
 // Returns all fields if the initial list is empty.
-func getAuthorizedMusicFields(fields []string) []string {
+func GetAuthorizedMusicFields(fields []string) []string {
 	authorized_fields_map := map[string]bool{
 		"Id": true, "Title": true, "Artist": true, "Genres": true,
 		"Album": true, "Path": true, "Nblistened": true, "Ratings": true, "Nbratings": true,
@@ -37,7 +37,7 @@ func getAuthorizedMusicFields(fields []string) []string {
 
 // getAuthorizedMusicFilters filters a map of requested filters to only return the filters that the user is authorized to see.
 // Returns all filters if the initial map is empty.
-func getAuthorizedMusicFilters(filters map[string]interface{}) map[string]interface{} {
+func GetAuthorizedMusicFilters(filters map[string]interface{}) map[string]interface{} {
 	authorized_filters_map := map[string]bool{
 		"Id": true, "Title": true, "Artist": true, "Genres": true, "Album": true,
 		"Path": true, "Nblistened": true, "Ratings": true, "Nbratings": true,

@@ -12,8 +12,6 @@ RUN apk add --no-cache \
     npm install -g npm@latest @vue/cli
 
 # Copy the source code
-COPY ./internal ./internal/
-COPY ./frontend ./frontend/
 COPY ./pkg ./pkg/
 COPY ./go.mod \
     ./go.sum \
@@ -21,8 +19,10 @@ COPY ./go.mod \
     ./
 COPY ./cmd ./cmd/
 COPY ./secret ./secret/
+COPY ./internal ./internal/
+COPY ./frontend ./frontend/
 
-# Build frontend
+# Build frontend & install go dependencies
 RUN cd /home/user/BeatBoxBox/frontend && \
     npm install && \
     npm run build && \

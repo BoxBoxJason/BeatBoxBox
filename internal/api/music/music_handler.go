@@ -9,22 +9,20 @@ package music_handler
 
 import "github.com/gorilla/mux"
 
-var MusicsRouter = mux.NewRouter()
-
-func init() {
+func SetupMusicsRoutes(music_api_router *mux.Router) {
 	// POST requests
-	MusicsRouter.HandleFunc("/musics", uploadHandler).Methods("POST")
+	music_api_router.HandleFunc("/", uploadHandler).Methods("POST")
 
 	// GET requests
-	MusicsRouter.HandleFunc("/musics", getMusicsHandler).Methods("GET")
-	MusicsRouter.HandleFunc("/musics/download", downloadMusicsHandler).Methods("GET")
-	MusicsRouter.HandleFunc("/musics/download/{music_id:[0-9]+}", downloadMusicHandler).Methods("GET")
-	MusicsRouter.HandleFunc("/musics/{music_id:[0-9]+}", getMusicHandler).Methods("GET")
+	music_api_router.HandleFunc("/", getMusicsHandler).Methods("GET")
+	music_api_router.HandleFunc("/download", downloadMusicsHandler).Methods("GET")
+	music_api_router.HandleFunc("/download/{music_id:[0-9]+}", downloadMusicHandler).Methods("GET")
+	music_api_router.HandleFunc("/{music_id:[0-9]+}", getMusicHandler).Methods("GET")
 
 	// PUT requests
-	MusicsRouter.HandleFunc("/musics/{music_id:[0-9]+}", putMusicsHandler).Methods("PUT")
+	music_api_router.HandleFunc("/{music_id:[0-9]+}", putMusicsHandler).Methods("PUT")
 
 	// DELETE requests
-	MusicsRouter.HandleFunc("/musics/{music_id:[0-9]+}", deleteMusicHandler).Methods("DELETE")
-	MusicsRouter.HandleFunc("/musics", deleteMusicsHandler).Methods("DELETE")
+	music_api_router.HandleFunc("/{music_id:[0-9]+}", deleteMusicHandler).Methods("DELETE")
+	music_api_router.HandleFunc("/", deleteMusicsHandler).Methods("DELETE")
 }
