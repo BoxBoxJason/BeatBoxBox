@@ -42,10 +42,10 @@ func UserExistsFromName(username string) bool {
 
 // GetUser returns a user from the database
 // Selects the user with the given user_id
-func GetUser(user_id int) (user_model.User, error) {
+func GetUser(user_id int) (db_model.User, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
-		return user_model.User{}, err
+		return db_model.User{}, err
 	}
 	defer db_model.CloseDB(db)
 	return user_model.GetUser(db, user_id)
@@ -53,7 +53,7 @@ func GetUser(user_id int) (user_model.User, error) {
 
 // GetUsers returns a list of users from the database
 // Selects the users with the given user_ids
-func GetUsers(user_ids []int) ([]user_model.User, error) {
+func GetUsers(user_ids []int) ([]db_model.User, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		return nil, err

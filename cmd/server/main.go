@@ -2,7 +2,7 @@ package main
 
 import (
 	api_init "BeatBoxBox/internal/api"
-	"BeatBoxBox/internal/model/dbinit"
+	db_model "BeatBoxBox/internal/model"
 	"BeatBoxBox/pkg/logger"
 	"net/http"
 
@@ -15,7 +15,7 @@ func main() {
 	http.Handle("/", fs)
 
 	// Check the database connection
-	err := dbinit.CheckDB()
+	err := db_model.CheckDB()
 	if err != nil {
 		logger.Critical(err)
 		return

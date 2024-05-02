@@ -43,10 +43,10 @@ func PlaylistExistsFromParams(playlist_name string, playlist_creator_id int) boo
 
 // GetPlaylist returns a playlist from the database
 // Selects the playlist with the given playlist_id
-func GetPlaylist(playlist_id int) (playlist_model.Playlist, error) {
+func GetPlaylist(playlist_id int) (db_model.Playlist, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
-		return playlist_model.Playlist{}, err
+		return db_model.Playlist{}, err
 	}
 	defer db_model.CloseDB(db)
 	return playlist_model.GetPlaylist(db, playlist_id)
@@ -54,7 +54,7 @@ func GetPlaylist(playlist_id int) (playlist_model.Playlist, error) {
 
 // GetPlaylists returns a list of playlists from the database
 // Selects the playlists with the given playlist_ids
-func GetPlaylists(playlist_ids []int) ([]playlist_model.Playlist, error) {
+func GetPlaylists(playlist_ids []int) ([]db_model.Playlist, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		return nil, err

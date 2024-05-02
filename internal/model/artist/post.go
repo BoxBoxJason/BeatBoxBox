@@ -1,10 +1,14 @@
 package artist_model
 
-import "gorm.io/gorm"
+import (
+	db_model "BeatBoxBox/internal/model"
+
+	"gorm.io/gorm"
+)
 
 // CreateArtist creates a new artist in the database
 func CreateArtist(db *gorm.DB, pseudo string, illustration string) error {
-	new_artist := Artist{
+	new_artist := db_model.Artist{
 		Pseudo:       pseudo,
 		Illustration: illustration,
 	}
