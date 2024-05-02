@@ -2,6 +2,7 @@
   <nav>
     <router-link to="/">Home</router-link> |
     <router-link to="/about">About</router-link>
+    <router-link to="/auth" class="login-link">Login</router-link>
   </nav>
   <router-view/>
 </template>
@@ -27,4 +28,10 @@ nav a {
 nav a.router-link-exact-active {
   color: #42b983;
 }
+
+.login-link {
+  padding: 10px;
+  margin-left: auto;
+}
+
 </style>
