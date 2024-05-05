@@ -1,4 +1,4 @@
-package utils
+package format_utils
 
 import (
 	"regexp"

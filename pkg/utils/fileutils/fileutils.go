@@ -1,4 +1,4 @@
-package utils
+package file_utils
 
 import (
 	"crypto/rand"
