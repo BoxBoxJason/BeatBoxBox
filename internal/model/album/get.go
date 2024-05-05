@@ -23,7 +23,7 @@ func GetAlbumsFromFilters(db *gorm.DB, filters map[string]interface{}) ([]db_mod
 func GetAlbum(db *gorm.DB, album_id int) (db_model.Album, error) {
 	var album db_model.Album
 	// Using `First` to retrieve the first record that matches the album_id
-	result := db.Where("Id = ?", album_id).First(&album)
+	result := db.Where("id = ?", album_id).First(&album)
 	if result.Error != nil {
 		return db_model.Album{}, result.Error
 	}
@@ -35,7 +35,7 @@ func GetAlbum(db *gorm.DB, album_id int) (db_model.Album, error) {
 func GetAlbums(db *gorm.DB, album_ids []int) ([]db_model.Album, error) {
 	var albums []db_model.Album
 	// Using `Find` to retrieve records with the IDs in album_ids slice
-	result := db.Where("Id IN ?", album_ids).Find(&albums)
+	result := db.Where("id IN ?", album_ids).Find(&albums)
 	if result.Error != nil {
 		return nil, result.Error
 	}

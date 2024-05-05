@@ -13,5 +13,5 @@ func DeleteMusic(db *gorm.DB, music_id int) error {
 
 // DeleteMusics deletes existing musics from the database
 func DeleteMusics(db *gorm.DB, music_ids []int) error {
-	return db.Where("Id IN ?", music_ids).Delete(&db_model.Music{}).Error
+	return db.Where("id IN ?", music_ids).Delete(&db_model.Music{}).Error
 }

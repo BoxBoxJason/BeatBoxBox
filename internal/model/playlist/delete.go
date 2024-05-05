@@ -13,5 +13,5 @@ func DeletePlaylist(db *gorm.DB, playlist_id int) error {
 
 // DeletePlaylists is a function that deletes multiple playlists from the database.
 func DeletePlaylists(db *gorm.DB, playlist_ids []int) error {
-	return db.Where("Id IN ?", playlist_ids).Delete(&db_model.Playlist{}).Error
+	return db.Where("id IN ?", playlist_ids).Delete(&db_model.Playlist{}).Error
 }

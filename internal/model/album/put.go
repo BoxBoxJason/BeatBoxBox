@@ -7,5 +7,5 @@ import (
 )
 
 func UpdateAlbum(db *gorm.DB, album_id int, update_map map[string]interface{}) error {
-	return db.Model(&db_model.Album{}).Where("Id = ?", album_id).Updates(update_map).Error
+	return db.Model(&db_model.Album{}).Where("id = ?", album_id).Updates(update_map).Error
 }

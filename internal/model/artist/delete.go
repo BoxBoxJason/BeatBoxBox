@@ -13,5 +13,5 @@ func DeleteArtist(db *gorm.DB, artist_id int) error {
 
 // DeleteArtists deletes existing artists from the database
 func DeleteArtists(db *gorm.DB, artist_ids []int) error {
-	return db.Where("Id IN ?", artist_ids).Delete(&db_model.Artist{}).Error
+	return db.Where("id IN ?", artist_ids).Delete(&db_model.Artist{}).Error
 }

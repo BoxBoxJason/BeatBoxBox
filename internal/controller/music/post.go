@@ -3,7 +3,7 @@ package music_controller
 import (
 	db_model "BeatBoxBox/internal/model"
 	music_model "BeatBoxBox/internal/model/music"
-	"BeatBoxBox/pkg/utils"
+	file_utils "BeatBoxBox/pkg/utils/fileutils"
 	"mime/multipart"
 	"path/filepath"
 )
@@ -13,11 +13,11 @@ import (
 // Returns nil if the music was successfully saved
 func PostMusic(title string, artist_id int, genres []string, album_id int, music_file multipart.File, illustration_file multipart.File) error {
 	// Generate a new file name & save the music file
-	music_file_name, err := utils.CreateNonExistingMusicFileName()
+	music_file_name, err := file_utils.CreateNonExistingMusicFileName()
 	if err != nil {
 		return err
 	}
-	err = utils.UploadFileToServer(music_file, filepath.Join("data", "musics", music_file_name))
+	err = file_utils.UploadFileToServer(music_file, filepath.Join("data", "musics", music_file_name))
 	if err != nil {
 		return err
 	}
@@ -25,11 +25,11 @@ func PostMusic(title string, artist_id int, genres []string, album_id int, music
 	// Generate a new file name & save the illustration file
 	illustration_file_name := "default.jpg"
 	if illustration_file != nil {
-		illustration_file_name, err = utils.CreateNonExistingIllustrationFileName("musics")
+		illustration_file_name, err = file_utils.CreateNonExistingIllustrationFileName("musics")
 		if err != nil {
 			return err
 		}
-		err = utils.UploadFileToServer(illustration_file, filepath.Join("data", "illustrations", "musics", illustration_file_name))
+		err = file_utils.UploadFileToServer(illustration_file, filepath.Join("data", "illustrations", "musics", illustration_file_name))
 		if err != nil {
 			return err
 		}

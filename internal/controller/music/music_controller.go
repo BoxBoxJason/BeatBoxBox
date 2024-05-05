@@ -7,12 +7,12 @@ Contains the logic for the music handling. Handles the connection between the AP
 package music_controller
 
 import (
-	"BeatBoxBox/pkg/utils"
+	file_utils "BeatBoxBox/pkg/utils/fileutils"
 	"path/filepath"
 )
 
 // Create the music directory & musics illustrations directory if it doesn't exist
 func init() {
-	go utils.CheckDirExists(filepath.Join("data", "musics"))
-	go utils.CheckDirExists(filepath.Join("data", "illustrations", "musics"))
+	go file_utils.CheckDirExists(filepath.Join("data", "musics"))
+	go file_utils.CheckDirExists(filepath.Join("data", "illustrations", "musics"))
 }

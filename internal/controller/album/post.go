@@ -3,7 +3,7 @@ package album_controller
 import (
 	db_model "BeatBoxBox/internal/model"
 	album_model "BeatBoxBox/internal/model/album"
-	"BeatBoxBox/pkg/utils"
+	file_utils "BeatBoxBox/pkg/utils/fileutils"
 	"errors"
 	"mime/multipart"
 	"path/filepath"
@@ -19,11 +19,11 @@ func PostAlbum(title string, artist_id int, illustration_file multipart.File) er
 
 	illustration_file_name := "default.jpg"
 	if illustration_file != nil {
-		illustration_file_name, err := utils.CreateNonExistingIllustrationFileName("albums")
+		illustration_file_name, err := file_utils.CreateNonExistingIllustrationFileName("albums")
 		if err != nil {
 			return err
 		}
-		err = utils.UploadFileToServer(illustration_file, filepath.Join("data", "illustrations", "albums", illustration_file_name))
+		err = file_utils.UploadFileToServer(illustration_file, filepath.Join("data", "illustrations", "albums", illustration_file_name))
 		if err != nil {
 			return err
 		}

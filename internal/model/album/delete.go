@@ -13,5 +13,5 @@ func DeleteAlbum(db *gorm.DB, album_id int) error {
 
 // DeleteAlbums is a function that deletes multiple albums from the database.
 func DeleteAlbums(db *gorm.DB, album_ids []int) error {
-	return db.Where("Id IN ?", album_ids).Delete(&db_model.Album{}).Error
+	return db.Where("id IN ?", album_ids).Delete(&db_model.Album{}).Error
 }

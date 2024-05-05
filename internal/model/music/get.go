@@ -23,7 +23,7 @@ func GetMusicsFromFilters(db *gorm.DB, filters map[string]interface{}) ([]db_mod
 func GetMusic(db *gorm.DB, music_id int) (db_model.Music, error) {
 	var music db_model.Music
 	// Using `First` to retrieve the first record that matches the music_id
-	result := db.Where("Id = ?", music_id).First(&music)
+	result := db.Where("id = ?", music_id).First(&music)
 	if result.Error != nil {
 		return db_model.Music{}, result.Error
 	}
@@ -35,7 +35,7 @@ func GetMusic(db *gorm.DB, music_id int) (db_model.Music, error) {
 func GetMusics(db *gorm.DB, music_ids []int) ([]db_model.Music, error) {
 	var musics []db_model.Music
 	// Using `Find` to retrieve records with the IDs in music_ids slice
-	result := db.Where("Id IN ?", music_ids).Find(&musics)
+	result := db.Where("id IN ?", music_ids).Find(&musics)
 	if result.Error != nil {
 		return nil, result.Error
 	}

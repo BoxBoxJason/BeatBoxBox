@@ -3,7 +3,6 @@ package db_model
 import (
 	"BeatBoxBox/pkg/logger"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -17,7 +16,7 @@ func init() {
 	if err != nil {
 		logger.Critical("Failed to connect database: ", err)
 	} else {
-		db.AutoMigrate(Artist{}, User{}, Album{}, Music{}, Playlist{})
+		db.AutoMigrate(Artist{}, User{}, Album{}, Music{}, Playlist{}, AuthCookie{})
 		logger.Info("Tables created successfully")
 	}
 }
@@ -42,7 +41,7 @@ func CheckDB() error {
 // Open a database connection to the PostgreSQL database
 func OpenDB() (*gorm.DB, error) {
 	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
+		logger.Critical("Error loading .env file: " + err.Error())
 	}
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
@@ -77,6 +76,7 @@ type Playlist struct {
 	Musics       []Music `gorm:"many2many:playlist_musics;"`
 	CreatorId    int
 	Creator      User `gorm:"foreignKey:CreatorId"`
+	Protected    bool `gorm:"default:true"`
 }
 
 type Album struct {
@@ -91,7 +91,7 @@ type Artist struct {
 	Id           int     `gorm:"primaryKey;autoIncrement"`
 	Pseudo       string  `gorm:"type:varchar(32);unique;not null"`
 	Illustration string  `gorm:"type:varchar(36);default:'default.jpg'"`
-	Musics       []Music `gorm:"many2many:artist_musics;"`
+	Musics       []Music `gorm:"foreignKey:AlbumId;"`
 }
 
 type Music struct {
@@ -121,4 +121,12 @@ type User struct {
 	Playlists           []Playlist `gorm:"foreignKey:CreatorId"`
 	LikedMusics         []Music    `gorm:"many2many:user_liked_musics;"`
 	UploadedMusics      []Music    `gorm:"foreignKey:UploaderId"`
+}
+
+type AuthCookie struct {
+	Id              int    `gorm:"primaryKey;autoIncrement"`
+	HashedAuthToken string `gorm:"type:varchar(60);not null"`
+	UserId          int
+	User            User  `gorm:"foreignKey:UserId"`
+	ExpirationDate  int64 `gorm:"not null"`
 }

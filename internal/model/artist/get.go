@@ -23,7 +23,7 @@ func GetArtistsFromFilters(db *gorm.DB, filters map[string]interface{}) ([]db_mo
 func GetArtist(db *gorm.DB, artist_id int) (db_model.Artist, error) {
 	var artist db_model.Artist
 	// Using `First` to retrieve the first record that matches the artist_id
-	result := db.Where("Id = ?", artist_id).First(&artist)
+	result := db.Where("id = ?", artist_id).First(&artist)
 	if result.Error != nil {
 		return db_model.Artist{}, result.Error
 	}
@@ -35,7 +35,7 @@ func GetArtist(db *gorm.DB, artist_id int) (db_model.Artist, error) {
 func GetArtists(db *gorm.DB, artist_ids []int) ([]db_model.Artist, error) {
 	var artists []db_model.Artist
 	// Using `Find` to retrieve records with the IDs in artist_ids slice
-	result := db.Where("Id IN ?", artist_ids).Find(&artists)
+	result := db.Where("id IN ?", artist_ids).Find(&artists)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -46,7 +46,7 @@ func GetArtists(db *gorm.DB, artist_ids []int) ([]db_model.Artist, error) {
 // Selects the artist with the given pseudo
 func GetArtistByPseudo(db *gorm.DB, pseudo string) (db_model.Artist, error) {
 	var artist db_model.Artist
-	result := db.Where("Pseudo = ?", pseudo).First(&artist)
+	result := db.Where("pseudo = ?", pseudo).First(&artist)
 	if result.Error != nil {
 		return db_model.Artist{}, result.Error
 	}

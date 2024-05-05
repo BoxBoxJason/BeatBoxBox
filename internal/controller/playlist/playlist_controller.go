@@ -1,11 +1,11 @@
 package playlist_controller
 
 import (
-	"BeatBoxBox/pkg/utils"
+	file_utils "BeatBoxBox/pkg/utils/fileutils"
 	"path/filepath"
 )
 
 // Create the music directory if it doesn't exist
 func init() {
-	go utils.CheckDirExists(filepath.Join("data", "illustrations", "playlists"))
+	go file_utils.CheckDirExists(filepath.Join("data", "illustrations", "playlists"))
 }

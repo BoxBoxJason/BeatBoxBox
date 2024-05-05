@@ -3,7 +3,7 @@ package artist_controller
 import (
 	db_model "BeatBoxBox/internal/model"
 	artist_model "BeatBoxBox/internal/model/artist"
-	"BeatBoxBox/pkg/utils"
+	file_utils "BeatBoxBox/pkg/utils/fileutils"
 	"errors"
 	"mime/multipart"
 	"path/filepath"
@@ -27,11 +27,11 @@ func PostArtist(pseudo string, illustration_file multipart.File) error {
 	// Generate a new file name & save the illustration file if needed
 	illustration_file_name := "default.jpg"
 	if illustration_file != nil {
-		illustration_file_name, err = utils.CreateNonExistingIllustrationFileName("artists")
+		illustration_file_name, err = file_utils.CreateNonExistingIllustrationFileName("artists")
 		if err != nil {
 			return err
 		}
-		err = utils.UploadFileToServer(illustration_file, filepath.Join("data", "illustrations", "artists", illustration_file_name))
+		err = file_utils.UploadFileToServer(illustration_file, filepath.Join("data", "illustrations", "artists", illustration_file_name))
 		if err != nil {
 			return err
 		}

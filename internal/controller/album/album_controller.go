@@ -1,11 +1,11 @@
 package album_controller
 
 import (
-	"BeatBoxBox/pkg/utils"
+	file_utils "BeatBoxBox/pkg/utils/fileutils"
 	"path/filepath"
 )
 
 // Create the illustrations directory if it doesn't exist
 func init() {
-	go utils.CheckDirExists(filepath.Join("data", "illustrations", "albums"))
+	go file_utils.CheckDirExists(filepath.Join("data", "illustrations", "albums"))
 }

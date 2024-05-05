@@ -23,7 +23,7 @@ func GetPlaylistsFromFilters(db *gorm.DB, filters map[string]interface{}) ([]db_
 func GetPlaylist(db *gorm.DB, playlist_id int) (db_model.Playlist, error) {
 	var playlist db_model.Playlist
 	// Using `First` to retrieve the first record that matches the playlist_id
-	result := db.Where("Id = ?", playlist_id).First(&playlist)
+	result := db.Where("id = ?", playlist_id).First(&playlist)
 	if result.Error != nil {
 		return db_model.Playlist{}, result.Error
 	}
@@ -35,7 +35,7 @@ func GetPlaylist(db *gorm.DB, playlist_id int) (db_model.Playlist, error) {
 func GetPlaylists(db *gorm.DB, playlist_ids []int) ([]db_model.Playlist, error) {
 	var playlists []db_model.Playlist
 	// Using `Find` to retrieve records with the IDs in playlist_ids slice
-	result := db.Where("Id IN ?", playlist_ids).Find(&playlists)
+	result := db.Where("id IN ?", playlist_ids).Find(&playlists)
 	if result.Error != nil {
 		return nil, result.Error
 	}
