@@ -1,31 +1,41 @@
 package user_controller
 
 import (
+	cookie_controller "BeatBoxBox/internal/controller/cookie"
 	db_model "BeatBoxBox/internal/model"
 	user_model "BeatBoxBox/internal/model/user"
-	"BeatBoxBox/pkg/utils"
+	auth_utils "BeatBoxBox/pkg/utils/authutils"
 	"errors"
 )
 
-func AttemptLogin(username_or_email string, raw_password string) error {
+// AttemptLogin attempts to login a user with the given username or email and password
+func AttemptLogin(username_or_email string, raw_password string) (int, string, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
-		return err
+		return -1, "", err
 	}
 	defer db_model.CloseDB(db)
 
-	users, err := user_model.GetUsersFromFilters(db, map[string]interface{}{"email": username_or_email})
+	// Get the user from the database
+	users, err := user_model.GetUsersFromFilters(db, map[string]interface{}{"Email": username_or_email})
 	if err != nil {
-		users, err = user_model.GetUsersFromFilters(db, map[string]interface{}{"pseudo": username_or_email})
+		users, err = user_model.GetUsersFromFilters(db, map[string]interface{}{"Pseudo": username_or_email})
 	}
 	if err != nil || len(users) == 0 {
-		return errors.New("user not found")
+		return -1, "", errors.New("user not found")
 	}
 	user := users[0]
 
-	hashed_password := user.Hashed_password
-	if !utils.ComparePasswords(hashed_password, raw_password) {
-		return errors.New("wrong password")
+	// Check the password
+	if !auth_utils.CompareHash(user.Hashed_password, raw_password) {
+		return -1, "", errors.New("wrong password")
 	}
-	return nil
+
+	// Generate & Set a session token
+	raw_session_token, err := cookie_controller.PostAuthToken(user.Id)
+	if err != nil {
+		return -1, "", err
+	}
+
+	return user.Id, raw_session_token, nil
 }

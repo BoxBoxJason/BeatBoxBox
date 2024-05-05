@@ -23,7 +23,7 @@ func GetUsersFromFilters(db *gorm.DB, filters map[string]interface{}) ([]db_mode
 func GetUser(db *gorm.DB, user_id int) (db_model.User, error) {
 	var user db_model.User
 	// Using `First` to retrieve the first record that matches the user_id
-	result := db.Where("Id = ?", user_id).First(&user)
+	result := db.Where("id = ?", user_id).First(&user)
 	if result.Error != nil {
 		return db_model.User{}, result.Error
 	}
@@ -35,7 +35,7 @@ func GetUser(db *gorm.DB, user_id int) (db_model.User, error) {
 func GetUsers(db *gorm.DB, user_ids []int) ([]db_model.User, error) {
 	var users []db_model.User
 	// Using `Find` to retrieve records with the IDs in user_ids slice
-	result := db.Where("Id IN ?", user_ids).Find(&users)
+	result := db.Where("id IN ?", user_ids).Find(&users)
 	if result.Error != nil {
 		return nil, result.Error
 	}

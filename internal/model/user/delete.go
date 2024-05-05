@@ -13,5 +13,5 @@ func DeleteUser(db *gorm.DB, user_id int) error {
 
 // DeleteUsers deletes existing users from the database
 func DeleteUsers(db *gorm.DB, user_ids []int) error {
-	return db.Where("Id IN ?", user_ids).Delete(&db_model.User{}).Error
+	return db.Where("id IN ?", user_ids).Delete(&db_model.User{}).Error
 }
