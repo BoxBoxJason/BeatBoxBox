@@ -9,6 +9,9 @@ import (
 	"time"
 )
 
+// loginHandler handles the login request
+// Checks if the username or email and password are valid
+// Issues a session token to keep user logged in
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	attempt_username_or_email := r.FormValue("username_or_email")
 	raw_password := r.FormValue("password")
@@ -28,6 +31,9 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
+// logoutHandler handles the logout request
+// Checks if the session token is valid
+// Deletes it from the database
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("session_token")
 	if err != nil {
@@ -74,4 +80,10 @@ func deleteSessionCookie(w http.ResponseWriter) {
 		Secure:   true,
 		Expires:  time.Now().Add(-time.Hour),
 	})
+	user_id, auth_token, err := auth_utils.ParseAuthJWT("session_token")
+	if err != nil {
+		http.Error(w, "Error parsing session token", http.StatusUnauthorized)
+		return
+	}
+	go cookie_controller.DeleteMatchingAuthToken(user_id, auth_token) // Don't wait for this to finish
 }
