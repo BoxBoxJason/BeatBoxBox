@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import PlaylistView from '@/views/PlaylistView.vue'
-import AuthView from '@/views/AuthView.vue'
+import AuthView from '@/components/auth/AuthView.vue'
 
 const routes = [
   {
