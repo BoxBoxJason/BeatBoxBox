@@ -63,5 +63,5 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	// Set the session token in the cookie
 	updateSessionCookie(w, user_id, raw_auth_token)
 
-	http.Redirect(w, r, "/", http.StatusFound)
+	http.Redirect(w, r, "/", http.StatusCreated)
 }

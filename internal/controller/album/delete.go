@@ -1,6 +1,10 @@
 package album_controller
 
-import "fmt"
+import (
+	db_model "BeatBoxBox/internal/model"
+	album_model "BeatBoxBox/internal/model/album"
+	"fmt"
+)
 
 // DeleteAlbum deletes a album by its id
 func DeleteAlbum(album_id int) error {
@@ -8,7 +12,12 @@ func DeleteAlbum(album_id int) error {
 	if !album_exists {
 		return fmt.Errorf("album with id %d does not exist", album_id)
 	}
-	return DeleteAlbum(album_id)
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return err
+	}
+	defer db_model.CloseDB(db)
+	return album_model.DeleteAlbum(db, album_id)
 }
 
 // DeleteAlbums deletes albums by their ids
@@ -17,5 +26,10 @@ func DeleteAlbums(album_ids []int) error {
 	if !albums_exists {
 		return fmt.Errorf("albums with ids %v do not exist", album_ids)
 	}
-	return DeleteAlbums(album_ids)
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return err
+	}
+	defer db_model.CloseDB(db)
+	return album_model.DeleteAlbums(db, album_ids)
 }

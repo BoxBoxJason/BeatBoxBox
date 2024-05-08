@@ -5,8 +5,7 @@ package music_handler
 
 import (
 	music_controller "BeatBoxBox/internal/controller/music"
-	"archive/zip"
-	"io"
+	file_utils "BeatBoxBox/pkg/utils/fileutils"
 	"net/http"
 	"os"
 	"strconv"
@@ -127,49 +126,5 @@ func downloadMusicsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = zipMusics(w, musics_paths)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-}
-
-// Zip musics into a single zip file and write it to the response writer
-// Takes a list of music paths and writes them to the zip file
-func zipMusics(w http.ResponseWriter, musics_paths []string) error {
-	zipped_musics := zip.NewWriter(w)
-	defer zipped_musics.Close()
-
-	for _, music_path := range musics_paths {
-		music_file, err := os.Open(music_path)
-		if err != nil {
-			return err
-		}
-		defer music_file.Close()
-		music_info, err := music_file.Stat()
-		if err != nil {
-			return err
-		}
-		music_header, err := zip.FileInfoHeader(music_info)
-		if err != nil {
-			return err
-		}
-		music_header.Name = music_path
-		music_header.Method = zip.Deflate
-		writer, err := zipped_musics.CreateHeader(music_header)
-		if err != nil {
-			return err
-		}
-		if _, err := io.Copy(writer, music_file); err != nil {
-			return err
-		}
-	}
-
-	if err := zipped_musics.Close(); err != nil {
-		return err
-	}
-
-	return nil
+	file_utils.ServeZip(w, musics_paths, "musics.zip")
 }

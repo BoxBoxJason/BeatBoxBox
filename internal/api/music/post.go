@@ -5,14 +5,10 @@ package music_handler
 
 import (
 	music_controller "BeatBoxBox/internal/controller/music"
-	"errors"
-	"mime/multipart"
+	file_utils "BeatBoxBox/pkg/utils/fileutils"
 	"net/http"
 	"strconv"
 )
-
-const MAX_MUSIC_FILE_SIZE = 25 * 1024 * 1024
-const MAX_IMAGE_FILE_SIZE = 5 * 1024 * 1024
 
 // POST music handler
 // Checks that the request is under 20Mb and that the file is a valid .mp3 file
@@ -25,7 +21,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer music_file.Close()
-	err = checkFileMeetsRequirements(*music_file_header, MAX_MUSIC_FILE_SIZE, "audio/mpeg")
+	err = file_utils.CheckFileMeetsRequirements(*music_file_header, file_utils.MAX_MUSIC_FILE_SIZE, "audio/mpeg")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -34,7 +30,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	illustration_file, illustration_file_header, err := r.FormFile("illustration")
 	if err == nil {
 		defer illustration_file.Close()
-		err = checkFileMeetsRequirements(*illustration_file_header, MAX_IMAGE_FILE_SIZE, "image/jpeg")
+		err = file_utils.CheckFileMeetsRequirements(*illustration_file_header, file_utils.MAX_IMAGE_FILE_SIZE, "image/jpeg")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
@@ -50,7 +46,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	album_id_str := r.FormValue("album_id")
 
 	if title == "" || artist_id_str == "" {
-		http.Error(w, "Missing required fields (title & author)", http.StatusBadRequest)
+		http.Error(w, "Missing at least 1 of required fields (title & author)", http.StatusBadRequest)
 		return
 	}
 
@@ -64,20 +60,17 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	album_id := -1
 	if album_id_str != "" {
 		album_id, err = strconv.Atoi(album_id_str)
-		if err != nil || album_id < -1 {
-			http.Error(w, "Invalid album_id (must be >= -1 integer)", http.StatusBadRequest)
+		if err != nil || album_id < 0 {
+			http.Error(w, "Invalid album_id (must be > -1 integer)", http.StatusBadRequest)
 			return
 		}
 	}
-	music_controller.PostMusic(title, artist_id, genres, album_id, music_file, illustration_file)
-}
 
-func checkFileMeetsRequirements(file_header multipart.FileHeader, max_size int, content_type string) error {
-	if file_header.Size > int64(max_size) {
-		return errors.New("File too big, max size for " + content_type + " is " + strconv.Itoa(max_size/1024/1024) + "Mb (Megabytes)")
+	err = music_controller.PostMusic(title, artist_id, genres, album_id, music_file, illustration_file)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
-	if file_header.Header.Get("Content-Type") != content_type {
-		return errors.New("Invalid file type, should be " + content_type)
-	}
-	return nil
+
+	w.WriteHeader(http.StatusCreated)
 }

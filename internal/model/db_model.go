@@ -1,6 +1,7 @@
 package db_model
 
 import (
+	custom_errors "BeatBoxBox/pkg/errors"
 	"BeatBoxBox/pkg/logger"
 	"fmt"
 	"os"
@@ -53,7 +54,7 @@ func OpenDB() (*gorm.DB, error) {
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		logger.Critical("failed to connect database")
-		return nil, err
+		return nil, custom_errors.NewDatabaseError(err.Error())
 	}
 	return db, nil
 }
