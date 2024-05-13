@@ -111,3 +111,16 @@ func GetMusicsPathFromPlaylists(playlist_ids []int) (map[string][]string, error)
 	}
 	return musics_paths, nil
 }
+
+func GetUserPlaylistId(user_id int, playlist_title string) (int, error) {
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return -1, err
+	}
+	defer db_model.CloseDB(db)
+	playlists, err := playlist_model.GetPlaylistsFromFilters(db, map[string]interface{}{"creator_id": user_id, "title": playlist_title})
+	if err != nil || len(playlists) == 0 {
+		return -1, err
+	}
+	return playlists[0].Id, nil
+}

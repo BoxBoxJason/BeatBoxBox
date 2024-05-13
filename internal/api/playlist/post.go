@@ -36,15 +36,9 @@ func createPlaylistHandler(w http.ResponseWriter, r *http.Request) {
 		illustration_file = nil
 	}
 
-	err = playlist_controller.PostPlaylist(title, user_id, description, illustration_file)
+	playlist_id, err := playlist_controller.PostPlaylist(title, user_id, description, illustration_file)
 	if err != nil {
 		custom_errors.SendErrorToClient(err, w, "")
-		return
-	}
-
-	playlist_id, err := playlist_controller.GetUserPlaylistId(user_id, title)
-	if err != nil {
-		http.Error(w, "playlist was created but was not found", http.StatusNotFound)
 		return
 	}
 

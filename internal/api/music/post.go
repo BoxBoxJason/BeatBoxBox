@@ -66,7 +66,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	err = music_controller.PostMusic(title, artist_id, genres, album_id, music_file, illustration_file)
+	_, err = music_controller.PostMusic(title, artist_id, genres, album_id, music_file, illustration_file)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

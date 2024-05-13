@@ -7,11 +7,17 @@ import (
 )
 
 // PostPlaylist creates a new playlist in the database
-func CreatePlaylist(db *gorm.DB, title string, creator_id int, illustration string) error {
+// Returns corresponding Id
+func CreatePlaylist(db *gorm.DB, title string, creator_id int, description string, illustration string) (int, error) {
 	new_playlist := db_model.Playlist{
 		Title:        title,
 		CreatorId:    creator_id,
 		Illustration: illustration,
+		Description:  description,
 	}
-	return db.Create(&new_playlist).Error
+	err := db.Create(&new_playlist).Error
+	if err != nil {
+		return -1, err
+	}
+	return new_playlist.Id, nil
 }

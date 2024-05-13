@@ -9,19 +9,19 @@ import (
 	"path/filepath"
 )
 
-func PostArtist(pseudo string, illustration_file multipart.File) error {
+func PostArtist(pseudo string, illustration_file multipart.File) (int, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
-		return err
+		return -1, err
 	}
 	defer db_model.CloseDB(db)
 
 	// Check if the pseudo is empty or already taken
 	if pseudo == "" {
-		return errors.New("artist pseudo is empty")
+		return -1, errors.New("artist pseudo is empty")
 	}
 	if IsPseudoTaken(pseudo) {
-		return errors.New("artist already exists")
+		return -1, errors.New("artist already exists")
 	}
 
 	// Generate a new file name & save the illustration file if needed
@@ -29,11 +29,11 @@ func PostArtist(pseudo string, illustration_file multipart.File) error {
 	if illustration_file != nil {
 		illustration_file_name, err = file_utils.CreateNonExistingIllustrationFileName("artists")
 		if err != nil {
-			return err
+			return -1, err
 		}
 		err = file_utils.UploadFileToServer(illustration_file, filepath.Join("data", "illustrations", "artists", illustration_file_name))
 		if err != nil {
-			return err
+			return -1, err
 		}
 	}
 	return artist_model.CreateArtist(db, pseudo, illustration_file_name)

@@ -9,13 +9,13 @@ import (
 	"path/filepath"
 )
 
-func PostPlaylist(title string, creator_id int, illustration_file multipart.File) error {
+func PostPlaylist(title string, creator_id int, description string, illustration_file multipart.File) (int, error) {
 	// Check if the title is empty or already taken
 	if title == "" {
-		return errors.New("playlist title is empty")
+		return -1, errors.New("playlist title is empty")
 	}
 	if PlaylistExistsFromParams(title, creator_id) {
-		return errors.New("playlist with same name & creator already exists")
+		return -1, errors.New("playlist with same name & creator already exists")
 	}
 
 	// Generate a new file name & save the illustration file if needed
@@ -23,19 +23,19 @@ func PostPlaylist(title string, creator_id int, illustration_file multipart.File
 	if illustration_file != nil {
 		illustration_file_name, err := file_utils.CreateNonExistingIllustrationFileName("playlists")
 		if err != nil {
-			return err
+			return -1, err
 		}
 		err = file_utils.UploadFileToServer(illustration_file, filepath.Join("data", "illustrations", "playlists", illustration_file_name))
 		if err != nil {
-			return err
+			return -1, err
 		}
 	}
 
 	db, err := db_model.OpenDB()
 	if err != nil {
-		return err
+		return -1, err
 	}
 	defer db_model.CloseDB(db)
 
-	return playlist_model.CreatePlaylist(db, title, creator_id, illustration_file_name)
+	return playlist_model.CreatePlaylist(db, title, creator_id, description, illustration_file_name)
 }

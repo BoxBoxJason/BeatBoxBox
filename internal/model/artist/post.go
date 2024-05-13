@@ -7,10 +7,14 @@ import (
 )
 
 // CreateArtist creates a new artist in the database
-func CreateArtist(db *gorm.DB, pseudo string, illustration string) error {
+func CreateArtist(db *gorm.DB, pseudo string, illustration string) (int, error) {
 	new_artist := db_model.Artist{
 		Pseudo:       pseudo,
 		Illustration: illustration,
 	}
-	return db.Create(&new_artist).Error
+	err := db.Create(&new_artist).Error
+	if err != nil {
+		return -1, err
+	}
+	return new_artist.Id, nil
 }

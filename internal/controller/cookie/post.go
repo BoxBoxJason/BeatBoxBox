@@ -35,7 +35,7 @@ func PostAuthToken(user_id int) (string, error) {
 		return "", err
 	}
 	defer db_model.CloseDB(db)
-	err = cookie_model.CreateCookie(db, hashed_auth_token, user_id)
+	_, err = cookie_model.CreateCookie(db, hashed_auth_token, user_id)
 	if err != nil {
 		return "", err
 	}
