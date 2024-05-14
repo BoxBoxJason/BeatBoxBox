@@ -8,6 +8,11 @@ import (
 )
 
 func registerHandler(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Error parsing form", http.StatusBadRequest)
+		return
+	}
 	// Retrieve the form values
 	username := r.FormValue("username")
 	email := r.FormValue("email")
@@ -43,16 +48,12 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create the user
-	err := user_controller.PostUser(username, email, raw_password)
+	user_id, err := user_controller.PostUser(username, email, raw_password)
 	if err != nil {
 		http.Error(w, "Error creating user", http.StatusInternalServerError)
 		return
 	}
-	user_id, err := user_controller.GetUserIdFromUsername(username)
-	if err != nil {
-		http.Error(w, "Error creating user", http.StatusInternalServerError)
-		return
-	}
+
 	raw_auth_token, err := cookie_controller.PostAuthToken(user_id)
 	if err != nil {
 		http.Error(w, "Error creating auth token, the account was created successfuly", http.StatusInternalServerError)

@@ -2,13 +2,26 @@ package user_handler
 
 import (
 	user_controller "BeatBoxBox/internal/controller/user"
+	custom_errors "BeatBoxBox/pkg/errors"
+	format_utils "BeatBoxBox/pkg/utils/formatutils"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/gorilla/mux"
 )
 
+// deleteUserHandler deletes a user with the given ID
+// @Summary Delete a user by their ID
+// @Description Delete a user by their ID
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param user_id path int true "User ID"
+// @Success 200 {string} string "OK"
+// @Failure 400 {string} string "Invalid user ID provided, please use a valid integer user ID"
+// @Failure 404 {string} string "User does not exist"
+// @Failure 500 {string} string "Internal server error when deleting user"
+// @Router /api/users/{user_id} [delete]
 func deleteUserHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user ID from URL
 	user_id_str := mux.Vars(r)["user_id"]
@@ -27,46 +40,43 @@ func deleteUserHandler(w http.ResponseWriter, r *http.Request) {
 	// Delete user
 	err = user_controller.DeleteUser(user_id)
 	if err != nil {
-		http.Error(w, "Internal Server Error when deleting user", http.StatusInternalServerError)
+		custom_errors.SendErrorToClient(err, w, "")
 		return
 	}
 
 	// Send response
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusOK)
 }
 
+// deleteUsersHandler deletes users with the given IDs
+// @Summary Delete users by their IDs
+// @Description Delete users by their IDs
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param users_ids query []int true "User IDs"
+// @Success 200 {string} string "OK"
+// @Failure 400 {string} string "No user IDs provided, please use user_ids request parameter"
+// @Failure 404 {string} string "One or more users do not exist"
+// @Failure 500 {string} string "Internal server error when deleting users"
+// @Router /api/users [delete]
 func deleteUsersHandler(w http.ResponseWriter, r *http.Request) {
-	// Get the users IDs from the URL
-	user_ids_requested := r.URL.Query().Get("user_ids")
-	if user_ids_requested == "" {
-		http.Error(w, "No user IDs provided, please use user_ids request parameter", http.StatusBadRequest)
+	users_ids_str := r.URL.Query().Get("users_ids")
+	users_ids, err := format_utils.ConvertStringToIntArray(users_ids_str, ",")
+	if err != nil {
+		http.Error(w, "Invalid user IDs provided, please use a valid integer user IDs", http.StatusBadRequest)
 		return
 	}
-
-	user_ids_str := strings.Split(user_ids_requested, ",")
-	user_ids := []int{}
-	for _, user_id_str := range user_ids_str {
-		user_id, err := strconv.Atoi(user_id_str)
-		if err != nil {
-			http.Error(w, "Invalid user ID provided, please use a valid positive integer user ID", http.StatusBadRequest)
-			return
-		}
-		user_ids = append(user_ids, user_id)
-	}
-
-	// Check if users exist
-	if !user_controller.UsersExist(user_ids) {
+	if !user_controller.UsersExist(users_ids) {
 		http.Error(w, "One or more users do not exist", http.StatusNotFound)
 		return
 	}
 
-	// Delete users
-	err := user_controller.DeleteUsers(user_ids)
+	err = user_controller.DeleteUsers(users_ids)
 	if err != nil {
-		http.Error(w, "Internal Server Error when deleting users", http.StatusInternalServerError)
+		custom_errors.SendErrorToClient(err, w, "")
 		return
 	}
 
-	// Send response
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusOK)
 }

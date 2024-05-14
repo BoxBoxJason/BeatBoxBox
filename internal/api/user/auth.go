@@ -4,19 +4,29 @@ import (
 	cookie_controller "BeatBoxBox/internal/controller/cookie"
 	user_controller "BeatBoxBox/internal/controller/user"
 	cookie_model "BeatBoxBox/internal/model/cookie"
+	custom_errors "BeatBoxBox/pkg/errors"
 	auth_utils "BeatBoxBox/pkg/utils/authutils"
 	"net/http"
 	"time"
 )
 
-// loginHandler handles the login request
-// Checks if the username or email and password are valid
-// Issues a session token to keep user logged in
+// loginHandler logs in the user with the given username or email and password
+// @Summary Log in the user
+// @Description Log in the user
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param username_or_email formData string true "Username or Email"
+// @Param password formData string true "Password"
+// @Success 200 {string} string "OK"
+// @Failure 401 {string} string "Invalid username / password"
+// @Router /api/users/login [post]
 func loginHandler(w http.ResponseWriter, r *http.Request) {
-	attempt_username_or_email := r.FormValue("username_or_email")
-	raw_password := r.FormValue("password")
+	r.ParseForm()
+	attempt_username_or_email := r.PostFormValue("username_or_email")
+	raw_password := r.PostFormValue("password")
 	if len(attempt_username_or_email) < 3 || len(raw_password) < 6 {
-		http.Error(w, "Invalid Username / Password", http.StatusBadRequest)
+		http.Error(w, "Invalid Username / Password", http.StatusUnauthorized)
 		return
 	}
 
@@ -31,9 +41,15 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
-// logoutHandler handles the logout request
-// Checks if the session token is valid
-// Deletes it from the database
+// logoutHandler logs out the user
+// @Summary Log out the user
+// @Description Log out the user
+// @Tags users
+// @Accept json
+// @Produce json
+// @Success 200 {string} string "OK"
+// @Failure 401 {string} string "Unauthorized"
+// @Router /api/users/logout [post]
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("session_token")
 	if err != nil {
@@ -47,7 +63,7 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	err = cookie_controller.DeleteMatchingAuthToken(user_id, token)
 	if err != nil {
-		http.Error(w, "Could not delete auth token in database when logging out", http.StatusInternalServerError)
+		custom_errors.SendErrorToClient(err, w, "")
 		return
 	}
 	deleteSessionCookie(w)
