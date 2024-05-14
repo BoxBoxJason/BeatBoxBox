@@ -7,7 +7,7 @@ import (
 )
 
 // CreateMusic creates a new music in the database
-func CreateMusic(db *gorm.DB, title string, artist_id int, genres []string, album_id int, file_name string, illustration_path string) (int, error) {
+func CreateMusic(db *gorm.DB, title string, genres []string, album_id int, file_name string, illustration_path string) (int, error) {
 	new_music := db_model.Music{
 		Title:        title,
 		Path:         file_name,
