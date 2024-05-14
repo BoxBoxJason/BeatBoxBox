@@ -2,6 +2,7 @@ package format_utils
 
 import (
 	"regexp"
+	"strconv"
 	"strings"
 	"unicode"
 )
@@ -37,4 +38,47 @@ func CheckRawPasswordValidity(rawPassword string) bool {
 	}
 
 	return lengthValid && hasUpper && hasLower && hasNumber && hasSpecial
+}
+
+func ConvertStringToIntArray(raw_string string, separator string) ([]int, error) {
+	raw_string_array := strings.Split(raw_string, ",")
+	int_array := make([]int, len(raw_string_array))
+	for i, raw_string := range raw_string_array {
+		int_value, err := strconv.Atoi(raw_string)
+		if err != nil {
+			return nil, err
+		}
+		int_array[i] = int_value
+	}
+	return int_array, nil
+}
+
+func ConvertStringArrayToIntArray(raw_string_array []string) ([]int, error) {
+	int_array := make([]int, len(raw_string_array))
+	for i, raw_string := range raw_string_array {
+		int_value, err := strconv.Atoi(raw_string)
+		if err != nil {
+			return nil, err
+		}
+		int_array[i] = int_value
+	}
+	return int_array, nil
+}
+
+func CheckIntInArray(int_array []int, int_value int) bool {
+	for _, value := range int_array {
+		if value == int_value {
+			return true
+		}
+	}
+	return false
+}
+
+func CheckStringInArray(string_array []string, string_value string) bool {
+	for _, value := range string_array {
+		if value == string_value {
+			return true
+		}
+	}
+	return false
 }

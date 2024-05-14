@@ -3,37 +3,22 @@ package album_controller
 import (
 	db_model "BeatBoxBox/internal/model"
 	album_model "BeatBoxBox/internal/model/album"
-	file_utils "BeatBoxBox/pkg/utils/fileutils"
-	"errors"
-	"mime/multipart"
-	"path/filepath"
+	custom_errors "BeatBoxBox/pkg/errors"
 )
 
-func PostAlbum(title string, artist_id int, illustration_file multipart.File) error {
+func PostAlbum(title string, artists_ids []int, description string, illustration_file_name string) (int, error) {
 	if title == "" {
-		return errors.New("title is empty")
+		return -1, custom_errors.NewBadRequestError("title is empty")
 	}
-	if AlbumExistsFromFilters(title, artist_id) {
-		return errors.New("album already exists")
-	}
-
-	illustration_file_name := "default.jpg"
-	if illustration_file != nil {
-		illustration_file_name, err := file_utils.CreateNonExistingIllustrationFileName("albums")
-		if err != nil {
-			return err
-		}
-		err = file_utils.UploadFileToServer(illustration_file, filepath.Join("data", "illustrations", "albums", illustration_file_name))
-		if err != nil {
-			return err
-		}
+	if AlbumExistsFromFilters(title, artists_ids) {
+		return -1, custom_errors.NewBadRequestError("album already exists")
 	}
 
 	db, err := db_model.OpenDB()
 	if err != nil {
-		return err
+		return -1, err
 	}
 	defer db_model.CloseDB(db)
 
-	return album_model.CreateAlbum(db, title, artist_id, illustration_file_name)
+	return album_model.CreateAlbum(db, title, illustration_file_name)
 }

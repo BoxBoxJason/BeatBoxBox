@@ -15,6 +15,8 @@ import (
 
 const MAX_MUSIC_FILE_SIZE = 25 * 1024 * 1024
 const MAX_IMAGE_FILE_SIZE = 5 * 1024 * 1024
+const MAX_REQUEST_SIZE = MAX_IMAGE_FILE_SIZE + MAX_MUSIC_FILE_SIZE + 1024
+const DEFAULT_ILLUSTRATION_FILE = "default.jpg"
 
 // Return a 32 character long random string
 func createRandomFileName(extension string) (string, error) {
@@ -44,17 +46,29 @@ func CreateNonExistingIllustrationFileName(illustration_directory string) (strin
 func UploadIllustrationToServer(illustration_header *multipart.FileHeader, illustration_file multipart.File, illustration_directory string) (string, error) {
 	err := CheckFileMeetsRequirements(*illustration_header, MAX_IMAGE_FILE_SIZE, "image/jpeg")
 	if err != nil {
-		return "", custom_errors.NewBadRequestError("Image does not meet requirements: " + err.Error())
+		return DEFAULT_ILLUSTRATION_FILE, custom_errors.NewBadRequestError("Image does not meet requirements: " + err.Error())
 	}
 	illustration_file_name, err := CreateNonExistingIllustrationFileName(illustration_directory)
 	if err != nil {
-		return "", err
+		return DEFAULT_ILLUSTRATION_FILE, err
 	}
 	err = UploadFileToServer(illustration_file, filepath.Join("data", "illustrations", illustration_directory, illustration_file_name))
 	if err != nil {
-		return "", err
+		return DEFAULT_ILLUSTRATION_FILE, err
 	}
 	return illustration_file_name, nil
+}
+
+func UploadMusicToServer(music_file multipart.File) (string, error) {
+	music_file_name, err := CreateNonExistingMusicFileName()
+	if err != nil {
+		return "", err
+	}
+	err = UploadFileToServer(music_file, filepath.Join("data", "musics", music_file_name))
+	if err != nil {
+		return "", err
+	}
+	return music_file_name, nil
 }
 
 // Create a file name that doesn't exist in the specified directory
@@ -133,15 +147,15 @@ func ServeZip(w http.ResponseWriter, files_paths []string, zip_file_name string)
 	w.WriteHeader(http.StatusOK)
 }
 
-func ServePlaylistsZip(w http.ResponseWriter, playlists_paths map[string][]string) {
+func ServeTreeZip(w http.ResponseWriter, files_paths map[string][]string, zip_file_name string) {
 	w.Header().Set("Content-Type", "application/zip")
-	w.Header().Set("Content-Disposition", "attachment; filename=playlists.zip")
+	w.Header().Set("Content-Disposition", "attachment; filename="+zip_file_name+".zip")
 
 	zip_writer := zip.NewWriter(w)
 	defer zip_writer.Close()
 
-	for playlist_name, files_paths := range playlists_paths {
-		_, err := zip_writer.Create(playlist_name + "/")
+	for directory_name, files_paths := range files_paths {
+		_, err := zip_writer.Create(directory_name + "/")
 		if err != nil {
 			http.Error(w, "Error creating zip folder: "+err.Error(), http.StatusInternalServerError)
 			return
@@ -153,7 +167,7 @@ func ServePlaylistsZip(w http.ResponseWriter, playlists_paths map[string][]strin
 				return
 			}
 			defer file.Close()
-			zip_file, err := zip_writer.Create(filepath.Join(playlist_name, filepath.Base(file_path)))
+			zip_file, err := zip_writer.Create(filepath.Join(directory_name, filepath.Base(file_path)))
 			if err != nil {
 				http.Error(w, "Error creating zip file: "+err.Error(), http.StatusInternalServerError)
 				return

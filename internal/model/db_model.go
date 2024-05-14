@@ -83,6 +83,7 @@ type Playlist struct {
 type Album struct {
 	Id           int      `gorm:"primaryKey;autoIncrement"`
 	Title        string   `gorm:"type:text;not null"`
+	Description  string   `gorm:"type:text"`
 	Artists      []Artist `gorm:"many2many:album_artists;"`
 	Illustration string   `gorm:"type:varchar(36);default:'default.jpg'"`
 	Musics       []Music  `gorm:"many2many:album_musics;"`

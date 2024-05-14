@@ -41,3 +41,12 @@ func GetAlbums(db *gorm.DB, album_ids []int) ([]db_model.Album, error) {
 	}
 	return albums, nil
 }
+
+func GetAlbumsFromPartialTitle(db *gorm.DB, partial_title string) ([]db_model.Album, error) {
+	var albums []db_model.Album
+	result := db.Where("title LIKE ?", "%"+partial_title+"%").Find(&albums)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return albums, nil
+}
