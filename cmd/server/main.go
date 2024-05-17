@@ -29,8 +29,8 @@ func main() {
 	logger.Info("API routes are set up")
 
 	// Start the server
-	logger.Info("Server Up & Listening at https://localhost:8080")
-	err = http.ListenAndServeTLS(":8080", "secret/cert.pem", "secret/key.pem", nil)
+	logger.Info("Server Up & Listening at https://localhost:3000")
+	err = http.ListenAndServeTLS(":3000", "secret/cert.pem", "secret/key.pem", nil)
 	if err != nil {
 		logger.Critical(err)
 	}
