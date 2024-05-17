@@ -18,6 +18,13 @@ const MAX_IMAGE_FILE_SIZE = 5 * 1024 * 1024
 const MAX_REQUEST_SIZE = MAX_IMAGE_FILE_SIZE + MAX_MUSIC_FILE_SIZE + 1024
 const DEFAULT_ILLUSTRATION_FILE = "default.jpg"
 
+var PROJECT_ROOT_DIR string
+
+func init() {
+	PROJECT_ROOT_DIR, _ = os.Getwd()
+
+}
+
 // Return a 32 character long random string
 func createRandomFileName(extension string) (string, error) {
 	const letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"

@@ -35,7 +35,7 @@ func IsPseudoTaken(pseudo string) bool {
 		return false
 	}
 	defer db_model.CloseDB(db)
-	_, err = artist_model.GetArtistByPseudo(db, pseudo)
+	_, err = artist_model.GetArtistFromPseudo(db, pseudo)
 	return err == nil
 }
 

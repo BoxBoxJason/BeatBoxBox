@@ -42,13 +42,22 @@ func GetArtists(db *gorm.DB, artist_ids []int) ([]db_model.Artist, error) {
 	return artists, nil
 }
 
-// GetArtistByPseudo returns a artist from the database.
+// GetArtistFromPseudo returns a artist from the database.
 // Selects the artist with the given pseudo
-func GetArtistByPseudo(db *gorm.DB, pseudo string) (db_model.Artist, error) {
+func GetArtistFromPseudo(db *gorm.DB, pseudo string) (db_model.Artist, error) {
 	var artist db_model.Artist
 	result := db.Where("pseudo = ?", pseudo).First(&artist)
 	if result.Error != nil {
 		return db_model.Artist{}, result.Error
 	}
 	return artist, nil
+}
+
+func GetArtistFromPartialPseudo(db *gorm.DB, pseudo string) ([]db_model.Artist, error) {
+	var artists []db_model.Artist
+	result := db.Where("pseudo LIKE ?", "%"+pseudo+"%").Find(&artists)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return artists, nil
 }

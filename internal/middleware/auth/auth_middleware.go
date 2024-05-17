@@ -2,7 +2,6 @@ package auth_middleware
 
 import (
 	cookie_controller "BeatBoxBox/internal/controller/cookie"
-	cookie_model "BeatBoxBox/internal/model/cookie"
 	auth_utils "BeatBoxBox/pkg/utils/authutils"
 	"net/http"
 	"time"
@@ -27,7 +26,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 				Path:     "/",
 				Secure:   true,
 				HttpOnly: true,
-				Expires:  time.Now().Add(cookie_model.DEFAULT_TOKEN_EXPIRATION),
+				Expires:  time.Now().Add(auth_utils.DEFAULT_TOKEN_EXPIRATION),
 			})
 		}
 		next.ServeHTTP(w, r)

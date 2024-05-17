@@ -1,16 +1,18 @@
 package auth_utils
 
 import (
-	cookie_model "BeatBoxBox/internal/model/cookie"
 	"BeatBoxBox/pkg/logger"
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 )
+
+const DEFAULT_TOKEN_EXPIRATION = 48 * time.Hour
 
 // HashString hashes a password using bcrypt
 func HashString(password string) (string, error) {
@@ -21,32 +23,46 @@ func HashString(password string) (string, error) {
 	return string(hashed_password), err
 }
 
+// GenerateToken generates a random token of 128 bits
+func GenerateRandomTokenWithHash() (string, string, error) {
+	bytes := make([]byte, 64)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", "", err
+	}
+	raw_token := hex.EncodeToString(bytes)
+	hashed_token, err := HashString(raw_token)
+	if err != nil {
+		return "", "", err
+	}
+	return raw_token, hashed_token, nil
+}
+
 // CompareHash compares a hashed password with a plaintext password
 func CompareHash(hashed_string string, attempt_string string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(hashed_string), []byte(attempt_string)) == nil
 }
 
 func CreateAuthJWT(user_id int, auth_token string) (string, error) {
-	if err := godotenv.Load(); err != nil {
-		logger.Critical("Error loading .env file: " + err.Error())
-	}
 	JWT_SECRET := os.Getenv("SECRET_JWT_KEY")
-
+	if JWT_SECRET == "" {
+		logger.Critical("Missing environment variable SECRET_JWT_KEY")
+		return "", errors.New("missing environment variable SECRET_JWT_KEY")
+	}
 	claims := jwt.MapClaims{
 		"user_id":    user_id,
 		"auth_token": auth_token,
-		"expiration": time.Now().Add(cookie_model.DEFAULT_TOKEN_EXPIRATION).Unix(),
+		"expiration": time.Now().Add(DEFAULT_TOKEN_EXPIRATION).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(JWT_SECRET))
 }
 
 func ParseAuthJWT(token_string string) (int, string, error) {
-	if err := godotenv.Load(); err != nil {
-		logger.Critical("Error loading .env file: " + err.Error())
-	}
 	JWT_SECRET := os.Getenv("SECRET_JWT_KEY")
-
+	if JWT_SECRET == "" {
+		logger.Critical("Missing environment variable SECRET_JWT_KEY")
+		return -1, "", errors.New("missing environment variable SECRET_JWT_KEY")
+	}
 	token, err := jwt.Parse(token_string, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("unexpected signing method")

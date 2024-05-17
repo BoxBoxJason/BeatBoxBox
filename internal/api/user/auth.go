@@ -3,7 +3,6 @@ package user_handler
 import (
 	cookie_controller "BeatBoxBox/internal/controller/cookie"
 	user_controller "BeatBoxBox/internal/controller/user"
-	cookie_model "BeatBoxBox/internal/model/cookie"
 	custom_errors "BeatBoxBox/pkg/errors"
 	auth_utils "BeatBoxBox/pkg/utils/authutils"
 	"net/http"
@@ -83,7 +82,7 @@ func updateSessionCookie(w http.ResponseWriter, user_id int, raw_auth_token stri
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   true,
-		Expires:  time.Now().Add(cookie_model.DEFAULT_TOKEN_EXPIRATION),
+		Expires:  time.Now().Add(auth_utils.DEFAULT_TOKEN_EXPIRATION),
 	})
 }
 

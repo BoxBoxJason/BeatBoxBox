@@ -41,3 +41,13 @@ func GetPlaylists(db *gorm.DB, playlist_ids []int) ([]db_model.Playlist, error) 
 	}
 	return playlists, nil
 }
+
+func GetPlaylistsFromPartialTitle(db *gorm.DB, title string) ([]db_model.Playlist, error) {
+	var playlists []db_model.Playlist
+	// Using `Find` to retrieve records with the IDs in playlist_ids slice
+	result := db.Where("title LIKE ?", "%"+title+"%").Find(&playlists)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return playlists, nil
+}

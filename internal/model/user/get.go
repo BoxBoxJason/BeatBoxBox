@@ -41,3 +41,13 @@ func GetUsers(db *gorm.DB, user_ids []int) ([]db_model.User, error) {
 	}
 	return users, nil
 }
+
+func GetUsersFromPartialPseudo(db *gorm.DB, partial_pseudo string) ([]db_model.User, error) {
+	var users []db_model.User
+	// Using `Find` to retrieve records with the pseudo containing partial_pseudo
+	result := db.Where("pseudo LIKE ?", "%"+partial_pseudo+"%").Find(&users)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return users, nil
+}
