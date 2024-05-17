@@ -2,7 +2,7 @@ package artist_handler
 
 import "github.com/gorilla/mux"
 
-func SetupArtistsRoutes(artist_api_router *mux.Router) {
+func SetupArtistsAPIRoutes(artist_api_router *mux.Router) {
 	// POST
 	artist_api_router.HandleFunc("/", postArtistHandler).Methods("POST")
 

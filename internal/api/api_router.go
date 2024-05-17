@@ -2,6 +2,7 @@ package api_init
 
 import (
 	album_handler "BeatBoxBox/internal/api/album"
+	artist_handler "BeatBoxBox/internal/api/artist"
 	music_handler "BeatBoxBox/internal/api/music"
 	playlist_handler "BeatBoxBox/internal/api/playlist"
 	user_handler "BeatBoxBox/internal/api/user"
@@ -21,4 +22,7 @@ func SetupAPIRouter(api_router *mux.Router) {
 
 	albums_api_router := api_router.PathPrefix("/albums").Subrouter()
 	album_handler.SetupAlbumAPIRoutes(albums_api_router)
+
+	artists_api_router := api_router.PathPrefix("/artists").Subrouter()
+	artist_handler.SetupArtistsAPIRoutes(artists_api_router)
 }
