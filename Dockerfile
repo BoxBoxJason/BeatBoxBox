@@ -1,5 +1,21 @@
 FROM alpine:latest
 
+ARG DB_HOST=beatboxbox-db
+ARG DB_PORT=5432
+ARG DB_USER=admin
+ARG DB_PASSWORD=admin
+ARG DB_NAME=beatboxbox
+ARG DB_SSLMODE=disable
+ARG SECRET_JWT_KEY=secret
+
+ENV DB_HOST=${DB_HOST} \
+    DB_PORT=${DB_PORT} \
+    DB_USER=${DB_USER} \
+    DB_PASSWORD=${DB_PASSWORD} \
+    DB_NAME=${DB_NAME} \
+    DB_SSLMODE=${DB_SSLMODE} \
+    SECRET_JWT_KEY=${SECRET_JWT_KEY}
+
 WORKDIR /home/user/BeatBoxBox
 
 # Install required packages
@@ -30,3 +46,4 @@ RUN cd /home/user/BeatBoxBox/frontend && \
     go mod tidy
 
 ENTRYPOINT ["go", "run", "/home/user/BeatBoxBox/cmd/server/main.go"]
+#ENTRYPOINT ["go","test","./...","-parallel","4","-v"]

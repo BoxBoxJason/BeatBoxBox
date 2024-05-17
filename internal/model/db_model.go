@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -41,15 +40,16 @@ func CheckDB() error {
 
 // Open a database connection to the PostgreSQL database
 func OpenDB() (*gorm.DB, error) {
-	if err := godotenv.Load(); err != nil {
-		logger.Critical("Error loading .env file: " + err.Error())
-	}
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
 	user := os.Getenv("DB_USER")
 	password := os.Getenv("DB_PASSWORD")
 	dbname := os.Getenv("DB_NAME")
 	sslmode := os.Getenv("DB_SSLMODE")
+	if host == "" || port == "" || user == "" || password == "" || dbname == "" || sslmode == "" {
+		logger.Critical("Missing environment variables")
+		return nil, custom_errors.NewDatabaseError("Missing environment variables")
+	}
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s", host, user, password, dbname, port, sslmode)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -92,6 +92,7 @@ type Album struct {
 type Artist struct {
 	Id           int     `gorm:"primaryKey;autoIncrement"`
 	Pseudo       string  `gorm:"type:varchar(32);unique;not null"`
+	Bio          string  `gorm:"type:text"`
 	Illustration string  `gorm:"type:varchar(36);default:'default.jpg'"`
 	Musics       []Music `gorm:"foreignKey:AlbumId;"`
 }
@@ -99,6 +100,7 @@ type Artist struct {
 type Music struct {
 	Id           int      `gorm:"primaryKey;autoIncrement"`
 	Title        string   `gorm:"type:text;not null"`
+	Lyrics       string   `gorm:"type:text"`
 	Artists      []Artist `gorm:"many2many:artist_musics;"`
 	AlbumId      int
 	Album        Album    `gorm:"foreignKey:AlbumId"`
