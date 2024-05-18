@@ -7,6 +7,26 @@ import (
 	"net/http"
 )
 
+// RegisterHandler handles the registration of a user
+// @Summary Register a user
+// @Description Register a user
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param username formData string true "Username"
+// @Param email formData string true "Email"
+// @Param password formData string true "Password"
+// @Param password_confirm formData string true "Password confirmation"
+// @Success 201 {string} string "User created"
+// @Failure 400 {string} string "Invalid username, must be between 3 and 32 characters"
+// @Failure 400 {string} string "Invalid email, must be less than 256 characters be a valid email pattern"
+// @Failure 400 {string} string "Invalid password, must be at least 6 characters long with at least one special character, one uppercase, one lowercase and one number"
+// @Failure 400 {string} string "Passwords do not match"
+// @Failure 400 {string} string "Username already exists"
+// @Failure 400 {string} string "Email already exists"
+// @Failure 500 {string} string "Error creating user"
+// @Failure 500 {string} string "Error creating auth token, the account was created successfuly"
+// @Router /api/users/register [post]
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {

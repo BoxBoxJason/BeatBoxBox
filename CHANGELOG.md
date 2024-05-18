@@ -10,7 +10,19 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-## [User API Release] - 2024-04-27
+## [Playlist, Artist, Album REST API Release] - 2024-05-14
+
+### Added
+- Playlist CRUD operations
+- Album CRUD operations
+- Artist CRUD operations
+- Quickstart script for easy setup (on Linux, Mac & Windows)
+
+### Changed
+- Updated ORM models for Playlist, Album, Artist, User & Music
+- Updated database schema to include Playlist, Album, Artist tables
+
+## [User REST API Release] - 2024-04-27
 
 ### Added
 - ORM models for all database tables
@@ -22,7 +34,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-## [Musics API Release] - 2024-04-20
+## [Musics REST API Release] - 2024-04-20
 
 ### Added
 

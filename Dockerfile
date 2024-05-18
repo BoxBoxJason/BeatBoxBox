@@ -14,9 +14,10 @@ ENV DB_HOST=${DB_HOST} \
     DB_PASSWORD=${DB_PASSWORD} \
     DB_NAME=${DB_NAME} \
     DB_SSLMODE=${DB_SSLMODE} \
-    SECRET_JWT_KEY=${SECRET_JWT_KEY}
+    SECRET_JWT_KEY=${SECRET_JWT_KEY} \
+    BEATBOXBOX_ROOT_DIR="/home/user/beatboxbox"
 
-WORKDIR /home/user/BeatBoxBox
+WORKDIR /home/user/beatboxbox
 
 # Install required packages
 RUN apk add --no-cache \
@@ -39,11 +40,11 @@ COPY ./internal ./internal/
 COPY ./frontend ./frontend/
 
 # Build frontend & install go dependencies
-RUN cd /home/user/BeatBoxBox/frontend && \
+RUN cd /home/user/beatboxbox/frontend && \
     npm install && \
     npm run build && \
-    cd /home/user/BeatBoxBox && \
+    cd /home/user/beatboxbox && \
     go mod tidy
 
-ENTRYPOINT ["go", "run", "/home/user/BeatBoxBox/cmd/server/main.go"]
+ENTRYPOINT ["go", "run", "/home/user/beatboxbox/cmd/server/main.go"]
 #ENTRYPOINT ["go","test","./...","-parallel","4","-v"]
