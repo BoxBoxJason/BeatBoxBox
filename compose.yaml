@@ -4,7 +4,7 @@ services:
   beatboxbox-server:
     image: beatboxbox:latest
     ports:
-      - "8080:8080"
+      - "3000:3000"
     depends_on:
       - beatboxbox-db
     networks:
