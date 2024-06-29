@@ -173,10 +173,7 @@ func TestGetMusicsFromPartialTitle(t *testing.T) {
 	}
 	db.Create(&music)
 
-	musics, err := GetMusicsFromPartialTitle(db, "Test Music")
-	if err != nil {
-		t.Errorf("Error getting music: %s", err)
-	}
+	musics := GetMusicsFromPartialTitle(db, "Test Music")
 	if len(musics) < 1 {
 		t.Errorf("Expected at least 1 music, got %d", len(musics))
 	} else {
@@ -280,6 +277,32 @@ func TestMusicsDeleteFromIds(t *testing.T) {
 
 	music_id := music.Id
 	err = DeleteMusics(db, []int{music_id})
+	if err != nil {
+		t.Errorf("Error deleting music: %s", err)
+	}
+
+	music = db_tables.Music{}
+	result := db.Where("id = ?", music_id).First(&music)
+	if result.Error == nil {
+		t.Errorf("Expected music to be deleted, got %v", music)
+	}
+}
+
+func TestMusicsDeleteFromRecords(t *testing.T) {
+	db, err := db_model.OpenDB()
+	if err != nil {
+		t.Errorf("Error opening database: %s", err)
+	}
+	defer db_model.CloseDB(db)
+
+	music := db_tables.Music{
+		Title: "Test Music 12",
+		Path:  "fake.mp3",
+	}
+	db.Create(&music)
+
+	music_id := music.Id
+	err = DeleteMusicsFromRecords(db, []*db_tables.Music{&music})
 	if err != nil {
 		t.Errorf("Error deleting music: %s", err)
 	}

@@ -47,15 +47,15 @@ func GetMusics(db *gorm.DB, music_ids []int) ([]db_tables.Music, error) {
 	return musics, nil
 }
 
-func GetMusicsFromPartialTitle(db *gorm.DB, title string) ([]db_tables.Music, error) {
+func GetMusicsFromPartialTitle(db *gorm.DB, title string) []db_tables.Music {
 	raw_musics := db_model.GetRecordsByFieldsWithCondition(db, &db_tables.Music{}, map[string]interface{}{}, "title LIKE ?", "%"+title+"%")
 	if raw_musics == nil {
-		return nil, gorm.ErrRecordNotFound
+		return nil
 	}
 	musics := make([]db_tables.Music, len(raw_musics))
 	for i, music := range raw_musics {
 		musics[i] = music.(db_tables.Music)
 	}
 
-	return musics, nil
+	return musics
 }

@@ -12,10 +12,12 @@ func UpdateMusic(db *gorm.DB, music *db_tables.Music, fields map[string]interfac
 	return db.Model(music).Updates(fields).Error
 }
 
+// AddArtistsToMusic adds artists to a music in the database
 func AddArtistsToMusic(db *gorm.DB, music *db_tables.Music, artists []*db_tables.Artist) error {
 	return db_model.AddElementsToAssociation(db, music, "Artists", artists)
 }
 
+// RemoveArtistsFromMusic removes artists from a music in the database
 func RemoveArtistsFromMusic(db *gorm.DB, music *db_tables.Music, artists []*db_tables.Artist) error {
 	return db_model.RemoveElementsFromAssociation(db, music, "Artists", artists)
 }
