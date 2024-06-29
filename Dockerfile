@@ -21,12 +21,18 @@ WORKDIR /home/user/beatboxbox
 
 # Install required packages
 RUN apk add --no-cache \
-    bash \
-    curl \
-    openssh \
     npm \
     go && \
-    npm install -g npm@latest @vue/cli
+    rm -rf /var/cache/apk/* && \
+    npm install --no-cache -g npm@latest @vue/cli
+
+# Build frontend
+COPY ./frontend ./frontend/
+RUN cd /home/user/beatboxbox/frontend && \
+    npm --no-cache install && \
+    npm cache clean --force && \
+    npm run build && \
+    find dist -mindepth 1 -maxdepth 1 ! -name 'dist' -exec rm -rf {} +
 
 # Copy the source code
 COPY ./pkg ./pkg/
@@ -37,14 +43,10 @@ COPY ./go.mod \
 COPY ./cmd ./cmd/
 COPY ./secret ./secret/
 COPY ./internal ./internal/
-COPY ./frontend ./frontend/
 
-# Build frontend & install go dependencies
-RUN cd /home/user/beatboxbox/frontend && \
-    npm install && \
-    npm run build && \
-    cd /home/user/beatboxbox && \
+# Build backend
+RUN cd /home/user/beatboxbox && \
     go mod tidy
 
-ENTRYPOINT ["go", "run", "/home/user/beatboxbox/cmd/server/main.go"]
-#ENTRYPOINT ["go","test","./...","-parallel","4","-v"]
+# ENTRYPOINT ["go", "run", "/home/user/beatboxbox/cmd/server/main.go"]
+ENTRYPOINT ["go","test","./...","-parallel","4","-v"]

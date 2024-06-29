@@ -14,6 +14,8 @@ fi
 
 # Get rid of the old containers
 docker compose down
+docker rm beatboxbox-beatboxbox-db-1 beatboxbox-beatboxbox-server-1
+docker volume rm beatboxbox_postgres_data
 docker rmi -f beatboxbox:latest
 
 # Build the new container

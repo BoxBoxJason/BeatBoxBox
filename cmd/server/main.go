@@ -2,7 +2,7 @@ package main
 
 import (
 	api_init "BeatBoxBox/internal/api"
-	db_model "BeatBoxBox/internal/model"
+	db_model "BeatBoxBox/pkg/db_model"
 	"BeatBoxBox/pkg/logger"
 	"net/http"
 
