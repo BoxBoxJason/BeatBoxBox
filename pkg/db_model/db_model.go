@@ -20,7 +20,7 @@ func OpenDB() (*gorm.DB, error) {
 	sslmode := os.Getenv("DB_SSLMODE")
 	if host == "" || port == "" || user == "" || password == "" || dbname == "" || sslmode == "" {
 		logger.Critical("Missing environment variables")
-		return nil, custom_errors.NewDatabaseError("Missing environment variables")
+		return nil, custom_errors.NewDatabaseError("Missing at least one of the required environment variables: DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME, DB_SSLMODE")
 	}
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s", host, user, password, dbname, port, sslmode)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})

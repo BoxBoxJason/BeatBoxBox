@@ -1,8 +1,9 @@
 package db_model
 
 import (
+	"BeatBoxBox/pkg/logger"
+	format_utils "BeatBoxBox/pkg/utils/formatutils"
 	"fmt"
-
 	"gorm.io/gorm"
 )
 
@@ -35,12 +36,16 @@ func RecordsExistFromIds(db *gorm.DB, model interface{}, ids []int) error {
 
 // GetRecordsFromIds fetches multiple records from the database based on their ids
 func GetRecordsFromIds(db *gorm.DB, model interface{}, ids []int) []interface{} {
-	var records []interface{}
-	result := db.Where("id IN ?", ids).Find(model)
+	// Create a slice of the model type
+	records_ptr := format_utils.CreateSliceOfAny(model)
+	// Perform the query
+	result := db.Model(model).Where("id IN ?", ids).Find(records_ptr)
 	if result.Error != nil {
+		logger.Error(result.Error)
 		return nil
 	}
-	return records
+	// Convert to []interface{}
+	return format_utils.ConvertRecordsToInterfaceArray(records_ptr)
 }
 
 // RecordExistsByField fetches a single record from the database based on a specific field
@@ -54,18 +59,23 @@ func RecordExistsByField(db *gorm.DB, model interface{}, field string, value int
 
 // GetRecordsByField fetches multiple records from the database based on a specific field
 func GetRecordsByField(db *gorm.DB, model interface{}, field string, value interface{}) []interface{} {
-	var records []interface{}
-	result := db.Where(field+" = ?", value).Find(model)
+	// Create a slice of the model type
+	records_ptr := format_utils.CreateSliceOfAny(model)
+	// Perform the query
+	result := db.Model(model).Where(field+" = ?", value).Find(records_ptr)
 	if result.Error != nil {
+		logger.Error(result.Error)
 		return nil
 	}
-	return records
+	// Convert to []interface{}
+	return format_utils.ConvertRecordsToInterfaceArray(records_ptr)
 }
 
 // GetRecordByField fetches a single record from the database based on a specific field
 func GetRecordByField(db *gorm.DB, model interface{}, field string, value interface{}) interface{} {
 	result := db.Where(field+" = ?", value).First(model)
 	if result.Error != nil {
+		logger.Error(result.Error)
 		return nil
 	}
 	return model
@@ -82,12 +92,16 @@ func RecordExistsByFields(db *gorm.DB, model interface{}, fields map[string]inte
 
 // GetRecordsByFields fetches multiple records from the database based on multiple fields
 func GetRecordsByFields(db *gorm.DB, model interface{}, fields map[string]interface{}) []interface{} {
-	var records []interface{}
-	result := db.Where(fields).Find(model)
+	// Create a slice of the model type
+	records_ptr := format_utils.CreateSliceOfAny(model)
+	// Perform the query
+	result := db.Model(model).Where(fields).Find(records_ptr)
 	if result.Error != nil {
+		logger.Error(result.Error)
 		return nil
 	}
-	return records
+	// Convert to []interface{}
+	return format_utils.ConvertRecordsToInterfaceArray(records_ptr)
 }
 
 // RecordExistsByFieldWithCondition fetches a single record from the database based on a specific field with a condition
@@ -101,23 +115,20 @@ func RecordExistsByFieldsWithCondition(db *gorm.DB, model interface{}, fields ma
 
 // GetRecordsByFieldWithCondition fetches multiple records from the database based on a specific field with a condition
 func GetRecordsByFieldsWithCondition(db *gorm.DB, model interface{}, fields map[string]interface{}, condition string, condition_value interface{}) []interface{} {
-	var results []interface{}
-	query := db.Model(model)
-
-	for field, value := range fields {
-		query = query.Where(fmt.Sprintf("%s = ?", field), value)
-	}
-
+	// Create a slice of the model type
+	records_ptr := format_utils.CreateSliceOfAny(model)
+	// Perform the query
+	query := db.Model(model).Where(fields)
 	if condition != "" {
 		query = query.Where(condition, condition_value)
 	}
-
-	err := query.Find(&results).Error
-	if err != nil {
+	result := query.Find(records_ptr)
+	if result.Error != nil {
+		logger.Error(result.Error)
 		return nil
 	}
-
-	return results
+	// Convert to []interface{}
+	return format_utils.ConvertRecordsToInterfaceArray(records_ptr)
 }
 
 // RecordExistsByListFieldElement fetches a single record from the database based on a specific list field if the element exists in the field
@@ -132,11 +143,14 @@ func RecordExistsByListFieldElement(db *gorm.DB, model interface{}, field string
 
 // GetRecordsByListFieldElement fetches multiple records from the database based on a specific list field if the element exists in the field
 func GetRecordsByListFieldElement(db *gorm.DB, model interface{}, field string, value interface{}) []interface{} {
-	var records []interface{}
+	// Create a slice of the model type
+	records_ptr := format_utils.CreateSliceOfAny(model)
+	// Perform the query
 	condition := fmt.Sprintf("%s @> ?", field)
 	result := db.Where(condition, fmt.Sprintf("{%v}", value)).Find(model)
 	if result.Error != nil {
 		return nil
 	}
-	return records
+	// Convert to []interface{}
+	return format_utils.ConvertRecordsToInterfaceArray(records_ptr)
 }

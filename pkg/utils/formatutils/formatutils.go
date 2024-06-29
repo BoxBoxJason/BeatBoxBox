@@ -1,6 +1,7 @@
 package format_utils
 
 import (
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -88,4 +89,26 @@ func Max(a int, b int) int {
 		return a
 	}
 	return b
+}
+
+func Min(a int, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func ConvertRecordsToInterfaceArray(records_ptr any) []interface{} {
+	records := reflect.ValueOf(records_ptr).Elem()
+	records_interface := make([]interface{}, records.Len())
+	for i := 0; i < records.Len(); i++ {
+		records_interface[i] = records.Index(i).Interface()
+	}
+
+	return records_interface
+}
+
+func CreateSliceOfAny(to_slice any) any {
+	to_slice_type := reflect.TypeOf(to_slice).Elem()
+	return reflect.New(reflect.SliceOf(to_slice_type)).Interface()
 }

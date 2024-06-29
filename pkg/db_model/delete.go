@@ -12,7 +12,7 @@ func DeleteDBRecord(db *gorm.DB, model interface{}, id int) error {
 }
 
 // DeleteDBRecordNoFetch deletes a single record from the database based on the record itself
-func DeleteDBRecordNoFetch(db *gorm.DB, model interface{}, record interface{}) error {
+func DeleteDBRecordNoFetch(db *gorm.DB, record interface{}) error {
 	err := db.Delete(record).Error
 	if err != nil {
 		return err
@@ -23,15 +23,6 @@ func DeleteDBRecordNoFetch(db *gorm.DB, model interface{}, record interface{}) e
 // DeleteDBRecords deletes multiple records from the database based on their ids
 func DeleteDBRecords(db *gorm.DB, model interface{}, ids []int) error {
 	err := db.Where("id IN ?", ids).Delete(model).Error
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// DeleteDBRecordsNoFetch deletes multiple records from the database based on the records themselves
-func DeleteDBRecordsNoFetch(db *gorm.DB, model interface{}, records []interface{}) error {
-	err := db.Delete(records).Error
 	if err != nil {
 		return err
 	}

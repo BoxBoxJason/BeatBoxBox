@@ -9,19 +9,13 @@ import (
 // EditRecordField edits a single field of a record in the database
 func EditRecordField(db *gorm.DB, record interface{}, field string, value interface{}) error {
 	result := db.Model(record).Update(field, value)
-	if result.Error != nil {
-		return result.Error
-	}
-	return nil
+	return result.Error
 }
 
 // EditRecordFields edits multiple fields of a record in the database
 func EditRecordFields(db *gorm.DB, record interface{}, fields map[string]interface{}) error {
 	result := db.Model(record).Updates(fields)
-	if result.Error != nil {
-		return result.Error
-	}
-	return nil
+	return result.Error
 }
 
 // AddElementToRecordListField adds an element to a list field of a record in the database
@@ -53,4 +47,14 @@ func RemoveElementFromRecordListField(db *gorm.DB, record interface{}, field str
 		}
 	}
 	return gorm.ErrRecordNotFound
+}
+
+// RemoveElementsFromAssociation removes elements from an association of a record in the database
+func RemoveElementsFromAssociation(db *gorm.DB, record interface{}, association string, association_records interface{}) error {
+	return db.Model(record).Association(association).Delete(association_records)
+}
+
+// AddElementsToAssociation adds elements to an association of a record in the database
+func AddElementsToAssociation(db *gorm.DB, record interface{}, association string, association_records interface{}) error {
+	return db.Model(record).Association(association).Append(association_records)
 }
