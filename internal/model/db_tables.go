@@ -27,7 +27,7 @@ type Playlist struct {
 	Description  string  `gorm:"type:text"`
 	Illustration string  `gorm:"type:text;default:'default.jpg'"`
 	Musics       []Music `gorm:"many2many:playlist_musics;"`
-	CreatorId    int
+	CreatorId    *uint
 	Creator      User `gorm:"foreignKey:CreatorId"`
 	Protected    bool `gorm:"default:true"`
 	CreatedOn    int  `gorm:"autoCreateTime" json:"created_on"`
