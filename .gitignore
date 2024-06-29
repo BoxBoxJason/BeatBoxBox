@@ -1,0 +1,6 @@
+*.pem
+secret/
+node_modules/
+dist/
+.idea/
+go.sum
