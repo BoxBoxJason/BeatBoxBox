@@ -1,20 +1,21 @@
 package music_model
 
 import (
-	db_model "BeatBoxBox/internal/model"
+	db_tables "BeatBoxBox/internal/model"
+	db_model "BeatBoxBox/pkg/db_model"
 
 	"gorm.io/gorm"
 )
 
 // UpdateMusic updates an existing music in the database
-func UpdateMusic(db *gorm.DB, music_id int, update_map map[string]interface{}) error {
-	return db.Model(&db_model.Music{}).Where("id = ?", music_id).Updates(update_map).Error
+func UpdateMusic(db *gorm.DB, music *db_tables.Music, fields map[string]interface{}) error {
+	return db.Model(music).Updates(fields).Error
 }
 
-func AddArtistsToMusic(db *gorm.DB, music_id int, artists_ids []int) error {
-	return db.Model(&db_model.Music{}).Where("id = ?", music_id).Association("artist_musics").Append(artists_ids)
+func AddArtistsToMusic(db *gorm.DB, music *db_tables.Music, artists []*db_tables.Artist) error {
+	return db_model.AddElementsToAssociation(db, music, "Artists", artists)
 }
 
-func RemoveArtistsFromMusic(db *gorm.DB, music_id int, artists_ids []int) error {
-	return db.Model(&db_model.Music{}).Where("id = ?", music_id).Association("artist_musics").Delete(artists_ids)
+func RemoveArtistsFromMusic(db *gorm.DB, music *db_tables.Music, artists []*db_tables.Artist) error {
+	return db_model.RemoveElementsFromAssociation(db, music, "Artists", artists)
 }

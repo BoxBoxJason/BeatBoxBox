@@ -29,7 +29,7 @@ func GetMusic(db *gorm.DB, music_id int) (db_tables.Music, error) {
 	if music == nil {
 		return db_tables.Music{}, gorm.ErrRecordNotFound
 	}
-	return music.(db_tables.Music), nil
+	return *music.(*db_tables.Music), nil
 }
 
 // GetMusics returns a list of musics from the database
@@ -48,7 +48,7 @@ func GetMusics(db *gorm.DB, music_ids []int) ([]db_tables.Music, error) {
 }
 
 func GetMusicsFromPartialTitle(db *gorm.DB, title string) ([]db_tables.Music, error) {
-	raw_musics := db_model.GetRecordsByFieldsWithCondition(db, &db_tables.Music{}, map[string]interface{}{"title": title}, "title LIKE ?", "%"+title+"%")
+	raw_musics := db_model.GetRecordsByFieldsWithCondition(db, &db_tables.Music{}, map[string]interface{}{}, "title LIKE ?", "%"+title+"%")
 	if raw_musics == nil {
 		return nil, gorm.ErrRecordNotFound
 	}

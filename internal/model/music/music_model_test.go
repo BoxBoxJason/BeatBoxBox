@@ -1,7 +1,9 @@
 package music_model
 
 import (
-	db_model "BeatBoxBox/internal/model"
+	db_tables "BeatBoxBox/internal/model"
+	db_model "BeatBoxBox/pkg/db_model"
+	"strings"
 	"testing"
 )
 
@@ -13,7 +15,7 @@ func TestMusicCreate(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	_, err = CreateMusic(db, "Test Music", []string{"pop", "funk"}, 0, "fake.mp3", "default.jpg")
+	_, err = CreateMusic(db, "Test Music 1", []string{"pop", "funk"}, -1, "fake.mp3", "default.jpg", -1)
 	if err != nil {
 		t.Errorf("Error creating music: %s", err)
 	}
@@ -27,21 +29,22 @@ func TestMusicUpdate(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	music := db_model.Music{
-		Title: "Test Music",
+	music := db_tables.Music{
+		Title: "Test Music 2",
 		Path:  "fake.mp3",
 	}
 	db.Create(&music)
 
-	UpdateMusic(db, music.Id, map[string]interface{}{"title": "New Music"})
-	UpdateMusic(db, music.Id, map[string]interface{}{"path": "new_fake.mp3"})
-
-	music_id := music.Id
-	music = db_model.Music{}
-	db.Where("id = ?", music_id).First(&music)
-
+	err = UpdateMusic(db, &music, map[string]interface{}{"title": "New Music"})
+	if err != nil {
+		t.Errorf("Error updating music: %s", err)
+	}
 	if music.Title != "New Music" {
 		t.Errorf("Expected music title to be 'New Music', got '%s'", music.Title)
+	}
+	err = UpdateMusic(db, &music, map[string]interface{}{"path": "new_fake.mp3"})
+	if err != nil {
+		t.Errorf("Error updating music: %s", err)
 	}
 	if music.Path != "new_fake.mp3" {
 		t.Errorf("Expected music path to be 'new_fake.mp3', got '%s'", music.Path)
@@ -55,24 +58,21 @@ func TestAddArtistToMusic(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	music := db_model.Music{
-		Title: "Test Music",
+	music := db_tables.Music{
+		Title: "Test Music 3",
 		Path:  "fake.mp3",
 	}
 	db.Create(&music)
 
-	artist := db_model.Artist{
-		Pseudo: "Test Artist",
+	artist := db_tables.Artist{
+		Pseudo: "Test Artist 1",
 	}
 	db.Create(&artist)
 
-	err = AddArtistsToMusic(db, music.Id, []int{artist.Id})
+	err = AddArtistsToMusic(db, &music, []*db_tables.Artist{&artist})
 	if err != nil {
 		t.Errorf("Error adding artist to music: %s", err)
 	}
-
-	music = db_model.Music{}
-	db.Where("id = ?", music.Id).Preload("Artists").First(&music)
 
 	if len(music.Artists) < 1 {
 		t.Errorf("Expected at least 1 artist, got %d", len(music.Artists))
@@ -87,29 +87,26 @@ func TestRemoveArtistFromMusic(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	music := db_model.Music{
-		Title: "Test Music",
+	music := db_tables.Music{
+		Title: "Test Music 4",
 		Path:  "fake.mp3",
 	}
 	db.Create(&music)
 
-	artist := db_model.Artist{
-		Pseudo: "Test Artist",
+	artist := db_tables.Artist{
+		Pseudo: "Test Artist 2",
 	}
 	db.Create(&artist)
 
-	err = AddArtistsToMusic(db, music.Id, []int{artist.Id})
+	err = AddArtistsToMusic(db, &music, []*db_tables.Artist{&artist})
 	if err != nil {
 		t.Errorf("Error adding artist to music: %s", err)
 	}
 
-	err = RemoveArtistsFromMusic(db, music.Id, []int{artist.Id})
+	err = RemoveArtistsFromMusic(db, &music, []*db_tables.Artist{&artist})
 	if err != nil {
 		t.Errorf("Error removing artist from music: %s", err)
 	}
-
-	music = db_model.Music{}
-	db.Where("id = ?", music.Id).Preload("Artists").First(&music)
 
 	if len(music.Artists) > 0 {
 		t.Errorf("Expected 0 artist, got %d", len(music.Artists))
@@ -125,8 +122,8 @@ func TestGetMusic(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	music := db_model.Music{
-		Title: "Test Music",
+	music := db_tables.Music{
+		Title: "Test Music 5",
 		Path:  "fake.mp3",
 	}
 	db.Create(&music)
@@ -135,8 +132,8 @@ func TestGetMusic(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error getting music: %s", err)
 	}
-	if music.Title != "Test Music" {
-		t.Errorf("Expected music title to be 'Test Music', got '%s'", music.Title)
+	if music.Title != "Test Music 5" {
+		t.Errorf("Expected music title to be 'Test Music 5', got '%s'", music.Title)
 	}
 }
 
@@ -147,22 +144,19 @@ func TestGetMusicsFromFilters(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	music := db_model.Music{
-		Title: "Test Music",
+	music := db_tables.Music{
+		Title: "Test Music 6",
 		Path:  "fake.mp3",
 	}
 	db.Create(&music)
 
-	musics, err := GetMusicsFromFilters(db, map[string]interface{}{"title": "Test Music"})
-	if err != nil {
-		t.Errorf("Error getting music: %s", err)
-	}
+	musics := GetMusicsFromFilters(db, map[string]interface{}{"title": "Test Music 6"})
 	if len(musics) < 1 {
 		t.Errorf("Expected at least 1 music, got %d", len(musics))
-	}
-
-	if musics[0].Title != "Test Music" {
-		t.Errorf("Expected music title to be 'Test Music', got '%s'", musics[0].Title)
+	} else {
+		if musics[0].Title != "Test Music 6" {
+			t.Errorf("Expected music title to be 'Test Music', got '%s'", musics[0].Title)
+		}
 	}
 }
 
@@ -173,22 +167,22 @@ func TestGetMusicsFromPartialTitle(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	music := db_model.Music{
-		Title: "Test Music",
+	music := db_tables.Music{
+		Title: "Test Music 7",
 		Path:  "fake.mp3",
 	}
 	db.Create(&music)
 
-	musics, err := GetMusicsFromPartialTitle(db, "Test")
+	musics, err := GetMusicsFromPartialTitle(db, "Test Music")
 	if err != nil {
 		t.Errorf("Error getting music: %s", err)
 	}
 	if len(musics) < 1 {
 		t.Errorf("Expected at least 1 music, got %d", len(musics))
-	}
-
-	if musics[0].Title != "Test Music" {
-		t.Errorf("Expected music title to be 'Test Music', got '%s'", musics[0].Title)
+	} else {
+		if !strings.Contains(musics[0].Title, "Test Music") {
+			t.Errorf("Expected music title to contain 'Test Music', got '%s'", musics[0].Title)
+		}
 	}
 }
 
@@ -199,8 +193,8 @@ func TestGetMusics(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	music := db_model.Music{
-		Title: "Test Music",
+	music := db_tables.Music{
+		Title: "Test Music 8",
 		Path:  "fake.mp3",
 	}
 	db.Create(&music)
@@ -211,10 +205,10 @@ func TestGetMusics(t *testing.T) {
 	}
 	if len(musics) < 1 {
 		t.Errorf("Expected at least 1 music, got %d", len(musics))
-	}
-
-	if musics[0].Title != "Test Music" {
-		t.Errorf("Expected music title to be 'Test Music', got '%s'", musics[0].Title)
+	} else {
+		if !strings.Contains(musics[0].Title, "Test Music") {
+			t.Errorf("Expected music title to contain 'Test Music', got '%s'", musics[0].Title)
+		}
 	}
 }
 
@@ -227,8 +221,8 @@ func TestMusicDeleteFromId(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	music := db_model.Music{
-		Title: "Test Music",
+	music := db_tables.Music{
+		Title: "Test Music 9",
 		Path:  "fake.mp3",
 	}
 	db.Create(&music)
@@ -239,7 +233,32 @@ func TestMusicDeleteFromId(t *testing.T) {
 		t.Errorf("Error deleting music: %s", err)
 	}
 
-	music = db_model.Music{}
+	music = db_tables.Music{}
+	result := db.Where("id = ?", music_id).First(&music)
+	if result.Error == nil {
+		t.Errorf("Expected music to be deleted, got %v", music)
+	}
+}
+
+func TestMusicDeleteFromRecord(t *testing.T) {
+	db, err := db_model.OpenDB()
+	if err != nil {
+		t.Errorf("Error opening database: %s", err)
+	}
+	defer db_model.CloseDB(db)
+
+	music := db_tables.Music{
+		Title: "Test Music 10",
+		Path:  "fake.mp3",
+	}
+	db.Create(&music)
+	music_id := music.Id
+	err = DeleteMusicFromRecord(db, &music)
+	if err != nil {
+		t.Errorf("Error deleting music: %s", err)
+	}
+
+	music = db_tables.Music{}
 	result := db.Where("id = ?", music_id).First(&music)
 	if result.Error == nil {
 		t.Errorf("Expected music to be deleted, got %v", music)
@@ -253,8 +272,8 @@ func TestMusicsDeleteFromIds(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	music := db_model.Music{
-		Title: "Test Music",
+	music := db_tables.Music{
+		Title: "Test Music 11",
 		Path:  "fake.mp3",
 	}
 	db.Create(&music)
@@ -265,7 +284,7 @@ func TestMusicsDeleteFromIds(t *testing.T) {
 		t.Errorf("Error deleting music: %s", err)
 	}
 
-	music = db_model.Music{}
+	music = db_tables.Music{}
 	result := db.Where("id = ?", music_id).First(&music)
 	if result.Error == nil {
 		t.Errorf("Expected music to be deleted, got %v", music)
