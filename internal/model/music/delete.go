@@ -23,11 +23,6 @@ func DeleteMusics(db *gorm.DB, music_ids []int) error {
 
 // DeleteMusicsFromRecords deletes existing musics from the database
 func DeleteMusicsFromRecords(db *gorm.DB, musics []*db_tables.Music) error {
-	for _, music := range musics {
-		err := DeleteMusicFromRecord(db, music)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+	result := db.Delete(musics)
+	return result.Error
 }

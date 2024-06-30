@@ -23,11 +23,6 @@ func DeleteUsers(db *gorm.DB, user_ids []int) error {
 
 // DeleteUsersFromRecords deletes existing users from the database
 func DeleteUsersFromRecords(db *gorm.DB, users []*db_tables.User) error {
-	for _, user := range users {
-		err := db_model.DeleteDBRecordNoFetch(db, user)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+	result := db.Delete(users)
+	return result.Error
 }

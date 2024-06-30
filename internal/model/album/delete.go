@@ -13,12 +13,6 @@ func DeleteAlbumFromRecord(db *gorm.DB, album db_tables.Album) error {
 }
 
 // DeleteAlbumsFromRecords is a function that deletes multiple albums from the database.
-func DeleteAlbumsFromRecords(db *gorm.DB, albums []db_tables.Album) error {
-	for _, album := range albums {
-		err := db_model.DeleteDBRecordNoFetch(db, &album)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+func DeleteAlbumsFromRecords(db *gorm.DB, albums []*db_tables.Album) error {
+	return db.Delete(albums).Error
 }
