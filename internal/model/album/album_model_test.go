@@ -289,7 +289,7 @@ func TestAlbumDeleteFromRecords(t *testing.T) {
 	}
 	db.Create(&album)
 	album_id := album.Id
-	err = DeleteAlbumsFromRecords(db, []db_tables.Album{album})
+	err = DeleteAlbumsFromRecords(db, []*db_tables.Album{&album})
 	if err != nil {
 		t.Errorf("Error deleting album: %s", err)
 	}
