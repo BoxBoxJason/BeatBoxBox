@@ -40,7 +40,7 @@ type Album struct {
 	Description  string   `gorm:"type:text"`
 	Artists      []Artist `gorm:"many2many:album_artists;"`
 	Illustration string   `gorm:"type:text;default:'default.jpg'"`
-	Music        []Music  `gorm:"foreignKey:AlbumId;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Musics       []Music  `gorm:"foreignKey:AlbumId;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	CreatedOn    int      `gorm:"autoCreateTime" json:"created_on"`
 	ModifiedOn   int      `gorm:"autoUpdateTime:milli" json:"modified_on"`
 }

@@ -7,12 +7,18 @@ import (
 	"gorm.io/gorm"
 )
 
-// DeleteAlbum is a function that deletes an album from the database.
-func DeleteAlbum(db *gorm.DB, album_id int) error {
-	return db_model.DeleteDBRecord(db, &db_tables.Album{}, album_id)
+// DeleteAlbumFromRecord is a function that deletes an album from the database.
+func DeleteAlbumFromRecord(db *gorm.DB, album db_tables.Album) error {
+	return db_model.DeleteDBRecordNoFetch(db, &album)
 }
 
-// DeleteAlbums is a function that deletes multiple albums from the database.
-func DeleteAlbums(db *gorm.DB, album_ids []int) error {
-	return db_model.DeleteDBRecords(db, &db_tables.Album{}, album_ids)
+// DeleteAlbumsFromRecords is a function that deletes multiple albums from the database.
+func DeleteAlbumsFromRecords(db *gorm.DB, albums []db_tables.Album) error {
+	for _, album := range albums {
+		err := db_model.DeleteDBRecordNoFetch(db, &album)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

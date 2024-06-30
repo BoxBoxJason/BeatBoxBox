@@ -1,7 +1,8 @@
 package album_model
 
 import (
-	db_model "BeatBoxBox/internal/model"
+	db_tables "BeatBoxBox/internal/model"
+	db_model "BeatBoxBox/pkg/db_model"
 	"testing"
 )
 
@@ -13,13 +14,12 @@ func TestAlbumCreation(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	id, err := CreateAlbum(db, "Test Album", "This is a test album")
+	id, err := CreateAlbum(db, "Test Album 1", "fake.jpeg")
 
 	if err != nil {
 		t.Errorf("Error creating album: %s", err)
-	}
-	if id < 0 {
-		t.Errorf("Expected album Id to be a positive integer, got %d", id)
+	} else if id < 0 {
+		t.Errorf("Error creating album: id is negative")
 	}
 }
 
@@ -31,20 +31,17 @@ func TestAlbumUpdate(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	album := db_model.Album{
-		Title: "Test Album",
+	album := db_tables.Album{
+		Title: "Test Album 2",
 	}
 	db.Create(&album)
 
-	UpdateAlbum(db, album.Id, map[string]interface{}{"title": "Updated Album"})
-	UpdateAlbum(db, album.Id, map[string]interface{}{"description": "This is an updated test album"})
-	UpdateAlbum(db, album.Id, map[string]interface{}{"illustration": "update.jpg"})
+	err = UpdateAlbum(db, &album, map[string]interface{}{"title": "Updated Album 2", "description": "This is an updated test album", "illustration": "update.jpg"})
+	if err != nil {
+		t.Errorf("Error updating album: %s", err)
+	}
 
-	// Refresh the album from the database
-	album = db_model.Album{}
-	db.Where("id = ?", album.Id).First(&album)
-
-	if album.Title != "Updated Album" {
+	if album.Title != "Updated Album 2" {
 		t.Errorf("Expected album title to be 'Updated Album', got '%s'", album.Title)
 	}
 	if album.Description != "This is an updated test album" {
@@ -62,25 +59,21 @@ func TestAddMusicsToAlbum(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	album := db_model.Album{
-		Title: "Test Album",
+	album := db_tables.Album{
+		Title: "Test Album 3",
 	}
 	db.Create(&album)
-	album_id := album.Id
 
-	music := db_model.Music{
-		Title: "Test Music",
+	music := db_tables.Music{
+		Title: "Test Music 15",
+		Path:  "test.mp3",
 	}
 	db.Create(&music)
 
-	err = AddMusicsToAlbum(db, album.Id, []int{music.Id})
+	err = AddMusicsToAlbum(db, &album, []*db_tables.Music{&music})
 	if err != nil {
 		t.Errorf("Error adding music to album: %s", err)
 	}
-
-	// Refresh the album from the database
-	album = db_model.Album{}
-	db.Preload("Musics").Where("id = ?", album_id).First(&album)
 
 	if len(album.Musics) < 1 {
 		t.Errorf("Expected at least 1 music in album, got %d", len(album.Musics))
@@ -94,99 +87,79 @@ func TestRemoveMusicsFromAlbum(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	album := db_model.Album{
-		Title: "Test Album",
+	album := db_tables.Album{
+		Title: "Test Album 4",
 	}
 	db.Create(&album)
-	album_id := album.Id
 
-	music := db_model.Music{
-		Title: "Test Music",
+	music := db_tables.Music{
+		Title: "Test Music 16",
+		Path:  "test.mp3",
 	}
 	db.Create(&music)
 
-	err = AddMusicsToAlbum(db, album.Id, []int{music.Id})
-	if err != nil {
-		t.Errorf("Error adding music to album: %s", err)
-	}
+	album.Musics = append(album.Musics, music)
 
-	err = RemoveMusicsFromAlbum(db, album.Id, []int{music.Id})
+	err = RemoveMusicsFromAlbum(db, &album, []*db_tables.Music{&music})
 	if err != nil {
 		t.Errorf("Error removing music from album: %s", err)
 	}
-
-	// Refresh the album from the database
-	album = db_model.Album{}
-	db.Preload("Musics").Where("id = ?", album_id).First(&album)
 
 	if len(album.Musics) > 0 {
 		t.Errorf("Expected no music in album, got %d", len(album.Musics))
 	}
 }
 
-func TestAddArtistToAlbum(t *testing.T) {
+func TestAddArtistsToAlbum(t *testing.T) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		t.Errorf("Error opening database: %s", err)
 	}
 	defer db_model.CloseDB(db)
 
-	album := db_model.Album{
-		Title: "Test Album",
+	album := db_tables.Album{
+		Title: "Test Album 5",
 	}
 	db.Create(&album)
-	album_id := album.Id
 
-	artist := db_model.Artist{
-		Pseudo: "Test Artist",
+	artist := db_tables.Artist{
+		Pseudo: "Test Artist 3",
 	}
 	db.Create(&artist)
 
-	err = AddArtistToAlbum(db, album.Id, artist.Id)
+	err = AddArtistsToAlbum(db, &album, []*db_tables.Artist{&artist})
 	if err != nil {
 		t.Errorf("Error adding artist to album: %s", err)
 	}
-
-	// Refresh the album from the database
-	album = db_model.Album{}
-	db.Preload("Artists").Where("id = ?", album_id).First(&album)
 
 	if len(album.Artists) < 1 {
 		t.Errorf("Expected at least 1 artist in album, got %d", len(album.Artists))
 	}
 }
 
-func TestRemoveArtistFromAlbum(t *testing.T) {
+func TestRemoveArtistsFromAlbum(t *testing.T) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		t.Errorf("Error opening database: %s", err)
 	}
 	defer db_model.CloseDB(db)
 
-	album := db_model.Album{
-		Title: "Test Album",
+	album := db_tables.Album{
+		Title: "Test Album 6",
 	}
 	db.Create(&album)
-	album_id := album.Id
 
-	artist := db_model.Artist{
-		Pseudo: "Test Artist",
+	artist := db_tables.Artist{
+		Pseudo: "Test Artist 4",
 	}
 	db.Create(&artist)
 
-	err = AddArtistToAlbum(db, album.Id, artist.Id)
-	if err != nil {
-		t.Errorf("Error adding artist to album: %s", err)
-	}
+	album.Artists = append(album.Artists, artist)
 
-	err = RemoveArtistFromAlbum(db, album.Id, artist.Id)
+	err = RemoveArtistsFromAlbum(db, &album, []*db_tables.Artist{&artist})
 	if err != nil {
 		t.Errorf("Error removing artist from album: %s", err)
 	}
-
-	// Refresh the album from the database
-	album = db_model.Album{}
-	db.Preload("Artists").Where("id = ?", album_id).First(&album)
 
 	if len(album.Artists) > 0 {
 		t.Errorf("Expected no artist in album, got %d", len(album.Artists))
@@ -202,8 +175,8 @@ func TestAlbumGetFromId(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	album := db_model.Album{
-		Title: "Test Album",
+	album := db_tables.Album{
+		Title: "Test Album 7",
 	}
 	db.Create(&album)
 
@@ -224,17 +197,15 @@ func TestAlbumGetFromPartialTitle(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	album := db_model.Album{
-		Title: "Test Album",
+	album := db_tables.Album{
+		Title: "Test Album 8",
 	}
 	db.Create(&album)
 
-	albums, err := GetAlbumsFromPartialTitle(db, "Test")
-	if err != nil {
-		t.Errorf("Error retrieving album: %s", err)
-	}
-
-	if len(albums) < 1 {
+	albums := GetAlbumsFromPartialTitle(db, map[string]interface{}{}, "Test Album")
+	if albums == nil {
+		t.Errorf("Error retrieving album")
+	} else if len(albums) < 1 {
 		t.Errorf("Expected at least 1 album, got %d", len(albums))
 	}
 }
@@ -246,17 +217,15 @@ func TestAlbumGetFromFilters(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	album := db_model.Album{
-		Title: "Test Album",
+	album := db_tables.Album{
+		Title: "Test Album 9",
 	}
 	db.Create(&album)
 
-	albums, err := GetAlbumsFromFilters(db, map[string]interface{}{"title": "Test Album"})
-	if err != nil {
-		t.Errorf("Error retrieving album: %s", err)
-	}
-
-	if len(albums) < 1 {
+	albums := GetAlbumsFromFilters(db, map[string]interface{}{"title": "Test Album 9"})
+	if albums == nil {
+		t.Errorf("Error retrieving album")
+	} else if len(albums) < 1 {
 		t.Errorf("Expected at least 1 album, got %d", len(albums))
 	}
 }
@@ -268,68 +237,66 @@ func TestAlbumGetFromIds(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	album := db_model.Album{
-		Title: "Test Album",
+	album := db_tables.Album{
+		Title: "Test Album 10",
 	}
 	db.Create(&album)
 
 	albums, err := GetAlbums(db, []int{album.Id})
 	if err != nil {
 		t.Errorf("Error retrieving album: %s", err)
-	}
-
-	if len(albums) < 1 {
+	} else if len(albums) < 1 {
 		t.Errorf("Expected at least 1 album, got %d", len(albums))
 	}
 }
 
 // DELETE FUNCTIONS TESTS
 
-func TestAlbumDeleteFromId(t *testing.T) {
+func TestAlbumDeleteFromRecord(t *testing.T) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		t.Errorf("Error opening database: %s", err)
 	}
 	defer db_model.CloseDB(db)
 
-	album := db_model.Album{
-		Title: "Test Album",
+	album := db_tables.Album{
+		Title: "Test Album 11",
 	}
 	db.Create(&album)
-
-	err = DeleteAlbum(db, album.Id)
+	album_id := album.Id
+	err = DeleteAlbumFromRecord(db, album)
 	if err != nil {
 		t.Errorf("Error deleting album: %s", err)
 	}
 
 	// Refresh the album from the database
-	album = db_model.Album{}
-	result := db.Where("id = ?", album.Id).First(&album)
+	album = db_tables.Album{}
+	result := db.Where("id = ?", album_id).First(&album)
 	if result.Error == nil {
 		t.Errorf("Expected error when retrieving deleted album, got nil")
 	}
 }
 
-func TestAlbumDeleteFromIds(t *testing.T) {
+func TestAlbumDeleteFromRecords(t *testing.T) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		t.Errorf("Error opening database: %s", err)
 	}
 	defer db_model.CloseDB(db)
 
-	album := db_model.Album{
-		Title: "Test Album",
+	album := db_tables.Album{
+		Title: "Test Album 12",
 	}
 	db.Create(&album)
-
-	err = DeleteAlbums(db, []int{album.Id})
+	album_id := album.Id
+	err = DeleteAlbumsFromRecords(db, []db_tables.Album{album})
 	if err != nil {
 		t.Errorf("Error deleting album: %s", err)
 	}
 
 	// Refresh the album from the database
-	album = db_model.Album{}
-	result := db.Where("id = ?", album.Id).First(&album)
+	album = db_tables.Album{}
+	result := db.Where("id = ?", album_id).First(&album)
 	if result.Error == nil {
 		t.Errorf("Expected error when retrieving deleted album, got nil")
 	}

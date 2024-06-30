@@ -7,18 +7,22 @@ import (
 	"gorm.io/gorm"
 )
 
-func UpdateAlbum(db *gorm.DB, album db_tables.Album, update_map map[string]interface{}) error {
+func UpdateAlbum(db *gorm.DB, album *db_tables.Album, update_map map[string]interface{}) error {
 	return db_model.EditRecordFields(db, album, update_map)
 }
 
-func AddMusicsToAlbum(db *gorm.DB, album db_tables.Album, musics_ids []int) error {
+func AddMusicsToAlbum(db *gorm.DB, album *db_tables.Album, musics []*db_tables.Music) error {
+	return db_model.AddElementsToAssociation(db, album, "Musics", musics)
 }
 
-func RemoveMusicsFromAlbum(db *gorm.DB, album_id int, musics_ids []int) error {
+func RemoveMusicsFromAlbum(db *gorm.DB, album *db_tables.Album, musics []*db_tables.Music) error {
+	return db_model.RemoveElementsFromAssociation(db, album, "Musics", musics)
 }
 
-func AddArtistToAlbum(db *gorm.DB, album_id int, artist_id int) error {
+func AddArtistsToAlbum(db *gorm.DB, album *db_tables.Album, artists []*db_tables.Artist) error {
+	return db_model.AddElementsToAssociation(db, album, "Artists", artists)
 }
 
-func RemoveArtistFromAlbum(db *gorm.DB, album_id int, artist_id int) error {
+func RemoveArtistsFromAlbum(db *gorm.DB, album *db_tables.Album, artists []*db_tables.Artist) error {
+	return db_model.RemoveElementsFromAssociation(db, album, "Artists", artists)
 }
