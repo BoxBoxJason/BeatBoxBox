@@ -1,7 +1,9 @@
 package cookie_model
 
 import (
-	db_model "BeatBoxBox/internal/model"
+	db_tables "BeatBoxBox/internal/model"
+	"BeatBoxBox/pkg/db_model"
+	"BeatBoxBox/pkg/logger"
 	"time"
 
 	"gorm.io/gorm"
@@ -11,18 +13,20 @@ func init() {
 	db, err := db_model.OpenDB()
 	if err == nil {
 		defer db_model.CloseDB(db)
-		DeleteExpiredTokens(db)
+		err = DeleteExpiredTokens(db)
+		if err != nil {
+			logger.Error("Error deleting expired tokens: ", err)
+		}
 	}
-
 }
 
 // DeleteExpiredCookies deletes all the cookies that are expired
 func DeleteExpiredTokens(db *gorm.DB) error {
 	current_datetime := time.Now().Unix()
-	return db.Where("expiration_date < ?", current_datetime).Delete(&db_model.AuthCookie{}).Error
+	return db.Where("expiration_date < ?", current_datetime).Delete(&db_tables.AuthCookie{}).Error
 }
 
 // DeleteAuthToken deletes the cookie with the given id
-func DeleteAuthToken(db *gorm.DB, id int) error {
-	return db.Where("id = ?", id).Delete(&db_model.AuthCookie{}).Error
+func DeleteAuthToken(db *gorm.DB, cookie *db_tables.AuthCookie) error {
+	return db.Delete(cookie).Error
 }

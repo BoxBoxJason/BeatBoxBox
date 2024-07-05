@@ -25,7 +25,7 @@ func HashString(password string) (string, error) {
 
 // GenerateToken generates a random token of 128 bits
 func GenerateRandomTokenWithHash() (string, string, error) {
-	bytes := make([]byte, 64)
+	bytes := make([]byte, 36)
 	if _, err := rand.Read(bytes); err != nil {
 		return "", "", err
 	}

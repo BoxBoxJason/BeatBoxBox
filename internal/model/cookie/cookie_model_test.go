@@ -1,9 +1,11 @@
 package cookie_model
 
 import (
-	db_model "BeatBoxBox/internal/model"
+	db_tables "BeatBoxBox/internal/model"
+	"BeatBoxBox/pkg/db_model"
 	auth_utils "BeatBoxBox/pkg/utils/authutils"
 	"testing"
+	"time"
 )
 
 // POST FUNCTIONS TESTS
@@ -18,7 +20,14 @@ func TestCookieCreate(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error generating random token: %s", err)
 	}
-	_, err = CreateCookie(db, hashed_token, 0)
+	user := db_tables.User{
+		Pseudo:          "Test User 18",
+		Hashed_password: "password",
+		Email:           "Test email 18",
+	}
+	db.Create(&user)
+
+	_, err = CreateCookie(db, hashed_token, user.Id)
 
 	if err != nil {
 		t.Errorf("Error creating cookie: %s", err)
@@ -37,14 +46,21 @@ func TestCookieUpdate(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error generating random token: %s", err)
 	}
-	cookie := db_model.AuthCookie{
+
+	user := db_tables.User{
+		Pseudo:          "Test User 19",
+		Hashed_password: "password",
+		Email:           "Test email 19",
+	}
+	db.Create(&user)
+
+	cookie := db_tables.AuthCookie{
 		HashedAuthToken: hashed_token,
+		UserId:          user.Id,
+		ExpirationDate:  time.Now().Add(auth_utils.DEFAULT_TOKEN_EXPIRATION).Unix(),
 	}
 	db.Create(&cookie)
-	cookie_id := cookie.Id
-	UpdateCookieAuthToken(db, cookie.Id, "new_hashed_token")
-	cookie = db_model.AuthCookie{}
-	db.Where("id = ?", cookie_id).First(&cookie)
+	err = UpdateCookieAuthToken(db, &cookie, "new_hashed_token")
 
 	if cookie.HashedAuthToken != "new_hashed_token" {
 		t.Errorf("Expected cookie hashed token to be 'new_hashed_token', got '%s'", cookie.HashedAuthToken)
@@ -63,16 +79,22 @@ func TestGetUserCookie(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error generating random token: %s", err)
 	}
-	cookie := db_model.AuthCookie{
+
+	user := db_tables.User{
+		Pseudo:          "Test User 20",
+		Hashed_password: "password",
+		Email:           "Test email 20",
+	}
+	db.Create(&user)
+
+	cookie := db_tables.AuthCookie{
 		HashedAuthToken: hashed_token,
-		UserId:          0,
+		UserId:          user.Id,
+		ExpirationDate:  time.Now().Add(auth_utils.DEFAULT_TOKEN_EXPIRATION).Unix(),
 	}
 	db.Create(&cookie)
 
-	cookies, err := GetUserCookies(db, 0)
-	if err != nil {
-		t.Errorf("Error getting cookie: %s", err)
-	}
+	cookies := GetUserCookies(db, user.Id)
 	if len(cookies) < 1 {
 		t.Errorf("Expected at least 1 cookie, got %d", len(cookies))
 	}
@@ -90,17 +112,27 @@ func TestCookieDeleteAuthToken(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error generating random token: %s", err)
 	}
-	cookie := db_model.AuthCookie{
+
+	user := db_tables.User{
+		Pseudo:          "Test User 21",
+		Hashed_password: "password",
+		Email:           "Test email 21",
+	}
+	db.Create(&user)
+
+	cookie := db_tables.AuthCookie{
 		HashedAuthToken: hashed_token,
+		ExpirationDate:  time.Now().Add(auth_utils.DEFAULT_TOKEN_EXPIRATION).Unix(),
+		UserId:          user.Id,
 	}
 	db.Create(&cookie)
 	cookie_id := cookie.Id
-	err = DeleteAuthToken(db, cookie.Id)
+	err = DeleteAuthToken(db, &cookie)
 	if err != nil {
 		t.Errorf("Error deleting cookie: %s", err)
 	}
 
-	cookie = db_model.AuthCookie{}
+	cookie = db_tables.AuthCookie{}
 	result := db.Where("id = ?", cookie_id).First(&cookie)
 	if result.Error == nil {
 		t.Errorf("Expected cookie to be deleted, got %v", cookie)
@@ -118,9 +150,18 @@ func TestCookieDeleteExpiredTokens(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error generating random token: %s", err)
 	}
-	cookie := db_model.AuthCookie{
+
+	user := db_tables.User{
+		Pseudo:          "Test User 22",
+		Hashed_password: "password",
+		Email:           "Test email 22",
+	}
+	db.Create(&user)
+
+	cookie := db_tables.AuthCookie{
 		HashedAuthToken: hashed_token,
 		ExpirationDate:  0,
+		UserId:          user.Id,
 	}
 	db.Create(&cookie)
 	cookie_id := cookie.Id
@@ -129,7 +170,7 @@ func TestCookieDeleteExpiredTokens(t *testing.T) {
 		t.Errorf("Error deleting expired tokens: %s", err)
 	}
 
-	cookie = db_model.AuthCookie{}
+	cookie = db_tables.AuthCookie{}
 	result := db.Where("id = ?", cookie_id).First(&cookie)
 	if result.Error == nil {
 		t.Errorf("Expected cookie to be deleted, got %v", cookie)
