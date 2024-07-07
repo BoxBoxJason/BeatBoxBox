@@ -14,8 +14,14 @@ func TestMusicCreate(t *testing.T) {
 		t.Errorf("Error opening database: %s", err)
 	}
 	defer db_model.CloseDB(db)
+	artists := []db_tables.Artist{
+		{
+			Pseudo: "Test Artist 14",
+		},
+	}
+	db.Create(&artists)
 
-	_, err = CreateMusic(db, "Test Music 1", []string{"pop", "funk"}, -1, "fake.mp3", "default.jpg", -1)
+	_, err = CreateMusic(db, "Test Music 1", []string{"pop", "funk"}, -1, "fake.mp3", "default.jpg", -1, artists)
 	if err != nil {
 		t.Errorf("Error creating music: %s", err)
 	}
@@ -206,6 +212,31 @@ func TestGetMusics(t *testing.T) {
 		if !strings.Contains(musics[0].Title, "Test Music") {
 			t.Errorf("Expected music title to contain 'Test Music', got '%s'", musics[0].Title)
 		}
+	}
+}
+
+func TestMusicAlreadyExists(t *testing.T) {
+	db, err := db_model.OpenDB()
+	if err != nil {
+		t.Errorf("Error opening database: %s", err)
+	}
+	defer db_model.CloseDB(db)
+	artists := []db_tables.Artist{
+		{
+			Pseudo: "Test Artist 15",
+		},
+	}
+	db.Create(&artists)
+
+	music := db_tables.Music{
+		Title:   "Test Music 21",
+		Path:    "fake.mp3",
+		Artists: artists,
+	}
+	db.Create(&music)
+
+	if !MusicAlreadyExists(db, "Test Music 21", []int{artists[0].Id}) {
+		t.Errorf("Expected music to exist, got false")
 	}
 }
 
