@@ -2,7 +2,7 @@ package file_utils
 
 import (
 	custom_errors "BeatBoxBox/pkg/errors"
-	format_utils "BeatBoxBox/pkg/utils/formatutils"
+	bool_utils "BeatBoxBox/pkg/utils/boolutils"
 	"archive/zip"
 	"crypto/rand"
 	"errors"
@@ -80,7 +80,7 @@ func getLastSubdirectory(directory_path string) (string, error) {
 	}
 
 	// Check if the last directory is full
-	attempt_new_dir := strconv.Itoa(format_utils.Max(number_dirs-1, 0))
+	attempt_new_dir := strconv.Itoa(bool_utils.Max(number_dirs-1, 0))
 	subdirs_count, err := countSubDirs(filepath.Join(directory_path, attempt_new_dir))
 	if err != nil {
 		return "", err

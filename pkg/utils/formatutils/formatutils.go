@@ -41,8 +41,9 @@ func CheckRawPasswordValidity(rawPassword string) bool {
 	return lengthValid && hasUpper && hasLower && hasNumber && hasSpecial
 }
 
+// ConvertStringToIntArray converts a string to an array of integers
 func ConvertStringToIntArray(raw_string string, separator string) ([]int, error) {
-	raw_string_array := strings.Split(raw_string, ",")
+	raw_string_array := strings.Split(raw_string, separator)
 	int_array := make([]int, len(raw_string_array))
 	for i, raw_string := range raw_string_array {
 		int_value, err := strconv.Atoi(raw_string)
@@ -54,6 +55,7 @@ func ConvertStringToIntArray(raw_string string, separator string) ([]int, error)
 	return int_array, nil
 }
 
+// ConvertStringArrayToIntArray converts an array of strings to an array of integers
 func ConvertStringArrayToIntArray(raw_string_array []string) ([]int, error) {
 	int_array := make([]int, len(raw_string_array))
 	for i, raw_string := range raw_string_array {
@@ -66,38 +68,7 @@ func ConvertStringArrayToIntArray(raw_string_array []string) ([]int, error) {
 	return int_array, nil
 }
 
-func CheckIntInArray(int_array []int, int_value int) bool {
-	for _, value := range int_array {
-		if value == int_value {
-			return true
-		}
-	}
-	return false
-}
-
-func CheckStringInArray(string_array []string, string_value string) bool {
-	for _, value := range string_array {
-		if value == string_value {
-			return true
-		}
-	}
-	return false
-}
-
-func Max(a int, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func Min(a int, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
+// ConvertRecordsToInterfaceArray converts a pointer to a slice of records to a slice of interfaces
 func ConvertRecordsToInterfaceArray(records_ptr any) []interface{} {
 	records := reflect.ValueOf(records_ptr).Elem()
 	records_interface := make([]interface{}, records.Len())
@@ -108,6 +79,7 @@ func ConvertRecordsToInterfaceArray(records_ptr any) []interface{} {
 	return records_interface
 }
 
+// CreateSliceOfAny creates a slice of any type
 func CreateSliceOfAny(to_slice any) any {
 	to_slice_type := reflect.TypeOf(to_slice).Elem()
 	return reflect.New(reflect.SliceOf(to_slice_type)).Interface()
