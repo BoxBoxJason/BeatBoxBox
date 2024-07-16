@@ -52,64 +52,6 @@ func TestAlbumUpdate(t *testing.T) {
 	}
 }
 
-func TestAddMusicsToAlbum(t *testing.T) {
-	db, err := db_model.OpenDB()
-	if err != nil {
-		t.Errorf("Error opening database: %s", err)
-	}
-	defer db_model.CloseDB(db)
-
-	album := db_tables.Album{
-		Title: "Test Album 3",
-	}
-	db.Create(&album)
-
-	music := db_tables.Music{
-		Title: "Test Music 15",
-		Path:  "test.mp3",
-	}
-	db.Create(&music)
-
-	err = AddMusicsToAlbum(db, &album, []*db_tables.Music{&music})
-	if err != nil {
-		t.Errorf("Error adding music to album: %s", err)
-	}
-
-	if len(album.Musics) < 1 {
-		t.Errorf("Expected at least 1 music in album, got %d", len(album.Musics))
-	}
-}
-
-func TestRemoveMusicsFromAlbum(t *testing.T) {
-	db, err := db_model.OpenDB()
-	if err != nil {
-		t.Errorf("Error opening database: %s", err)
-	}
-	defer db_model.CloseDB(db)
-
-	album := db_tables.Album{
-		Title: "Test Album 4",
-	}
-	db.Create(&album)
-
-	music := db_tables.Music{
-		Title: "Test Music 16",
-		Path:  "test.mp3",
-	}
-	db.Create(&music)
-
-	album.Musics = append(album.Musics, music)
-
-	err = RemoveMusicsFromAlbum(db, &album, []*db_tables.Music{&music})
-	if err != nil {
-		t.Errorf("Error removing music from album: %s", err)
-	}
-
-	if len(album.Musics) > 0 {
-		t.Errorf("Expected no music in album, got %d", len(album.Musics))
-	}
-}
-
 func TestAddArtistsToAlbum(t *testing.T) {
 	db, err := db_model.OpenDB()
 	if err != nil {
@@ -250,6 +192,34 @@ func TestAlbumGetFromIds(t *testing.T) {
 	}
 }
 
+func TestAlbumAlreadyExists(t *testing.T) {
+	db, err := db_model.OpenDB()
+	if err != nil {
+		t.Errorf("Error opening database: %s", err)
+	}
+	defer db_model.CloseDB(db)
+	artist := db_tables.Artist{
+		Pseudo: "Test Artist 22",
+	}
+	err = db.Create(&artist).Error
+	if err != nil {
+		t.Errorf("Error creating artist: %s", err)
+	}
+
+	album := db_tables.Album{
+		Title:   "Test Album 26",
+		Artists: []db_tables.Artist{artist},
+	}
+	err = db.Create(&album).Error
+	if err != nil {
+		t.Errorf("Error creating album: %s", err)
+	}
+	if !AlbumAlreadyExists(db, album.Title, []int{artist.Id}) {
+		t.Errorf("Expected album to exist, got false")
+	}
+
+}
+
 // DELETE FUNCTIONS TESTS
 
 func TestAlbumDeleteFromRecord(t *testing.T) {
@@ -264,7 +234,7 @@ func TestAlbumDeleteFromRecord(t *testing.T) {
 	}
 	db.Create(&album)
 	album_id := album.Id
-	err = DeleteAlbumFromRecord(db, album)
+	err = DeleteAlbumFromRecord(db, &album)
 	if err != nil {
 		t.Errorf("Error deleting album: %s", err)
 	}

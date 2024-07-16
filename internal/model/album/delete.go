@@ -8,8 +8,8 @@ import (
 )
 
 // DeleteAlbumFromRecord is a function that deletes an album from the database.
-func DeleteAlbumFromRecord(db *gorm.DB, album db_tables.Album) error {
-	return db_model.DeleteDBRecordNoFetch(db, &album)
+func DeleteAlbumFromRecord(db *gorm.DB, album *db_tables.Album) error {
+	return db_model.DeleteDBRecordNoFetch(db, album)
 }
 
 // DeleteAlbumsFromRecords is a function that deletes multiple albums from the database.

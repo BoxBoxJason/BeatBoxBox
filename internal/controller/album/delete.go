@@ -1,35 +1,39 @@
 package album_controller
 
 import (
-	db_model "BeatBoxBox/internal/model"
+	db_tables "BeatBoxBox/internal/model"
 	album_model "BeatBoxBox/internal/model/album"
-	"fmt"
+	"BeatBoxBox/pkg/db_model"
 )
 
 // DeleteAlbum deletes a album by its id
 func DeleteAlbum(album_id int) error {
-	album_exists := AlbumExists(album_id)
-	if !album_exists {
-		return fmt.Errorf("album with id %d does not exist", album_id)
-	}
 	db, err := db_model.OpenDB()
 	if err != nil {
 		return err
 	}
 	defer db_model.CloseDB(db)
-	return album_model.DeleteAlbum(db, album_id)
+	album, err := album_model.GetAlbum(db, album_id)
+	if err != nil {
+		return err
+	}
+	return album_model.DeleteAlbumFromRecord(db, &album)
 }
 
 // DeleteAlbums deletes albums by their ids
 func DeleteAlbums(album_ids []int) error {
-	albums_exists := AlbumsExists(album_ids)
-	if !albums_exists {
-		return fmt.Errorf("albums with ids %v do not exist", album_ids)
-	}
 	db, err := db_model.OpenDB()
 	if err != nil {
 		return err
 	}
 	defer db_model.CloseDB(db)
-	return album_model.DeleteAlbums(db, album_ids)
+	albums, err := album_model.GetAlbums(db, album_ids)
+	if err != nil {
+		return err
+	}
+	albums_pointers := make([]*db_tables.Album, len(albums))
+	for i, album := range albums {
+		albums_pointers[i] = &album
+	}
+	return album_model.DeleteAlbumsFromRecords(db, albums_pointers)
 }

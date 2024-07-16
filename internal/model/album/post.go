@@ -1,14 +1,14 @@
 package album_model
 
 import (
-	db_model "BeatBoxBox/internal/model"
+	db_tables "BeatBoxBox/internal/model"
 
 	"gorm.io/gorm"
 )
 
 // PostAlbum is a function that creates a new album in the database.
 func CreateAlbum(db *gorm.DB, title string, illustration_path string) (int, error) {
-	album := db_model.Album{
+	album := db_tables.Album{
 		Title:        title,
 		Illustration: illustration_path,
 	}

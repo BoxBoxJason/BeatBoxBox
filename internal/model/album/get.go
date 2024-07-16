@@ -61,3 +61,17 @@ func GetAlbumsFromPartialTitle(db *gorm.DB, filters map[string]interface{}, part
 
 	return albums
 }
+
+func AlbumAlreadyExists(db *gorm.DB, title string, artists_ids []int) bool {
+	if len(artists_ids) == 0 {
+		return false
+	}
+	var album db_tables.Album
+	err := db.Where("title = ?", title).
+		Joins("JOIN album_artists ON album_artists.album_id = albums.id").
+		Where("album_artists.artist_id IN ?", artists_ids).
+		Group("albums.id").
+		Having("COUNT(DISTINCT album_artists.artist_id) = ?", len(artists_ids)).
+		First(&album).Error
+	return err == nil
+}
