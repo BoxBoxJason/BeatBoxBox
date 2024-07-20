@@ -1,11 +1,11 @@
 package api_init
 
 import (
-	album_handler "BeatBoxBox/internal/api/album"
-	artist_handler "BeatBoxBox/internal/api/artist"
-	music_handler "BeatBoxBox/internal/api/music"
-	playlist_handler "BeatBoxBox/internal/api/playlist"
-	user_handler "BeatBoxBox/internal/api/user"
+	album_handler "BeatBoxBox/internal/api/v1/album"
+	artist_handler "BeatBoxBox/internal/api/v1/artist"
+	music_handler "BeatBoxBox/internal/api/v1/music"
+	playlist_handler "BeatBoxBox/internal/api/v1/playlist"
+	user_handler "BeatBoxBox/internal/api/v1/user"
 
 	"github.com/gorilla/mux"
 )
