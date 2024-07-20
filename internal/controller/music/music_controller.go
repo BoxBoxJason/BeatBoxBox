@@ -21,15 +21,15 @@ func init() {
 
 // ConvertMusicToJSON converts a music to a JSON object
 func ConvertMusicToJSON(music *db_tables.Music) ([]byte, error) {
-	artist_ids := make([]int, len(music.Artists))
+	artists_ids := make([]int, len(music.Artists))
 	for i, artist := range music.Artists {
-		artist_ids[i] = artist.Id
+		artists_ids[i] = artist.Id
 	}
 	music_json := map[string]interface{}{
 		"id":           music.Id,
 		"title":        music.Title,
 		"lyrics":       music.Lyrics,
-		"artists_ids":  artist_ids,
+		"artists_ids":  artists_ids,
 		"album_id":     music.AlbumId,
 		"genres":       music.Genres,
 		"nb_plays":     music.Nblistened,
@@ -46,13 +46,23 @@ func ConvertMusicToJSON(music *db_tables.Music) ([]byte, error) {
 func ConvertMusicsToJSON(musics []*db_tables.Music) ([]byte, error) {
 	musics_json := make([]map[string]interface{}, len(musics))
 	for i, music := range musics {
-		music_json, err := ConvertMusicToJSON(music)
-		if err != nil {
-			return nil, err
+		artists_ids := make([]int, len(music.Artists))
+		for j, artist := range music.Artists {
+			artists_ids[j] = artist.Id
 		}
-		err = json.Unmarshal(music_json, &musics_json[i])
-		if err != nil {
-			return nil, err
+		musics_json[i] = map[string]interface{}{
+			"id":           music.Id,
+			"title":        music.Title,
+			"lyrics":       music.Lyrics,
+			"artists_ids":  artists_ids,
+			"album_id":     music.AlbumId,
+			"genres":       music.Genres,
+			"nb_plays":     music.Nblistened,
+			"path":         filepath.Base(music.Path),
+			"illustration": filepath.Base(music.Illustration),
+			"likes":        music.Likes,
+			"created_on":   music.CreatedOn,
+			"modified_on":  music.ModifiedOn,
 		}
 	}
 	return json.Marshal(musics_json)

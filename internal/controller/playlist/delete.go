@@ -1,21 +1,42 @@
 package playlist_controller
 
-import "errors"
+import (
+	db_tables "BeatBoxBox/internal/model"
+	playlist_model "BeatBoxBox/internal/model/playlist"
+	"BeatBoxBox/pkg/db_model"
+	custom_errors "BeatBoxBox/pkg/errors"
+)
 
-// DeletePlaylist deletes an playlist from the database
-// Selects the playlist with the given playlist_id
+// DeletePlaylist deletes a playlist from the database
 func DeletePlaylist(playlist_id int) error {
-	if !PlaylistExists(playlist_id) {
-		return errors.New("playlist does not exist")
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return err
 	}
-	return DeletePlaylist(playlist_id)
+	defer db_model.CloseDB(db)
+	playlist, err := playlist_model.GetPlaylist(db, playlist_id)
+	if err != nil {
+		return err
+	}
+	return playlist_model.DeletePlaylist(db, &playlist)
 }
 
 // DeletePlaylists deletes a list of playlists from the database
-// Selects the playlists with the given playlist_ids
 func DeletePlaylists(playlist_ids []int) error {
-	if !PlaylistsExist(playlist_ids) {
-		return errors.New("at least one playlist does not exist")
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return err
 	}
-	return DeletePlaylists(playlist_ids)
+	defer db_model.CloseDB(db)
+	playlists, err := playlist_model.GetPlaylists(db, playlist_ids)
+	if err != nil {
+		return err
+	} else if playlists == nil || len(playlists) != len(playlist_ids) {
+		return custom_errors.NewNotFoundError("not all playlists found")
+	}
+	playlists_ptr := make([]*db_tables.Playlist, len(playlists))
+	for i, playlist := range playlists {
+		playlists_ptr[i] = &playlist
+	}
+	return playlist_model.DeletePlaylists(db, playlists_ptr)
 }

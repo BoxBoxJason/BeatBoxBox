@@ -8,8 +8,8 @@ import (
 )
 
 // DeletePlaylist is a function that deletes an existing playlist from the database.
-func DeletePlaylist(db *gorm.DB, playlist db_tables.Playlist) error {
-	return db_model.DeleteDBRecordNoFetch(db, &playlist)
+func DeletePlaylist(db *gorm.DB, playlist *db_tables.Playlist) error {
+	return db_model.DeleteDBRecordNoFetch(db, playlist)
 }
 
 // DeletePlaylists is a function that deletes multiple existing playlists from the database.

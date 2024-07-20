@@ -195,7 +195,7 @@ func TestPlaylistDelete(t *testing.T) {
 	db.Create(&playlist)
 	playlist_id := playlist.Id
 
-	err = DeletePlaylist(db, playlist)
+	err = DeletePlaylist(db, &playlist)
 	playlist = db_tables.Playlist{}
 	result := db.Where("id = ?", playlist_id).First(&playlist)
 

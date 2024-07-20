@@ -1,12 +1,12 @@
 package playlist_controller
 
 import (
-	db_model "BeatBoxBox/internal/model"
+	db_tables "BeatBoxBox/internal/model"
 	playlist_model "BeatBoxBox/internal/model/playlist"
+	db_model "BeatBoxBox/pkg/db_model"
 	custom_errors "BeatBoxBox/pkg/errors"
-	"encoding/json"
+	"fmt"
 	"path"
-	"strconv"
 )
 
 // PlaylistExists returns whether a playlist exists in the database
@@ -32,47 +32,48 @@ func PlaylistsExist(playlist_ids []int) bool {
 }
 
 // PlaylistExistsFromParams returns whether a playlist exists in the database
-func PlaylistExistsFromParams(playlist_name string, playlist_creator_id int) bool {
+func PlaylistAlreadyExists(playlist_name string, playlist_creator_id int) bool {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		return false
 	}
 	defer db_model.CloseDB(db)
-	playlists, err := playlist_model.GetPlaylistsFromFilters(db, map[string]interface{}{
-		"Title":     playlist_name,
-		"CreatorId": playlist_creator_id,
-	})
-	return err == nil && len(playlists) > 0
+	playlists := playlist_model.GetPlaylistsFromFilters(db, map[string]interface{}{"title": playlist_name, "creator_id": playlist_creator_id})
+	return playlists != nil && len(playlists) > 0
 }
 
 // GetPlaylist returns a playlist from the database as a JSON object
-// Selects the playlist with the given playlist_id
-func GetPlaylist(playlist_id int) ([]byte, error) {
+func GetPlaylistJSON(playlist_id int) ([]byte, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		return nil, err
 	}
 	defer db_model.CloseDB(db)
-	playlist, err := playlist_model.GetPlaylist(db, playlist_id)
+	playlist, err := playlist_model.GetPlaylist(db.Preload("Musics"), playlist_id)
 	if err != nil {
-		return nil, custom_errors.NewNotFoundError("Playlist id " + strconv.Itoa(playlist_id) + " not found")
+		return nil, custom_errors.NewNotFoundError(fmt.Sprintf("Playlist id %d not found", playlist_id))
 	}
-	return json.Marshal(playlist)
+	return ConvertPlaylistToJSON(&playlist)
 }
 
 // GetPlaylists returns a list of playlists from the database as a JSON array
-// Selects the playlists with the given playlist_ids
-func GetPlaylists(playlist_ids []int) ([]byte, error) {
+func GetPlaylistsJSON(playlists_ids []int) ([]byte, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		return nil, err
 	}
 	defer db_model.CloseDB(db)
-	playlists, err := playlist_model.GetPlaylists(db, playlist_ids)
+	playlists, err := playlist_model.GetPlaylists(db.Preload("Musics"), playlists_ids)
 	if err != nil {
-		return nil, custom_errors.NewNotFoundError("Playlists not found")
+		return nil, err
+	} else if playlists == nil || len(playlists) == 0 {
+		return nil, custom_errors.NewNotFoundError("some playlists were not found")
 	}
-	return json.Marshal(playlists)
+	playlists_ptr := make([]*db_tables.Playlist, len(playlists))
+	for i, playlist := range playlists {
+		playlists_ptr[i] = &playlist
+	}
+	return ConvertPlaylistsToJSON(playlists_ptr)
 }
 
 func GetMusicsPathFromPlaylist(playlist_id int) (string, []string, error) {
@@ -81,9 +82,9 @@ func GetMusicsPathFromPlaylist(playlist_id int) (string, []string, error) {
 		return "", nil, err
 	}
 	defer db_model.CloseDB(db)
-	playlist, err := playlist_model.GetPlaylist(db, playlist_id)
+	playlist, err := playlist_model.GetPlaylist(db.Preload("Musics"), playlist_id)
 	if err != nil {
-		return "", nil, custom_errors.NewNotFoundError("Playlist id " + strconv.Itoa(playlist_id) + " not found")
+		return "", nil, err
 	}
 	musics_paths := []string{}
 	for _, music := range playlist.Musics {
@@ -98,29 +99,16 @@ func GetMusicsPathFromPlaylists(playlist_ids []int) (map[string][]string, error)
 		return nil, err
 	}
 	defer db_model.CloseDB(db)
-	playlists, err := playlist_model.GetPlaylists(db, playlist_ids)
+	playlists, err := playlist_model.GetPlaylists(db.Preload("Musics"), playlist_ids)
 	if err != nil {
 		return nil, err
 	}
-	musics_paths := map[string][]string{}
+	musics_paths := make(map[string][]string, len(playlists))
 	for _, playlist := range playlists {
-		musics_paths[playlist.Title] = []string{}
-		for _, music := range playlist.Musics {
-			musics_paths[playlist.Title] = append(musics_paths[playlist.Title], path.Join("data", "musics", music.Path))
+		musics_paths[playlist.Title] = make([]string, len(playlist.Musics))
+		for i, music := range playlist.Musics {
+			musics_paths[playlist.Title][i] = path.Join("data", "musics", music.Path)
 		}
 	}
 	return musics_paths, nil
-}
-
-func GetUserPlaylistId(user_id int, playlist_title string) (int, error) {
-	db, err := db_model.OpenDB()
-	if err != nil {
-		return -1, err
-	}
-	defer db_model.CloseDB(db)
-	playlists, err := playlist_model.GetPlaylistsFromFilters(db, map[string]interface{}{"creator_id": user_id, "title": playlist_title})
-	if err != nil || len(playlists) == 0 {
-		return -1, err
-	}
-	return playlists[0].Id, nil
 }

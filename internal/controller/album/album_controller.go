@@ -40,14 +40,23 @@ func ConvertAlbumToJSON(album *db_tables.Album) ([]byte, error) {
 func ConvertAlbumsToJSON(albums []*db_tables.Album) ([]byte, error) {
 	albums_json := make([]map[string]interface{}, len(albums))
 	for i, album := range albums {
-		album_json, err := ConvertAlbumToJSON(album)
-		if err != nil {
-			return nil, err
+		musics_ids := make([]int, len(album.Musics))
+		for i, music := range album.Musics {
+			musics_ids[i] = music.Id
 		}
-		albums_json[i] = map[string]interface{}{}
-		err = json.Unmarshal(album_json, &albums_json[i])
-		if err != nil {
-			return nil, err
+		artists_ids := make([]int, len(album.Artists))
+		for i, artist := range album.Artists {
+			artists_ids[i] = artist.Id
+		}
+		albums_json[i] = map[string]interface{}{
+			"id":           album.Id,
+			"title":        album.Title,
+			"description":  album.Description,
+			"illustration": filepath.Base(album.Illustration),
+			"artists_ids":  artists_ids,
+			"musics_ids":   musics_ids,
+			"created_on":   album.CreatedOn,
+			"modified_on":  album.ModifiedOn,
 		}
 	}
 	return json.Marshal(albums_json)
