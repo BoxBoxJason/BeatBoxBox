@@ -2,23 +2,27 @@ name: go-lint
 on: [push, pull_request]
 jobs:
   golanci-lint:
-    runs-on: alpine-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         
       - name: Golangci-lint
-        uses: golangci/golangci-lint-action@latest
+        uses: golangci/golangci-lint-action@v6.0.1
         with:
-          args: --enable-all --tests --outformat sarif --output golangci-lint.sarif ./...
+          args: --enable-all --tests --out-format sarif ./... > golangci-lint.sarif
+
+      - name: Show golangci-lint report
+        run: cat golangci-lint.sarif
 
       - name: Upload golangci-lint report
         uses: actions/upload-artifact@v4
         with:
-          name: golangci-lint.sarif
+          name: golangci-lint report
+          path: golangci-lint.sarif
   
   gosec:
-    runs-on: alpine-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -26,9 +30,13 @@ jobs:
       - name: Gosec security scanner
         uses: securego/gosec@master
         with:
-          args: -no-fail -fmt sarif -out gosec.sarif ./...
+          args: -fmt sarif -out gosec.sarif ./...
+
+      - name: Show gosec report
+        run: cat gosec.sarif
 
       - name: Upload gosec report
         uses: actions/upload-artifact@v4
         with:
-          name: gosec.sarif
+          name: gosec-report
+          path: gosec.sarif
