@@ -67,6 +67,19 @@ func (e *DatabaseError) Error() string {
 	return e.Message
 }
 
+// InternalServerError represents a 500 error
+type InternalServerError struct {
+	Message string
+}
+
+func NewInternalServerError(message string) *InternalServerError {
+	return &InternalServerError{Message: message}
+}
+
+func (e *InternalServerError) Error() string {
+	return e.Message
+}
+
 func SendErrorToClient(err error, w http.ResponseWriter, default_error_msg string) {
 	switch err.(type) {
 	case *BadRequestError, *FileTooBigError:
@@ -75,7 +88,7 @@ func SendErrorToClient(err error, w http.ResponseWriter, default_error_msg strin
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 	case *NotFoundError:
 		http.Error(w, err.Error(), http.StatusNotFound)
-	case *DatabaseError:
+	case *DatabaseError, *InternalServerError:
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	default:
 		if default_error_msg != "" {

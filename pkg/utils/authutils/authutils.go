@@ -88,3 +88,12 @@ func ParseAuthJWT(token_string string) (int, string, error) {
 
 	return user_id, auth_token, errors.New("invalid token")
 }
+
+func GetNewTokenExpirationTime() int64 {
+	return time.Now().Add(DEFAULT_TOKEN_EXPIRATION).Unix()
+}
+
+func CheckExpiryTimeNear(expiry_time int64) bool {
+	remaining_time := expiry_time - time.Now().Unix()
+	return remaining_time < int64(DEFAULT_TOKEN_EXPIRATION.Seconds())
+}

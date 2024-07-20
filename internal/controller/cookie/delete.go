@@ -1,11 +1,26 @@
 package cookie_controller
 
 import (
-	db_model "BeatBoxBox/internal/model"
 	cookie_model "BeatBoxBox/internal/model/cookie"
+	db_model "BeatBoxBox/pkg/db_model"
+	custom_errors "BeatBoxBox/pkg/errors"
+	"BeatBoxBox/pkg/logger"
 	auth_utils "BeatBoxBox/pkg/utils/authutils"
-	"errors"
+	"fmt"
 )
+
+func init() {
+	db, err := db_model.OpenDB()
+	if err == nil {
+		defer db_model.CloseDB(db)
+		err = cookie_model.DeleteExpiredTokens(db)
+		if err != nil {
+			logger.Error("Error deleting expired tokens: ", err)
+		}
+	} else {
+		logger.Error("Error opening database: ", err)
+	}
+}
 
 func DeleteMatchingAuthToken(user_id int, attempt_token string) error {
 	db, err := db_model.OpenDB()
@@ -14,16 +29,16 @@ func DeleteMatchingAuthToken(user_id int, attempt_token string) error {
 	}
 	defer db_model.CloseDB(db)
 
-	auth_tokens, err := cookie_model.GetUserCookies(db, user_id)
-	if err != nil {
-		return err
+	auth_tokens := cookie_model.GetUserCookies(db, user_id)
+	if auth_tokens == nil {
+		return custom_errors.NewNotFoundError(fmt.Sprintf("no auth tokens found for user %d", user_id))
 	}
 
 	for _, auth_token := range auth_tokens {
 		if auth_utils.CompareHash(auth_token.HashedAuthToken, attempt_token) {
-			return cookie_model.DeleteAuthToken(db, auth_token.Id)
+			return cookie_model.DeleteAuthToken(db, &auth_token)
 		}
 	}
 
-	return errors.New("no matching auth token found")
+	return custom_errors.NewNotFoundError(fmt.Sprintf("no matching auth tokens found for user %d", user_id))
 }

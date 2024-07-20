@@ -1,18 +1,19 @@
 package cookie_controller
 
 import (
-	db_model "BeatBoxBox/internal/model"
+	db_tables "BeatBoxBox/internal/model"
 	cookie_model "BeatBoxBox/internal/model/cookie"
+	db_model "BeatBoxBox/pkg/db_model"
+	custom_errors "BeatBoxBox/pkg/errors"
 	auth_utils "BeatBoxBox/pkg/utils/authutils"
-	"time"
 )
 
-func updateAuthTokenIfNearExpiry(auth_cookie db_model.AuthCookie) (string, error) {
-	if checkTokenNearExpiry(auth_cookie.ExpirationDate) {
+func updateAuthTokenIfNearExpiry(auth_cookie *db_tables.AuthCookie) (string, error) {
+	if auth_utils.CheckExpiryTimeNear(auth_cookie.ExpirationDate) {
 		// Generate a new token
 		new_token, new_hash, err := auth_utils.GenerateRandomTokenWithHash()
 		if err != nil {
-			return "", err
+			return "", custom_errors.NewInternalServerError("failed to generate new token")
 		}
 
 		// Update the token in the database
@@ -21,13 +22,11 @@ func updateAuthTokenIfNearExpiry(auth_cookie db_model.AuthCookie) (string, error
 			return "", err
 		}
 		defer db_model.CloseDB(db)
-		cookie_model.UpdateCookieAuthToken(db, auth_cookie.Id, new_hash)
+		err = cookie_model.UpdateCookieAuthToken(db, auth_cookie, new_hash)
+		if err != nil {
+			return "", err
+		}
 		return new_token, nil
 	}
 	return "", nil
-}
-
-func checkTokenNearExpiry(expiry_time int64) bool {
-	remaining_time := expiry_time - time.Now().Unix()
-	return remaining_time < int64(auth_utils.DEFAULT_TOKEN_EXPIRATION.Seconds())
 }

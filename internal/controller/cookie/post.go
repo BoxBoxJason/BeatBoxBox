@@ -1,8 +1,9 @@
 package cookie_controller
 
 import (
-	db_model "BeatBoxBox/internal/model"
 	cookie_model "BeatBoxBox/internal/model/cookie"
+	db_model "BeatBoxBox/pkg/db_model"
+	custom_errors "BeatBoxBox/pkg/errors"
 	auth_utils "BeatBoxBox/pkg/utils/authutils"
 )
 
@@ -10,7 +11,7 @@ func PostAuthToken(user_id int) (string, error) {
 	// Generate a random token and hash it
 	raw_auth_token, hashed_auth_token, err := auth_utils.GenerateRandomTokenWithHash()
 	if err != nil {
-		return "", err
+		return "", custom_errors.NewInternalServerError("failed to generate auth token")
 	}
 
 	// Store the hashed token in the database

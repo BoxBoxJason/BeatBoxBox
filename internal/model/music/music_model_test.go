@@ -21,7 +21,7 @@ func TestMusicCreate(t *testing.T) {
 	}
 	db.Create(&artists)
 
-	_, err = CreateMusic(db, "Test Music 1", []string{"pop", "funk"}, -1, "fake.mp3", "default.jpg", -1, artists)
+	_, err = CreateMusic(db, "Test Music 1", []string{"pop", "funk"}, -1, "fake.mp3", "default.jpg", artists)
 	if err != nil {
 		t.Errorf("Error creating music: %s", err)
 	}
