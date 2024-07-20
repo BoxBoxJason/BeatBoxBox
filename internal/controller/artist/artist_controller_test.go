@@ -8,7 +8,7 @@ import (
 
 // POST FUNCTIONS
 func TestPostArtist(t *testing.T) {
-	id, err := PostArtist("Test Artist 23", "description", "illustration_file_name")
+	id, err := PostArtist("Test Artist 23", "description", nil)
 	if err != nil {
 		t.Error(err)
 	} else if id < 0 {

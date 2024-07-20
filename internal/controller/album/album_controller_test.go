@@ -20,7 +20,7 @@ func TestPostAlbum(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	id, err := PostAlbum("Test Album 13", []int{artist.Id}, "description", "illustration_file_name")
+	id, err := PostAlbum("Test Album 13", []int{artist.Id}, "description", nil)
 	if err != nil {
 		t.Error(err)
 	} else if id < 0 {

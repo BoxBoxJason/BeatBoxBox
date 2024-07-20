@@ -35,7 +35,7 @@ func GetAlbumJSON(album_id int) ([]byte, error) {
 		return nil, err
 	}
 	defer db_model.CloseDB(db)
-	album, err := album_model.GetAlbum(db, album_id)
+	album, err := album_model.GetAlbum(db.Preload("Musics").Preload("Artists"), album_id)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func GetAlbumsJSON(albums_ids []int) ([]byte, error) {
 		return nil, err
 	}
 	defer db_model.CloseDB(db)
-	albums, err := album_model.GetAlbums(db, albums_ids)
+	albums, err := album_model.GetAlbums(db.Preload("Musics").Preload("Artists"), albums_ids)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +105,7 @@ func GetAlbumsJSONFromPartialTitle(partial_title string) ([]byte, error) {
 		return nil, err
 	}
 	defer db_model.CloseDB(db)
-	albums := album_model.GetAlbumsFromPartialTitle(db, map[string]interface{}{}, partial_title)
+	albums := album_model.GetAlbumsFromPartialTitle(db.Preload("Musics").Preload("Artists"), map[string]interface{}{}, partial_title)
 	albums_ptr := make([]*db_tables.Album, len(albums))
 	for i, album := range albums {
 		albums_ptr[i] = &album

@@ -1,12 +1,11 @@
 package file_utils
 
 import (
-	custom_errors "BeatBoxBox/pkg/errors"
 	bool_utils "BeatBoxBox/pkg/utils/boolutils"
 	"archive/zip"
-	"crypto/rand"
 	"errors"
 	"io"
+	"math/rand"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -46,18 +45,13 @@ func init() {
 }
 
 // Return a 32 character long random string
-func createRandomFileName(extension string) (string, error) {
-	const letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+func createRandomFileName(extension string) string {
+	const CHARACTERS = "0123456789abcdefghijklmnopqrstuvwxyz"
 	bytes := make([]byte, 32)
-
-	_, err := rand.Read(bytes)
-	if err != nil {
-		return "", err
+	for i := range bytes {
+		bytes[i] = CHARACTERS[rand.Intn(len(CHARACTERS))]
 	}
-	for i, b := range bytes {
-		bytes[i] = letters[b%byte(len(letters))]
-	}
-	return string(bytes) + "." + extension, nil
+	return string(bytes) + "." + extension
 }
 
 // Create a filename that doesn't exist in the music directory
@@ -66,10 +60,7 @@ func createNonExistingMusicFileName() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	new_music_file_name, err := createNonExistingFileName(filepath.Join(MUSICS_DIR, music_subdir), "mp3")
-	if err != nil {
-		return "", err
-	}
+	new_music_file_name := createNonExistingFileName(filepath.Join(MUSICS_DIR, music_subdir), "mp3")
 	return filepath.Join(music_subdir, new_music_file_name), nil
 }
 
@@ -100,10 +91,7 @@ func getLastSubdirectory(directory_path string) (string, error) {
 // Count the number of subdirectories in a directory
 func countSubDirs(directory string) (int, error) {
 	sub_dirs, err := os.ReadDir(directory)
-	if err != nil {
-		return 0, err
-	}
-	return len(sub_dirs), nil
+	return len(sub_dirs), err
 }
 
 // Create a filename that doesn't exist in the illustration directory
@@ -112,17 +100,13 @@ func createNonExistingIllustrationFileName(illustration_directory string) (strin
 	if err != nil {
 		return "", err
 	}
-	new_illustration_file_name, err := createNonExistingFileName(filepath.Join(ILLUSTRATIONS_DIRS[illustration_directory], illustration_subdir), "jpg")
-	if err != nil {
-		return "", err
-	}
+	new_illustration_file_name := createNonExistingFileName(filepath.Join(ILLUSTRATIONS_DIRS[illustration_directory], illustration_subdir), "jpg")
 	return filepath.Join(illustration_subdir, new_illustration_file_name), nil
 }
 
-func UploadIllustrationToServer(illustration_header *multipart.FileHeader, illustration_file multipart.File, illustration_directory string) (string, error) {
-	err := CheckFileMeetsRequirements(*illustration_header, MAX_IMAGE_FILE_SIZE, "image/jpeg")
-	if err != nil {
-		return DEFAULT_ILLUSTRATION_FILE, custom_errors.NewBadRequestError("Image does not meet requirements: " + err.Error())
+func UploadIllustrationToServer(illustration_file *multipart.File, illustration_directory string) (string, error) {
+	if illustration_file == nil {
+		return DEFAULT_ILLUSTRATION_FILE, nil
 	}
 	illustration_file_name, err := createNonExistingIllustrationFileName(illustration_directory)
 	if err != nil {
@@ -135,7 +119,10 @@ func UploadIllustrationToServer(illustration_header *multipart.FileHeader, illus
 	return illustration_file_name, nil
 }
 
-func UploadMusicToServer(music_file multipart.File) (string, error) {
+func UploadMusicToServer(music_file *multipart.File) (string, error) {
+	if music_file == nil {
+		return "none", nil
+	}
 	music_file_name, err := createNonExistingMusicFileName()
 	if err != nil {
 		return "", err
@@ -148,27 +135,24 @@ func UploadMusicToServer(music_file multipart.File) (string, error) {
 }
 
 // Create a file name that doesn't exist in the specified directory
-func createNonExistingFileName(directory string, extension string) (string, error) {
+func createNonExistingFileName(directory string, extension string) string {
 	for {
-		file_name, err := createRandomFileName(extension)
-		if err != nil {
-			return "", err
-		}
+		file_name := createRandomFileName(extension)
 		if _, err := os.Stat(filepath.Join(directory, file_name)); os.IsNotExist(err) {
-			return file_name, nil
+			return file_name
 		}
 	}
 }
 
 // Upload a file to the server
-func UploadFileToServer(file multipart.File, dest_file string) error {
+func UploadFileToServer(file *multipart.File, dest_file string) error {
 	out_file, err := os.Create(dest_file)
 	if err != nil {
 		return err
 	}
 	defer out_file.Close()
 
-	_, err = io.Copy(out_file, file)
+	_, err = io.Copy(out_file, *file)
 	if err != nil {
 		return err
 	}

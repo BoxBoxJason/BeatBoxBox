@@ -46,7 +46,7 @@ func GetArtistJSON(artist_id int) ([]byte, error) {
 		return nil, err
 	}
 	defer db_model.CloseDB(db)
-	music, err := artist_model.GetArtist(db, artist_id)
+	music, err := artist_model.GetArtist(db.Preload("Musics").Preload("Albums"), artist_id)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func GetArtistsJSON(artists_ids []int) ([]byte, error) {
 		return nil, err
 	}
 	defer db_model.CloseDB(db)
-	artists, err := artist_model.GetArtists(db, artists_ids)
+	artists, err := artist_model.GetArtists(db.Preload("Musics").Preload("Albums"), artists_ids)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func GetArtistsJSONFromFilters(filters map[string]interface{}) ([]byte, error) {
 		return nil, err
 	}
 	defer db_model.CloseDB(db)
-	artists := artist_model.GetArtistsFromFilters(db, filters)
+	artists := artist_model.GetArtistsFromFilters(db.Preload("Musics").Preload("Albums"), filters)
 	artists_ptr := make([]*db_tables.Artist, len(artists))
 	for i, artist := range artists {
 		artists_ptr[i] = &artist
