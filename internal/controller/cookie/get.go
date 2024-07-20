@@ -16,7 +16,7 @@ func CheckAuthTokenMatches(user_id int, attempt_token string) (bool, string, err
 	defer db_model.CloseDB(db)
 
 	auth_tokens := cookie_model.GetUserCookies(db, user_id)
-	if auth_tokens == nil {
+	if auth_tokens == nil || len(auth_tokens) == 0 {
 		return false, "", custom_errors.NewNotFoundError(fmt.Sprintf("no auth tokens found for user %d", user_id))
 	}
 
@@ -41,7 +41,7 @@ func GetMatchingAuthTokenId(user_id int, attempt_token string) (int, error) {
 	defer db_model.CloseDB(db)
 
 	auth_tokens := cookie_model.GetUserCookies(db, user_id)
-	if auth_tokens == nil {
+	if auth_tokens == nil || len(auth_tokens) == 0 {
 		return -1, custom_errors.NewNotFoundError(fmt.Sprintf("no auth tokens found for user %d", user_id))
 	}
 

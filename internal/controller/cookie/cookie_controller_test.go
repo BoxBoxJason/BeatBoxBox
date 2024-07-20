@@ -16,7 +16,9 @@ func TestPostAuthToken(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 	user := db_tables.User{
-		Pseudo: "Test User 23",
+		Pseudo:          "Test User 23",
+		Hashed_password: "password",
+		Email:           "Test email 23",
 	}
 	err = db.Create(&user).Error
 	if err != nil {
@@ -70,18 +72,24 @@ func TestCheckAuthTokenMatches(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	raw_token, hashed_token, err := auth_utils.GenerateRandomTokenWithHash()
+	if err != nil {
+		t.Error(err)
+	}
 	auth_cookie := db_tables.AuthCookie{
 		UserId:          user.Id,
 		ExpirationDate:  auth_utils.GetNewTokenExpirationTime(),
-		HashedAuthToken: "hashed_auth_token",
+		HashedAuthToken: hashed_token,
 	}
 	err = db.Create(&auth_cookie).Error
 	if err != nil {
 		t.Error(err)
 	}
-	_, _, err = CheckAuthTokenMatches(user.Id, auth_cookie.HashedAuthToken)
+	matched, _, err := CheckAuthTokenMatches(user.Id, raw_token)
 	if err != nil {
 		t.Error(err)
+	} else if !matched {
+		t.Errorf("raw auth token %s did not match hashed auth token %s", raw_token, auth_cookie.HashedAuthToken)
 	}
 }
 
@@ -100,25 +108,28 @@ func TestGetMatchingAuthTokenId(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
+	raw_token, hashed_token, err := auth_utils.GenerateRandomTokenWithHash()
+	if err != nil {
+		t.Error(err)
+	}
 	auth_cookie := db_tables.AuthCookie{
 		UserId:          user.Id,
 		ExpirationDate:  auth_utils.GetNewTokenExpirationTime(),
-		HashedAuthToken: "hashed_auth_token",
+		HashedAuthToken: hashed_token,
 	}
 	err = db.Create(&auth_cookie).Error
 	if err != nil {
 		t.Error(err)
 	}
 
-	_, err = GetMatchingAuthTokenId(user.Id, auth_cookie.HashedAuthToken)
+	_, err = GetMatchingAuthTokenId(user.Id, raw_token)
 	if err != nil {
 		t.Error(err)
 	}
 }
 
 // PUT FUNCTIONS
-func TestupdateAuthTokenIfNearExpiry(t *testing.T) {
+func TestUpdateAuthTokenIfNearExpiry(t *testing.T) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		t.Error(err)
