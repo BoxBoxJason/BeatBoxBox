@@ -47,10 +47,11 @@ type Album struct {
 
 type Artist struct {
 	Id           int     `gorm:"primaryKey;autoIncrement"`
-	Pseudo       string  `gorm:"type:varchar(32);unique;not null"`
+	Pseudo       string  `gorm:"type:varchar(128);unique;not null"`
 	Bio          string  `gorm:"type:text"`
 	Illustration string  `gorm:"type:text;default:'default.jpg'"`
 	Musics       []Music `gorm:"many2many:artist_musics;"`
+	Albums       []Album `gorm:"many2many:album_artists;"`
 	CreatedOn    int     `gorm:"autoCreateTime" json:"created_on"`
 	ModifiedOn   int     `gorm:"autoUpdateTime:milli" json:"modified_on"`
 }
@@ -69,10 +70,8 @@ type Music struct {
 	Likes        int            `gorm:"default:0"`
 	Path         string         `gorm:"type:text;not null"`
 	Illustration string         `gorm:"type:text;default:'default.jpg'"`
-	UploaderId   *uint
-	Uploader     User `gorm:"foreignKey:UploaderId"`
-	CreatedOn    int  `gorm:"autoCreateTime" json:"created_on"`
-	ModifiedOn   int  `gorm:"autoUpdateTime:milli" json:"modified_on"`
+	CreatedOn    int            `gorm:"autoCreateTime" json:"created_on"`
+	ModifiedOn   int            `gorm:"autoUpdateTime:milli" json:"modified_on"`
 }
 
 type User struct {
@@ -84,7 +83,7 @@ type User struct {
 	SubscribedPlaylists []Playlist `gorm:"many2many:user_subscribed_playlists;"`
 	Playlists           []Playlist `gorm:"foreignKey:CreatorId"`
 	LikedMusics         []Music    `gorm:"many2many:user_liked_musics;"`
-	UploadedMusics      []Music    `gorm:"foreignKey:UploaderId"`
+	UploadedMusics      int        `gorm:"default:0"`
 	CreatedOn           int        `gorm:"autoCreateTime" json:"created_on"`
 	ModifiedOn          int        `gorm:"autoUpdateTime:milli" json:"modified_on"`
 }

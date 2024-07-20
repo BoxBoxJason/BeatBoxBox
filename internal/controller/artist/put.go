@@ -1,8 +1,8 @@
 package artist_controller
 
 import (
-	db_model "BeatBoxBox/internal/model"
 	artist_model "BeatBoxBox/internal/model/artist"
+	"BeatBoxBox/pkg/db_model"
 )
 
 func UpdateArtist(artist_id int, artist_map map[string]interface{}) error {
@@ -11,5 +11,9 @@ func UpdateArtist(artist_id int, artist_map map[string]interface{}) error {
 		return err
 	}
 	defer db_model.CloseDB(db)
-	return artist_model.UpdateArtist(db, artist_id, artist_map)
+	artist, err := artist_model.GetArtist(db, artist_id)
+	if err != nil {
+		return err
+	}
+	return artist_model.UpdateArtist(db, &artist, artist_map)
 }

@@ -1,12 +1,12 @@
 package artist_controller
 
 import (
-	db_model "BeatBoxBox/internal/model"
 	artist_model "BeatBoxBox/internal/model/artist"
+	"BeatBoxBox/pkg/db_model"
 	custom_errors "BeatBoxBox/pkg/errors"
 )
 
-func PostArtist(pseudo string, illustration_file_name string) (int, error) {
+func PostArtist(pseudo string, bio string, illustration_file_name string) (int, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		return -1, err
@@ -21,5 +21,5 @@ func PostArtist(pseudo string, illustration_file_name string) (int, error) {
 		return -1, custom_errors.NewBadRequestError("artist already exists")
 	}
 
-	return artist_model.CreateArtist(db, pseudo, illustration_file_name)
+	return artist_model.CreateArtist(db, pseudo, bio, illustration_file_name)
 }

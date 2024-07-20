@@ -2,7 +2,7 @@ package artist_model
 
 import (
 	db_tables "BeatBoxBox/internal/model"
-	db_model "BeatBoxBox/pkg/db_model"
+	"BeatBoxBox/pkg/db_model"
 	"testing"
 )
 
@@ -14,7 +14,7 @@ func TestArtistCreate(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	artist_id, err := CreateArtist(db, "Test Artist 5", "default.jpg")
+	artist_id, err := CreateArtist(db, "Test Artist 5", "test_bio", "default.jpg")
 	if err != nil {
 		t.Errorf("Error creating artist: %s", err)
 	} else if artist_id < 0 {
@@ -182,7 +182,7 @@ func TestArtistDeleteFromId(t *testing.T) {
 	db.Create(&artist)
 
 	artist_id := artist.Id
-	err = DeleteArtistFromRecord(db, artist)
+	err = DeleteArtistFromRecord(db, &artist)
 	if err != nil {
 		t.Errorf("Error deleting artist: %s", err)
 	}

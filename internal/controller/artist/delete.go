@@ -1,21 +1,43 @@
 package artist_controller
 
-import "errors"
+import (
+	db_tables "BeatBoxBox/internal/model"
+	artist_model "BeatBoxBox/internal/model/artist"
+	"BeatBoxBox/pkg/db_model"
+	custom_errors "BeatBoxBox/pkg/errors"
+	"fmt"
+)
 
 // DeleteArtist deletes an artist from the database
-// Selects the artist with the given artist_id
 func DeleteArtist(artist_id int) error {
-	if !ArtistExists(artist_id) {
-		return errors.New("artist does not exist")
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return err
 	}
-	return DeleteArtist(artist_id)
+	artist, err := artist_model.GetArtist(db, artist_id)
+	if err != nil {
+		return custom_errors.NewNotFoundError(fmt.Sprintf("artist with id %d not found", artist_id))
+	}
+	return artist_model.DeleteArtistFromRecord(db, &artist)
 }
 
 // DeleteArtists deletes a list of artists from the database
 // Selects the artists with the given artist_ids
 func DeleteArtists(artist_ids []int) error {
-	if !ArtistsExist(artist_ids) {
-		return errors.New("at least one artist does not exist")
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return err
 	}
-	return DeleteArtists(artist_ids)
+	artists, err := artist_model.GetArtists(db, artist_ids)
+	if err != nil {
+		return custom_errors.NewNotFoundError("no artist found")
+	} else if len(artists) != len(artist_ids) {
+		return custom_errors.NewNotFoundError("some artists were not found")
+	}
+
+	artists_ptr := make([]*db_tables.Artist, len(artists))
+	for i, artist := range artists {
+		artists_ptr[i] = &artist
+	}
+	return artist_model.DeleteArtistsFromRecords(db, artists_ptr)
 }

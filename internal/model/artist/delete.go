@@ -6,8 +6,8 @@ import (
 )
 
 // DeleteArtistFromRecord deletes an existing artist from the database
-func DeleteArtistFromRecord(db *gorm.DB, artist db_tables.Artist) error {
-	return db.Delete(&artist).Error
+func DeleteArtistFromRecord(db *gorm.DB, artist *db_tables.Artist) error {
+	return db.Delete(artist).Error
 }
 
 // DeleteArtists deletes existing artists from the database

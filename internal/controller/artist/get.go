@@ -1,9 +1,9 @@
 package artist_controller
 
 import (
-	db_model "BeatBoxBox/internal/model"
+	db_tables "BeatBoxBox/internal/model"
 	artist_model "BeatBoxBox/internal/model/artist"
-	"encoding/json"
+	"BeatBoxBox/pkg/db_model"
 )
 
 // ArtistExists checks if an artist with the given artist_id exists
@@ -25,7 +25,7 @@ func ArtistsExist(artist_ids []int) bool {
 	}
 	defer db_model.CloseDB(db)
 	artists, err := artist_model.GetArtists(db, artist_ids)
-	return err != nil && len(artists) == len(artist_ids)
+	return err == nil && len(artists) == len(artist_ids)
 }
 
 // IsPseudoTaken checks if a pseudo is already taken by an artist
@@ -35,14 +35,12 @@ func IsPseudoTaken(pseudo string) bool {
 		return false
 	}
 	defer db_model.CloseDB(db)
-	_, err = artist_model.GetArtistFromPseudo(db, pseudo)
-	return err == nil
+	artists := artist_model.GetArtistsFromFilters(db, map[string]interface{}{"pseudo": pseudo})
+	return artists == nil && len(artists) > 0
 }
 
-// GetArtist returns an artist from the database
-// Selects the artist with the given artist_id
-// Returns the artist as a JSON object
-func GetArtist(artist_id int) ([]byte, error) {
+// GetArtist returns an artist from the database in JSON format
+func GetArtistJSON(artist_id int) ([]byte, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		return nil, err
@@ -52,13 +50,11 @@ func GetArtist(artist_id int) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return json.Marshal(music)
+	return ConvertArtistToJSON(&music)
 }
 
-// GetArtists returns a list of artists from the database
-// Selects the artists with the given artist_ids
-// Returns the artists as a JSON array
-func GetArtists(artists_ids []int) ([]byte, error) {
+// GetArtists returns a list of artists from the database in JSON format
+func GetArtistsJSON(artists_ids []int) ([]byte, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		return nil, err
@@ -68,5 +64,23 @@ func GetArtists(artists_ids []int) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return json.Marshal(artists)
+	artists_ptr := make([]*db_tables.Artist, len(artists))
+	for i, artist := range artists {
+		artists_ptr[i] = &artist
+	}
+	return ConvertArtistsToJSON(artists_ptr)
+}
+
+func GetArtistsJSONFromFilters(filters map[string]interface{}) ([]byte, error) {
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return nil, err
+	}
+	defer db_model.CloseDB(db)
+	artists := artist_model.GetArtistsFromFilters(db, filters)
+	artists_ptr := make([]*db_tables.Artist, len(artists))
+	for i, artist := range artists {
+		artists_ptr[i] = &artist
+	}
+	return ConvertArtistsToJSON(artists_ptr)
 }
