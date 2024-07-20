@@ -65,8 +65,6 @@ type Music struct {
 	Album        Album          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Genres       pq.StringArray `gorm:"type:text[]"`
 	Nblistened   int            `gorm:"default:0"`
-	Rating       float32        `gorm:"default:0"`
-	Nbrating     int            `gorm:"default:0"`
 	Likes        int            `gorm:"default:0"`
 	Path         string         `gorm:"type:text;not null"`
 	Illustration string         `gorm:"type:text;default:'default.jpg'"`

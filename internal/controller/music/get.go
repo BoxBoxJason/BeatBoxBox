@@ -1,9 +1,10 @@
 package music_controller
 
 import (
-	db_model "BeatBoxBox/internal/model"
+	db_tables "BeatBoxBox/internal/model"
 	music_model "BeatBoxBox/internal/model/music"
-	"encoding/json"
+	db_model "BeatBoxBox/pkg/db_model"
+	custom_errors "BeatBoxBox/pkg/errors"
 	"path/filepath"
 )
 
@@ -19,46 +20,46 @@ func MusicExists(music_id int) bool {
 }
 
 // MusicsExists checks if musics exist in the database
-func MusicsExists(music_ids []int) bool {
+func MusicsExist(music_ids []int) bool {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		return false
 	}
 	defer db_model.CloseDB(db)
 	musics, err := music_model.GetMusics(db, music_ids)
-	return err != nil && len(musics) == len(music_ids)
+	return err == nil && len(musics) == len(music_ids)
 }
 
-// GetMusic returns a music from the database
-// Selects the music with the given music_id
-// Returns the music as a JSON object
-func GetMusic(music_id int) ([]byte, error) {
+// GetMusic returns a music from the database in JSON format
+func GetMusicJSON(music_id int) ([]byte, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		return nil, err
 	}
 	defer db_model.CloseDB(db)
-	music, err := music_model.GetMusic(db, music_id)
+	music, err := music_model.GetMusic(db.Preload("Artists"), music_id)
 	if err != nil {
 		return nil, err
 	}
-	return json.Marshal(music)
+	return ConvertMusicToJSON(&music)
 }
 
-// GetMusics returns a list of musics from the database
-// Selects the musics with the given music_ids
-// Returns the musics as a JSON array
-func GetMusics(musics_ids []int) ([]byte, error) {
+// GetMusics returns a list of musics from the database in JSON format
+func GetMusicsJSON(musics_ids []int) ([]byte, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		return nil, err
 	}
 	defer db_model.CloseDB(db)
-	musics, err := music_model.GetMusics(db, musics_ids)
+	musics, err := music_model.GetMusics(db.Preload("Artists"), musics_ids)
 	if err != nil {
 		return nil, err
 	}
-	return json.Marshal(musics)
+	musics_ptr := make([]*db_tables.Music, len(musics))
+	for i, music := range musics {
+		musics_ptr[i] = &music
+	}
+	return ConvertMusicsToJSON(musics_ptr)
 }
 
 // GetMusicPathFromId returns the path of a music from the database
@@ -77,7 +78,7 @@ func GetMusicPathFromId(music_id int) (string, error) {
 }
 
 // GetMusicsPathFromIds returns the paths of musics from the database
-func GetMusicsPathFromIds(music_ids []int) ([]string, error) {
+func GetMusicsPathFromIds(music_ids []int) (map[int]string, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		return nil, err
@@ -87,10 +88,12 @@ func GetMusicsPathFromIds(music_ids []int) ([]string, error) {
 	musics, err := music_model.GetMusics(db, music_ids)
 	if err != nil {
 		return nil, err
+	} else if musics == nil || len(musics) != len(music_ids) {
+		return nil, custom_errors.NewNotFoundError("some musics were not found")
 	}
-	paths := []string{}
+	paths := make(map[int]string, len(musics))
 	for _, music := range musics {
-		paths = append(paths, filepath.Join("data", "musics", music.Path))
+		paths[music.Id] = filepath.Join("data", "musics", music.Path)
 	}
 	return paths, nil
 }

@@ -1,23 +1,42 @@
 package music_controller
 
 import (
-	"fmt"
+	db_tables "BeatBoxBox/internal/model"
+	music_model "BeatBoxBox/internal/model/music"
+	"BeatBoxBox/pkg/db_model"
+	custom_errors "BeatBoxBox/pkg/errors"
 )
 
 // DeleteMusic deletes a music by its id
 func DeleteMusic(music_id int) error {
-	music_exists := MusicExists(music_id)
-	if !music_exists {
-		return fmt.Errorf("music with id %d does not exist", music_id)
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return err
 	}
-	return DeleteMusic(music_id)
+	defer db_model.CloseDB(db)
+	music, err := music_model.GetMusic(db, music_id)
+	if err != nil {
+		return err
+	}
+	return music_model.DeleteMusicFromRecord(db, &music)
 }
 
 // DeleteMusics deletes musics by their ids
 func DeleteMusics(music_ids []int) error {
-	musics_exists := MusicsExists(music_ids)
-	if !musics_exists {
-		return fmt.Errorf("musics with ids %v do not exist", music_ids)
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return err
 	}
-	return DeleteMusics(music_ids)
+	defer db_model.CloseDB(db)
+	musics, err := music_model.GetMusics(db, music_ids)
+	if err != nil {
+		return err
+	} else if musics == nil || len(musics) != len(music_ids) {
+		return custom_errors.NewNotFoundError("some musics were not found")
+	}
+	musics_ptr := make([]*db_tables.Music, len(musics))
+	for i, music := range musics {
+		musics_ptr[i] = &music
+	}
+	return music_model.DeleteMusicsFromRecords(db, musics_ptr)
 }
