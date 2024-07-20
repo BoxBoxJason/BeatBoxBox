@@ -166,7 +166,7 @@ func TestAlbumsExist(t *testing.T) {
 	}
 }
 
-func TestGetAlbum(t *testing.T) {
+func TestGetAlbumJSON(t *testing.T) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		t.Error(err)
@@ -180,9 +180,30 @@ func TestGetAlbum(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	_, err = GetAlbum(album.Id)
+	_, err = GetAlbumJSON(album.Id)
 	if err != nil {
 		t.Error(err)
+	}
+}
+
+func TestGetAlbumsJSON(t *testing.T) {
+	db, err := db_model.OpenDB()
+	if err != nil {
+		t.Error(err)
+	}
+	defer db_model.CloseDB(db)
+	album := db_tables.Album{
+		Title: "Test Album 26",
+	}
+	err = db.Create(&album).Error
+	if err != nil {
+		t.Error(err)
+	}
+	albums, err := GetAlbumsJSON([]int{album.Id})
+	if err != nil {
+		t.Error(err)
+	} else if len(albums) < 1 {
+		t.Error("album is not returned as expected")
 	}
 }
 
@@ -254,7 +275,7 @@ func TestGetMusicsPathFromAlbums(t *testing.T) {
 	}
 }
 
-func TestGetAlbumsFromPartialTitle(t *testing.T) {
+func TestGetAlbumsJSONFromPartialTitle(t *testing.T) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		t.Error(err)
@@ -267,7 +288,7 @@ func TestGetAlbumsFromPartialTitle(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	albums, err := GetAlbumsFromPartialTitle("Test Album")
+	albums, err := GetAlbumsJSONFromPartialTitle("Test Album")
 	if err != nil {
 		t.Error(err)
 	} else if len(albums) < 1 {

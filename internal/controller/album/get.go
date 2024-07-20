@@ -29,7 +29,7 @@ func AlbumsExist(album_ids []int) bool {
 }
 
 // GetAlbum returns an album from the database in JSON format
-func GetAlbum(album_id int) ([]byte, error) {
+func GetAlbumJSON(album_id int) ([]byte, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		return nil, err
@@ -43,7 +43,7 @@ func GetAlbum(album_id int) ([]byte, error) {
 }
 
 // GetAlbums returns a list of albums from the database in JSON format
-func GetAlbums(albums_ids []int) ([]byte, error) {
+func GetAlbumsJSON(albums_ids []int) ([]byte, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		return nil, err
@@ -99,7 +99,7 @@ func GetMusicsPathFromAlbums(albums_ids []int) (map[string][]string, error) {
 }
 
 // GetAlbumsFromPartialTitle returns a list of albums from the database in JSON format
-func GetAlbumsFromPartialTitle(partial_title string) ([]byte, error) {
+func GetAlbumsJSONFromPartialTitle(partial_title string) ([]byte, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		return nil, err
