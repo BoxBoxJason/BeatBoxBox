@@ -2,6 +2,7 @@ package cookie_controller
 
 import (
 	cookie_model "BeatBoxBox/internal/model/cookie"
+	user_model "BeatBoxBox/internal/model/user"
 	db_model "BeatBoxBox/pkg/db_model"
 	custom_errors "BeatBoxBox/pkg/errors"
 	auth_utils "BeatBoxBox/pkg/utils/authutils"
@@ -20,7 +21,11 @@ func PostAuthToken(user_id int) (string, error) {
 		return "", err
 	}
 	defer db_model.CloseDB(db)
-	_, err = cookie_model.CreateCookie(db, hashed_auth_token, user_id)
+	user, err := user_model.GetUser(db, user_id)
+	if err != nil {
+		return "", err
+	}
+	_, err = cookie_model.CreateCookie(db, hashed_auth_token, &user)
 	if err != nil {
 		return "", err
 	}

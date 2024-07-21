@@ -62,7 +62,7 @@ func PlaylistAlreadyExists(db *gorm.DB, playlist_name string, owners_ids []int) 
 		return false
 	}
 	var album db_tables.Playlist
-	err := db.Where("title = ?", playlist_name).
+	err := db.Preload("Owners").Where("title = ?", playlist_name).
 		Joins("JOIN playlists_owners ON playlists_owners.playlist_id = playlists.id").
 		Where("playlists_owners.user_id IN ?", owners_ids).
 		Group("playlists.id").

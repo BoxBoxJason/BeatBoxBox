@@ -12,11 +12,14 @@ func init() {
 	if err != nil {
 		logger.Critical("Failed to connect database: ", err)
 	} else {
-		err = db.AutoMigrate(Artist{}, User{}, Album{}, Music{}, Playlist{}, AuthCookie{})
-		if err != nil {
-			logger.Info("Tables created successfully")
-		} else {
-			logger.Critical("Failed to create tables: ", err)
+		if !db.Migrator().HasTable(&Artist{}) {
+			logger.Info("Creating tables")
+			err = db.AutoMigrate(Artist{}, User{}, Album{}, Music{}, Playlist{}, AuthCookie{}, Role{})
+			if err != nil {
+				logger.Info("Tables created successfully")
+			} else {
+				logger.Critical("Failed to create tables: ", err)
+			}
 		}
 	}
 }
@@ -74,6 +77,7 @@ type Music struct {
 
 type User struct {
 	Id                  int        `gorm:"primaryKey;autoIncrement"`
+	Roles               []Role     `gorm:"many2many:user_roles;"`
 	Pseudo              string     `gorm:"type:varchar(32);unique;not null"`
 	Email               string     `gorm:"type:varchar(256);unique;not null"`
 	Hashed_password     string     `gorm:"type:varchar(64);not null"`
@@ -94,4 +98,11 @@ type AuthCookie struct {
 	ExpirationDate  int64 `gorm:"not null"`
 	CreatedOn       int   `gorm:"autoCreateTime" json:"created_on"`
 	ModifiedOn      int   `gorm:"autoUpdateTime:milli" json:"modified_on"`
+}
+
+type Role struct {
+	Id          int    `gorm:"primaryKey;autoIncrement"`
+	Name        string `gorm:"type:varchar(20);unique;not null"`
+	Description string `gorm:"type:text"`
+	Users       []User `gorm:"many2many:user_roles;"`
 }

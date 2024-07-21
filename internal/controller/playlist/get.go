@@ -38,7 +38,7 @@ func GetPlaylistJSON(playlist_id int) ([]byte, error) {
 		return nil, err
 	}
 	defer db_model.CloseDB(db)
-	playlist, err := playlist_model.GetPlaylist(db.Preload("Musics"), playlist_id)
+	playlist, err := playlist_model.GetPlaylist(db.Preload("Musics").Preload("Subscribers").Preload("Owners"), playlist_id)
 	if err != nil {
 		return nil, custom_errors.NewNotFoundError(fmt.Sprintf("Playlist id %d not found", playlist_id))
 	}
@@ -52,7 +52,7 @@ func GetPlaylistsJSON(playlists_ids []int) ([]byte, error) {
 		return nil, err
 	}
 	defer db_model.CloseDB(db)
-	playlists, err := playlist_model.GetPlaylists(db.Preload("Musics"), playlists_ids)
+	playlists, err := playlist_model.GetPlaylists(db.Preload("Musics").Preload("Subscribers").Preload("Owners"), playlists_ids)
 	if err != nil {
 		return nil, err
 	} else if playlists == nil || len(playlists) == 0 {

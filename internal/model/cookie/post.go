@@ -6,10 +6,10 @@ import (
 	"gorm.io/gorm"
 )
 
-func CreateCookie(db *gorm.DB, hashed_token string, user_id int) (int, error) {
+func CreateCookie(db *gorm.DB, hashed_token string, user *db_tables.User) (int, error) {
 	new_cookie := db_tables.AuthCookie{
 		HashedAuthToken: hashed_token,
-		UserId:          user_id,
+		User:            *user,
 		ExpirationDate:  auth_utils.GetNewTokenExpirationTime(),
 	}
 	err := db.Create(&new_cookie).Error

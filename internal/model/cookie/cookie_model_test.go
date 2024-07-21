@@ -27,7 +27,7 @@ func TestCookieCreate(t *testing.T) {
 	}
 	db.Create(&user)
 
-	_, err = CreateCookie(db, hashed_token, user.Id)
+	_, err = CreateCookie(db, hashed_token, &user)
 
 	if err != nil {
 		t.Errorf("Error creating cookie: %s", err)

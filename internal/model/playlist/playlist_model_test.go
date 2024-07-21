@@ -234,15 +234,25 @@ func TestPlaylistAlreadyExists(t *testing.T) {
 		t.Errorf("Error opening database: %s", err)
 	}
 	defer db_model.CloseDB(db)
+	user := db_tables.User{
+		Pseudo:          "Test User 47",
+		Email:           "Test Email 47",
+		Hashed_password: "hashed_password",
+	}
+	err = db.Create(&user).Error
+	if err != nil {
+		t.Error(err)
+	}
 	playlist := db_tables.Playlist{
-		Title: "Test Playlist 26",
+		Title:  "Test Playlist 30",
+		Owners: []db_tables.User{user},
 	}
 	err = db.Create(&playlist).Error
 	if err != nil {
 		t.Error(err)
 	}
 
-	if !PlaylistAlreadyExists(db, "Test Playlist 26", []int{}) {
+	if !PlaylistAlreadyExists(db, "Test Playlist 30", []int{user.Id}) {
 		t.Errorf("Expected playlist to exist, got false")
 	}
 }

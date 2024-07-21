@@ -17,12 +17,21 @@ func ConvertPlaylistToJSON(playlist *db_tables.Playlist) ([]byte, error) {
 	for i, music := range playlist.Musics {
 		musics_ids[i] = music.Id
 	}
+	owners_ids := make([]int, len(playlist.Owners))
+	for i, owner := range playlist.Owners {
+		owners_ids[i] = owner.Id
+	}
+	subscribers_ids := make([]int, len(playlist.Subscribers))
+	for i, subscriber := range playlist.Subscribers {
+		subscribers_ids[i] = subscriber.Id
+	}
 	playlist_json := map[string]interface{}{
 		"id":           playlist.Id,
 		"title":        playlist.Title,
 		"description":  playlist.Description,
 		"illustration": playlist.Illustration,
-		"creator_id":   playlist.CreatorId,
+		"owners_ids":   owners_ids,
+		"subscribers":  subscribers_ids,
 		"musics_ids":   musics_ids,
 		"protected":    playlist.Protected,
 		"created_on":   playlist.CreatedOn,
@@ -38,12 +47,21 @@ func ConvertPlaylistsToJSON(playlists []*db_tables.Playlist) ([]byte, error) {
 		for j, music := range playlist.Musics {
 			musics_ids[j] = music.Id
 		}
+		owners_ids := make([]int, len(playlist.Owners))
+		for j, owner := range playlist.Owners {
+			owners_ids[j] = owner.Id
+		}
+		subscribers_ids := make([]int, len(playlist.Subscribers))
+		for j, subscriber := range playlist.Subscribers {
+			subscribers_ids[j] = subscriber.Id
+		}
 		playlists_json[i] = map[string]interface{}{
 			"id":           playlist.Id,
 			"title":        playlist.Title,
 			"description":  playlist.Description,
 			"illustration": playlist.Illustration,
-			"creator_id":   playlist.CreatorId,
+			"owners_ids":   owners_ids,
+			"subscribers":  subscribers_ids,
 			"musics_ids":   musics_ids,
 			"protected":    playlist.Protected,
 			"created_on":   playlist.CreatedOn,
