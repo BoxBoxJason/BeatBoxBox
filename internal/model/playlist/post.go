@@ -6,16 +6,17 @@ import (
 )
 
 // PostPlaylist creates a new playlist in the database
-// Returns corresponding Id
-func CreatePlaylist(db *gorm.DB, title string, creator_id int, description string, illustration string) (int, error) {
+func CreatePlaylist(db *gorm.DB, title string, owners_ptr []*db_tables.User, description string, illustration string) (int, error) {
+	owners := make([]db_tables.User, len(owners_ptr))
+	for i, owner := range owners_ptr {
+		owners[i] = *owner
+	}
 	new_playlist := db_tables.Playlist{
 		Title:        title,
 		Illustration: illustration,
 		Description:  description,
-	}
-	if creator_id >= 0 {
-		creator_id_uint := uint(creator_id)
-		new_playlist.CreatorId = &creator_id_uint
+		Owners:       owners,
+		Subscribers:  owners,
 	}
 	err := db.Create(&new_playlist).Error
 	if err != nil {

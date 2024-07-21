@@ -27,11 +27,11 @@ type Playlist struct {
 	Description  string  `gorm:"type:text"`
 	Illustration string  `gorm:"type:text;default:'default.jpg'"`
 	Musics       []Music `gorm:"many2many:playlist_musics;"`
-	CreatorId    *uint
-	Creator      User `gorm:"foreignKey:CreatorId"`
-	Protected    bool `gorm:"default:true"`
-	CreatedOn    int  `gorm:"autoCreateTime" json:"created_on"`
-	ModifiedOn   int  `gorm:"autoUpdateTime:milli" json:"modified_on"`
+	Owners       []User  `gorm:"many2many:playlists_owners;"`
+	Subscribers  []User  `gorm:"many2many:playlists_subscribers;"`
+	Protected    bool    `gorm:"default:true"`
+	CreatedOn    int     `gorm:"autoCreateTime" json:"created_on"`
+	ModifiedOn   int     `gorm:"autoUpdateTime:milli" json:"modified_on"`
 }
 
 type Album struct {
@@ -78,8 +78,8 @@ type User struct {
 	Email               string     `gorm:"type:varchar(256);unique;not null"`
 	Hashed_password     string     `gorm:"type:varchar(64);not null"`
 	Illustration        string     `gorm:"type:text;default:'default.jpg'"`
-	SubscribedPlaylists []Playlist `gorm:"many2many:user_subscribed_playlists;"`
-	Playlists           []Playlist `gorm:"foreignKey:CreatorId"`
+	SubscribedPlaylists []Playlist `gorm:"many2many:playlists_subscribers;"`
+	Playlists           []Playlist `gorm:"many2many:playlists_owners;"`
 	LikedMusics         []Music    `gorm:"many2many:user_liked_musics;"`
 	UploadedMusics      int        `gorm:"default:0"`
 	CreatedOn           int        `gorm:"autoCreateTime" json:"created_on"`

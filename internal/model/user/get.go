@@ -59,3 +59,22 @@ func GetUsersFromPartialPseudo(db *gorm.DB, partial_pseudo string) ([]db_tables.
 
 	return users, nil
 }
+
+func UserAlreadyExists(db *gorm.DB, pseudo string, email string) (bool, []string, error) {
+	user := db_tables.User{}
+	err := db.Where("pseudo = ? OR email = ?", pseudo, email).First(&user).Error
+	if err == gorm.ErrRecordNotFound {
+		return false, []string{}, nil
+	} else if err != nil {
+		return false, []string{}, err
+	} else {
+		var fields []string
+		if user.Pseudo == pseudo {
+			fields = append(fields, "pseudo")
+		}
+		if user.Email == email {
+			fields = append(fields, "email")
+		}
+		return true, fields, nil
+	}
+}

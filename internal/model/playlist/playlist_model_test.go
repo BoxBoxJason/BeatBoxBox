@@ -15,7 +15,7 @@ func TestPlaylistCreate(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	_, err = CreatePlaylist(db, "Test Playlist 3", -1, "", "default.jpg")
+	_, err = CreatePlaylist(db, "Test Playlist 3", []*db_tables.User{}, "", "default.jpg")
 	if err != nil {
 		t.Errorf("Error creating playlist: %s", err)
 	}
@@ -225,5 +225,24 @@ func TestPlaylistsDelete(t *testing.T) {
 	result := db.Where("id = ?", playlist1_id).First(&playlist1)
 	if result.Error == nil {
 		t.Errorf("Expected an error, got nil")
+	}
+}
+
+func TestPlaylistAlreadyExists(t *testing.T) {
+	db, err := db_model.OpenDB()
+	if err != nil {
+		t.Errorf("Error opening database: %s", err)
+	}
+	defer db_model.CloseDB(db)
+	playlist := db_tables.Playlist{
+		Title: "Test Playlist 26",
+	}
+	err = db.Create(&playlist).Error
+	if err != nil {
+		t.Error(err)
+	}
+
+	if !PlaylistAlreadyExists(db, "Test Playlist 26", []int{}) {
+		t.Errorf("Expected playlist to exist, got false")
 	}
 }

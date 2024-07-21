@@ -1,9 +1,10 @@
 package user_controller
 
 import (
-	db_model "BeatBoxBox/internal/model"
+	db_tables "BeatBoxBox/internal/model"
 	user_model "BeatBoxBox/internal/model/user"
-	"encoding/json"
+	db_model "BeatBoxBox/pkg/db_model"
+	custom_errors "BeatBoxBox/pkg/errors"
 )
 
 // UserExists returns whether a user exists in the database
@@ -28,35 +29,8 @@ func UsersExist(user_ids []int) bool {
 	return err == nil && len(users) == len(user_ids)
 }
 
-// UserExistsFromParams returns whether a user exists in the database
-func UserExistsFromName(username string) bool {
-	db, err := db_model.OpenDB()
-	if err != nil {
-		return false
-	}
-	defer db_model.CloseDB(db)
-	users, err := user_model.GetUsersFromFilters(db, map[string]interface{}{
-		"Pseudo": username,
-	})
-	return err == nil && len(users) > 0
-}
-
-// UserExistsFromEmail returns whether a user exists in the database
-func UserExistsFromEmail(email string) bool {
-	db, err := db_model.OpenDB()
-	if err != nil {
-		return false
-	}
-	defer db_model.CloseDB(db)
-	users, err := user_model.GetUsersFromFilters(db, map[string]interface{}{
-		"Email": email,
-	})
-	return err == nil && len(users) > 0
-}
-
-// GetUser returns a user from the database
-// Selects the user with the given user_id
-func GetUser(user_id int) ([]byte, error) {
+// GetUserJSON returns a user from the database
+func GetUserJSON(user_id int) ([]byte, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		return nil, err
@@ -68,12 +42,11 @@ func GetUser(user_id int) ([]byte, error) {
 		return nil, err
 	}
 
-	return mapUserToJson(user)
+	return ConvertUserToJSON(&user)
 }
 
-// GetUsers returns a list of users from the database
-// Selects the users with the given user_ids
-func GetUsers(user_ids []int) ([][]byte, error) {
+// GetUsersJSON returns a list of users from the database
+func GetUsersJSON(user_ids []int) ([]byte, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		return nil, err
@@ -83,56 +56,25 @@ func GetUsers(user_ids []int) ([][]byte, error) {
 	users, err := user_model.GetUsers(db, user_ids)
 	if err != nil {
 		return nil, err
+	} else if users == nil || len(users) != len(user_ids) {
+		return nil, custom_errors.NewNotFoundError("some users were not found")
 	}
-
-	users_json := make([][]byte, len(users))
+	users_ptr := make([]*db_tables.User, len(users))
 	for i, user := range users {
-		user_json, err := mapUserToJson(user)
-		if err != nil {
-			return nil, err
-		}
-		users_json[i] = user_json
+		users_ptr[i] = &user
 	}
-	return users_json, nil
+	return ConvertUsersToJSON(users_ptr)
 }
 
 func GetUserIdFromUsername(username string) (int, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
-		return 0, err
+		return -1, err
 	}
 	defer db_model.CloseDB(db)
-	users, err := user_model.GetUsersFromFilters(db, map[string]interface{}{
-		"Pseudo": username,
-	})
-	if err != nil || len(users) == 0 {
-		return 0, err
+	users := user_model.GetUsersFromFilters(db, map[string]interface{}{"pseudo": username})
+	if users == nil || len(users) == 0 {
+		return -1, custom_errors.NewNotFoundError("user not found")
 	}
 	return users[0].Id, nil
-}
-
-func mapUserToJson(user db_model.User) ([]byte, error) {
-	playlists_ids := make([]int, len(user.Playlists))
-	for i, playlist := range user.Playlists {
-		playlists_ids[i] = playlist.Id
-	}
-
-	subscribed_playlists_ids := make([]int, len(user.SubscribedPlaylists))
-	for i, playlist := range user.SubscribedPlaylists {
-		subscribed_playlists_ids[i] = playlist.Id
-	}
-
-	uploaded_musics_ids := make([]int, len(user.UploadedMusics))
-	for i, music := range user.UploadedMusics {
-		uploaded_musics_ids[i] = music.Id
-	}
-
-	return json.Marshal(map[string]interface{}{
-		"id":                   user.Id,
-		"pseudo":               user.Pseudo,
-		"illustration":         user.Illustration,
-		"subscribed_playlists": subscribed_playlists_ids,
-		"playlists":            playlists_ids,
-		"uploaded_musics":      uploaded_musics_ids,
-	})
 }

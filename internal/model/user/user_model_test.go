@@ -15,7 +15,7 @@ func TestUserCreate(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	_, err = CreateUser(db, "Test user 1", "Test email 1", "hashed_password")
+	_, err = CreateUser(db, "Test user 1", "Test email 1", "hashed_password", "default.jpg")
 	if err != nil {
 		t.Errorf("Error creating user: %s", err)
 	}
@@ -47,7 +47,7 @@ func TestUserUpdate(t *testing.T) {
 	}
 }
 
-func TestUserAddSubscribedPlaylistToUser(t *testing.T) {
+func TestUserAddSubscribedPlaylistsToUser(t *testing.T) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		t.Errorf("Error opening database: %s", err)
@@ -66,13 +66,13 @@ func TestUserAddSubscribedPlaylistToUser(t *testing.T) {
 	}
 	db.Create(&playlist)
 
-	err = AddSubscribedPlaylistToUser(db, &user, &playlist)
+	err = AddSubscribedPlaylistsToUser(db, &user, []*db_tables.Playlist{&playlist})
 	if err != nil {
 		t.Errorf("Error adding playlist to user: %s", err)
 	}
 }
 
-func TestUserRemoveSubscribedPlaylistFromUser(t *testing.T) {
+func TestUserRemoveSubscribedPlaylistsFromUser(t *testing.T) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		t.Errorf("Error opening database: %s", err)
@@ -93,14 +93,14 @@ func TestUserRemoveSubscribedPlaylistFromUser(t *testing.T) {
 
 	user.SubscribedPlaylists = append(user.SubscribedPlaylists, playlist)
 
-	err = RemoveSubscribedPlaylistFromUser(db, &user, &playlist)
+	err = RemoveSubscribedPlaylistsFromUser(db, &user, []*db_tables.Playlist{&playlist})
 	if err != nil {
 		t.Errorf("Error removing playlist from user: %s", err)
 	}
 
 }
 
-func TestUserAddLikedMusicToUser(t *testing.T) {
+func TestUserAddLikedMusicsToUser(t *testing.T) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		t.Errorf("Error opening database: %s", err)
@@ -120,7 +120,7 @@ func TestUserAddLikedMusicToUser(t *testing.T) {
 	}
 	db.Create(&music)
 
-	err = AddLikedMusicToUser(db, &user, &music)
+	err = AddLikedMusicsToUser(db, &user, []*db_tables.Music{&music})
 	if err != nil {
 		t.Errorf("Error adding music to user: %s", err)
 	}
@@ -148,7 +148,7 @@ func TestUserRemoveLikedMusicFromUser(t *testing.T) {
 
 	user.LikedMusics = append(user.LikedMusics, music)
 
-	err = RemoveLikedMusicFromUser(db, &user, &music)
+	err = RemoveLikedMusicsFromUser(db, &user, []*db_tables.Music{&music})
 	if err != nil {
 		t.Errorf("Error removing music from user: %s", err)
 	}
@@ -265,6 +265,35 @@ func TestUserGetFromPartialName(t *testing.T) {
 		t.Errorf("Error getting users: %s", err)
 	} else if len(users) < 2 {
 		t.Errorf("Expected at least 2 users, got %d", len(users))
+	}
+}
+
+func TestUserAlreadyExists(t *testing.T) {
+	db, err := db_model.OpenDB()
+	if err != nil {
+		t.Errorf("Error opening database: %s", err)
+	}
+	defer db_model.CloseDB(db)
+
+	user := db_tables.User{
+		Pseudo:          "Test User 30",
+		Email:           "Test email 30",
+		Hashed_password: "hashed_password",
+	}
+	db.Create(&user)
+
+	exists, fields, err := UserAlreadyExists(db, "Test User 30", "")
+	if err != nil {
+		t.Errorf("Error checking if user already exists: %s", err)
+	} else if !exists || len(fields) != 1 || fields[0] != "pseudo" {
+		t.Errorf("Expected user to exist, got false or wrong fields")
+	}
+
+	exists, fields, err = UserAlreadyExists(db, "USERNOTEXIST", "USERNOTEXIST")
+	if err != nil {
+		t.Errorf("Error checking if user already exists: %s", err)
+	} else if exists {
+		t.Errorf("Expected user to not exist, got true")
 	}
 }
 

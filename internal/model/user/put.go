@@ -11,22 +11,30 @@ func UpdateUser(db *gorm.DB, user *db_tables.User, fields map[string]interface{}
 	return db_model.EditRecordFields(db, user, fields)
 }
 
-// AddSubscribedPlaylistToUser adds a playlist to the list of subscribed playlists of a user
-func AddSubscribedPlaylistToUser(db *gorm.DB, user *db_tables.User, playlist *db_tables.Playlist) error {
-	return db.Model(user).Association("SubscribedPlaylists").Append(playlist)
+// AddSubscribedPlaylistsToUser adds playlists to the list of subscribed playlists of a user
+func AddSubscribedPlaylistsToUser(db *gorm.DB, user *db_tables.User, playlists []*db_tables.Playlist) error {
+	return db_model.AddElementsToAssociation(db, user, "SubscribedPlaylists", playlists)
 }
 
-// RemoveSubscribedPlaylistFromUser removes a playlist from the list of subscribed playlists of a user
-func RemoveSubscribedPlaylistFromUser(db *gorm.DB, user *db_tables.User, playlist *db_tables.Playlist) error {
-	return db.Model(user).Association("SubscribedPlaylists").Delete(playlist)
+// RemoveSubscribedPlaylistsFromUser removes playlists from the list of subscribed playlists of a user
+func RemoveSubscribedPlaylistsFromUser(db *gorm.DB, user *db_tables.User, playlists []*db_tables.Playlist) error {
+	return db_model.RemoveElementsFromAssociation(db, user, "SubscribedPlaylists", playlists)
 }
 
-// AddLikedMusicToUser adds a music to the list of liked musics of a user
-func AddLikedMusicToUser(db *gorm.DB, user *db_tables.User, music *db_tables.Music) error {
-	return db.Model(user).Association("LikedMusics").Append(music)
+// AddLikedMusicsToUser adds musics to the list of liked musics of a user
+func AddLikedMusicsToUser(db *gorm.DB, user *db_tables.User, musics []*db_tables.Music) error {
+	return db_model.AddElementsToAssociation(db, user, "LikedMusics", musics)
 }
 
-// RemoveLikedMusicFromUser removes a music from the list of liked musics of a user
-func RemoveLikedMusicFromUser(db *gorm.DB, user *db_tables.User, music *db_tables.Music) error {
-	return db.Model(user).Association("LikedMusics").Delete(music)
+// RemoveLikedMusicsFromUser removes a music from the list of liked musics of a user
+func RemoveLikedMusicsFromUser(db *gorm.DB, user *db_tables.User, musics []*db_tables.Music) error {
+	return db_model.RemoveElementsFromAssociation(db, user, "LikedMusics", musics)
+}
+
+func RemoveOwnedPlaylistsFromUser(db *gorm.DB, user *db_tables.User, playlists []*db_tables.Playlist) error {
+	return db_model.RemoveElementsFromAssociation(db, user, "Playlists", playlists)
+}
+
+func AddOwnedPlaylistsToUser(db *gorm.DB, user *db_tables.User, playlists []*db_tables.Playlist) error {
+	return db_model.AddElementsToAssociation(db, user, "Playlists", playlists)
 }

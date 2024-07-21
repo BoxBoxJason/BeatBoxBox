@@ -31,17 +31,6 @@ func PlaylistsExist(playlist_ids []int) bool {
 	return err == nil && len(playlists) == len(playlist_ids)
 }
 
-// PlaylistExistsFromParams returns whether a playlist exists in the database
-func PlaylistAlreadyExists(playlist_name string, playlist_creator_id int) bool {
-	db, err := db_model.OpenDB()
-	if err != nil {
-		return false
-	}
-	defer db_model.CloseDB(db)
-	playlists := playlist_model.GetPlaylistsFromFilters(db, map[string]interface{}{"title": playlist_name, "creator_id": playlist_creator_id})
-	return playlists != nil && len(playlists) > 0
-}
-
 // GetPlaylist returns a playlist from the database as a JSON object
 func GetPlaylistJSON(playlist_id int) ([]byte, error) {
 	db, err := db_model.OpenDB()

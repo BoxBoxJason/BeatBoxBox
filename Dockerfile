@@ -29,7 +29,7 @@ RUN apk add --no-cache \
 # Build frontend
 COPY ./frontend ./frontend/
 RUN cd /home/user/beatboxbox/frontend && \
-    npm --no-cache install && \
+    npm --no-cache --legacy-peer-deps install && \
     npm cache clean --force && \
     npm run build && \
     find dist -mindepth 1 -maxdepth 1 ! -name 'dist' -exec rm -rf {} +

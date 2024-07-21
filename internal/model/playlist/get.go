@@ -8,7 +8,6 @@ import (
 )
 
 // GetPlaylistsFromFilters returns a list of playlists from the database
-// Filters can be passed to filter the playlists
 func GetPlaylistsFromFilters(db *gorm.DB, filters map[string]interface{}) []db_tables.Playlist {
 	raw_playlists := db_model.GetRecordsByFields(db, &db_tables.Playlist{}, filters)
 	if raw_playlists == nil {
@@ -23,7 +22,6 @@ func GetPlaylistsFromFilters(db *gorm.DB, filters map[string]interface{}) []db_t
 }
 
 // GetPlaylist returns a playlist from the database
-// Selects the playlist with the given playlist_id
 func GetPlaylist(db *gorm.DB, playlist_id int) (db_tables.Playlist, error) {
 	playlist := db_model.GetRecordFromId(db, &db_tables.Playlist{}, playlist_id)
 	if playlist == nil {
@@ -33,7 +31,6 @@ func GetPlaylist(db *gorm.DB, playlist_id int) (db_tables.Playlist, error) {
 }
 
 // GetPlaylists returns a list of playlists from the database
-// Selects the playlists with the given playlist_ids
 func GetPlaylists(db *gorm.DB, playlist_ids []int) ([]db_tables.Playlist, error) {
 	records := db_model.GetRecordsFromIds(db, &db_tables.Playlist{}, playlist_ids)
 	if records == nil {
@@ -58,4 +55,18 @@ func GetPlaylistsFromPartialTitle(db *gorm.DB, filters map[string]interface{}, t
 	}
 
 	return playlists
+}
+
+func PlaylistAlreadyExists(db *gorm.DB, playlist_name string, owners_ids []int) bool {
+	if len(owners_ids) == 0 {
+		return false
+	}
+	var album db_tables.Playlist
+	err := db.Where("title = ?", playlist_name).
+		Joins("JOIN playlists_owners ON playlists_owners.playlist_id = playlists.id").
+		Where("playlists_owners.user_id IN ?", owners_ids).
+		Group("playlists.id").
+		Having("COUNT(DISTINCT playlists_owners.user_id) = ?", len(owners_ids)).
+		First(&album).Error
+	return err == nil
 }

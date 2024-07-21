@@ -2,8 +2,8 @@ package user_controller
 
 import (
 	cookie_controller "BeatBoxBox/internal/controller/cookie"
-	db_model "BeatBoxBox/internal/model"
 	user_model "BeatBoxBox/internal/model/user"
+	db_model "BeatBoxBox/pkg/db_model"
 	auth_utils "BeatBoxBox/pkg/utils/authutils"
 	"errors"
 )
@@ -17,11 +17,11 @@ func AttemptLogin(username_or_email string, raw_password string) (int, string, e
 	defer db_model.CloseDB(db)
 
 	// Get the user from the database
-	users, err := user_model.GetUsersFromFilters(db, map[string]interface{}{"Email": username_or_email})
-	if err != nil {
-		users, err = user_model.GetUsersFromFilters(db, map[string]interface{}{"Pseudo": username_or_email})
+	users := user_model.GetUsersFromFilters(db, map[string]interface{}{"email": username_or_email})
+	if users == nil || len(users) == 0 {
+		users = user_model.GetUsersFromFilters(db, map[string]interface{}{"pseudo": username_or_email})
 	}
-	if err != nil || len(users) == 0 {
+	if users == nil || len(users) == 0 {
 		return -1, "", errors.New("user not found")
 	}
 	user := users[0]

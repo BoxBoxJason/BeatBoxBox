@@ -1,19 +1,19 @@
 package user_controller
 
 import (
-	db_model "BeatBoxBox/internal/model"
 	user_model "BeatBoxBox/internal/model/user"
+	db_model "BeatBoxBox/pkg/db_model"
 	custom_errors "BeatBoxBox/pkg/errors"
 	auth_utils "BeatBoxBox/pkg/utils/authutils"
+	file_utils "BeatBoxBox/pkg/utils/fileutils"
 	format_utils "BeatBoxBox/pkg/utils/formatutils"
+	"fmt"
+	"mime/multipart"
 )
 
-func PostUser(username string, email string, raw_password string) (int, error) {
+func PostUser(username string, email string, raw_password string, avatar_file *multipart.File) (int, error) {
 	if !format_utils.CheckPseudoValidity(username) {
 		return -1, custom_errors.NewBadRequestError("pseudo is invalid, must be between 3 and 32 characters")
-	}
-	if UserExistsFromName(username) {
-		return -1, custom_errors.NewBadRequestError("pseudo already exists")
 	}
 	if !format_utils.CheckEmailValidity(email) {
 		return -1, custom_errors.NewBadRequestError("email is invalid, must be less than 256 characters and match the regex pattern")
@@ -31,6 +31,15 @@ func PostUser(username string, email string, raw_password string) (int, error) {
 		return -1, err
 	}
 	defer db_model.CloseDB(db)
-
-	return user_model.CreateUser(db, username, email, hashed_password)
+	exists, fields, err := user_model.UserAlreadyExists(db, username, email)
+	if err != nil {
+		return -1, err
+	} else if exists {
+		return -1, custom_errors.NewConflictError(fmt.Sprintf("user already exists with the following fields: %v", fields))
+	}
+	avatar_file_name, err := file_utils.UploadIllustrationToServer(avatar_file, "users")
+	if err != nil {
+		return -1, err
+	}
+	return user_model.CreateUser(db, username, email, hashed_password, avatar_file_name)
 }

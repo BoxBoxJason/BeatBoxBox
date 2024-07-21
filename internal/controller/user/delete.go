@@ -1,21 +1,42 @@
 package user_controller
 
-import "fmt"
+import (
+	db_tables "BeatBoxBox/internal/model"
+	user_model "BeatBoxBox/internal/model/user"
+	"BeatBoxBox/pkg/db_model"
+	custom_errors "BeatBoxBox/pkg/errors"
+)
 
 // DeleteUser deletes a user by its id
 func DeleteUser(user_id int) error {
-	user_exists := UserExists(user_id)
-	if !user_exists {
-		return fmt.Errorf("user with id %d does not exist", user_id)
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return err
 	}
-	return DeleteUser(user_id)
+	defer db_model.CloseDB(db)
+	user, err := user_model.GetUser(db, user_id)
+	if err != nil {
+		return err
+	}
+	return user_model.DeleteUserFromRecord(db, &user)
 }
 
 // DeleteUsers deletes users by their ids
 func DeleteUsers(user_ids []int) error {
-	users_exists := UsersExist(user_ids)
-	if !users_exists {
-		return fmt.Errorf("at least one of the ids %v does not exist", user_ids)
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return err
 	}
-	return DeleteUsers(user_ids)
+	defer db_model.CloseDB(db)
+	users, err := user_model.GetUsers(db, user_ids)
+	if err != nil {
+		return err
+	} else if users == nil || len(users) != len(user_ids) {
+		return custom_errors.NewNotFoundError("some users were not found")
+	}
+	users_ptr := make([]*db_tables.User, len(users))
+	for i, user := range users {
+		users_ptr[i] = &user
+	}
+	return user_model.DeleteUsersFromRecords(db, users_ptr)
 }

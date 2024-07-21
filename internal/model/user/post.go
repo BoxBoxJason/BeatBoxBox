@@ -7,11 +7,12 @@ import (
 )
 
 // PostUser creates a new user in the database
-func CreateUser(db *gorm.DB, pseudo string, email string, hashed_password string) (int, error) {
+func CreateUser(db *gorm.DB, pseudo string, email string, hashed_password string, avatar_file_name string) (int, error) {
 	new_user := db_model.User{
 		Pseudo:          pseudo,
 		Email:           email,
 		Hashed_password: hashed_password,
+		Illustration:    avatar_file_name,
 	}
 	err := db.Create(&new_user).Error
 	if err != nil {

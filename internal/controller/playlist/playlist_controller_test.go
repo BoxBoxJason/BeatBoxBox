@@ -22,7 +22,7 @@ func TestPostPlaylist(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	_, err = PostPlaylist("Test Playlist 13", user.Id, "description", nil)
+	_, err = PostPlaylist("Test Playlist 13", []int{user.Id}, "description", nil)
 	if err != nil {
 		t.Error(err)
 	}
@@ -110,34 +110,6 @@ func TestPlaylistsExist(t *testing.T) {
 		t.Error(err)
 	}
 	if !PlaylistsExist([]int{playlist.Id}) {
-		t.Error("Playlist not found")
-	}
-}
-
-func TestPlaylistAlreadyExists(t *testing.T) {
-	db, err := db_model.OpenDB()
-	if err != nil {
-		t.Error(err)
-	}
-	defer db_model.CloseDB(db)
-	user := db_tables.User{
-		Pseudo:          "Test User 28",
-		Hashed_password: "hashed_password",
-		Email:           "Test Email 28",
-	}
-	err = db.Create(&user).Error
-	if err != nil {
-		t.Error(err)
-	}
-	playlist := db_tables.Playlist{
-		Title:   "Test Playlist 18",
-		Creator: user,
-	}
-	err = db.Create(&playlist).Error
-	if err != nil {
-		t.Error(err)
-	}
-	if !PlaylistAlreadyExists(playlist.Title, user.Id) {
 		t.Error("Playlist not found")
 	}
 }
@@ -278,7 +250,7 @@ func TestAddMusicsToPlaylist(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 	music := db_tables.Music{
-		Title: "Test Music 40",
+		Title: "Test Music 41",
 		Path:  "test.mp3",
 	}
 	err = db.Create(&music).Error
@@ -311,7 +283,7 @@ func TestRemoveMusicsFromPlaylist(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 	music := db_tables.Music{
-		Title: "Test Music 41",
+		Title: "Test Music 42",
 		Path:  "test.mp3",
 	}
 	err = db.Create(&music).Error
