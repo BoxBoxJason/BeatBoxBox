@@ -13,7 +13,7 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: cd frontend && npm install
+        run: cd frontend && npm install --legacy-peer-deps
 
       - name: TODO
         run: 'echo "TODO: Add test command here"'

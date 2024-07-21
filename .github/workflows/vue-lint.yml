@@ -12,8 +12,14 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: cd frontend && npm install
+      - name: Run ESLint
+        run: cd frontend && npm install --legacy-peer-deps && npx eslint . > eslint-report.txt
+      
+      - name: Display ESLint report
+        run: cat frontend/eslint-report.txt
 
-      - name: TODO
-        run: 'echo "TODO: Add lint command here"'
+      - name: Upload ESLint report
+        uses: actions/upload-artifact@v4
+        with:
+          name: eslint-report
+          path: frontend/eslint-report.txt
