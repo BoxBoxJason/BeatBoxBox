@@ -10,6 +10,7 @@ import (
 
 // POST FUNCTIONS
 func TestPostAuthToken(t *testing.T) {
+	db_tables.CreateTables()
 	db, err := db_model.OpenDB()
 	if err != nil {
 		t.Error(err)

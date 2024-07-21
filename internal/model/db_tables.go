@@ -6,8 +6,12 @@ import (
 	"github.com/lib/pq"
 )
 
-// Initialize the database connection and create the tables
 func init() {
+	CreateTables()
+}
+
+// Initialize the database connection and create the tables
+func CreateTables() {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		logger.Critical("Failed to connect database: ", err)

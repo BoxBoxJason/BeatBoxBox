@@ -23,3 +23,30 @@ jobs:
         with:
           name: eslint-report
           path: frontend/eslint-report.txt
+
+  html5-validator:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies & build frontend
+        run: |
+          cd frontend && \
+          npm install --legacy-peer-deps && \
+          npm cache clean --force && \
+          npm run build && \
+          find dist -mindepth 1 -maxdepth 1 ! -name 'dist' -exec rm -rf {} +
+
+      - name: HTML5 Validator
+        uses: Cyb3r-Jak3/html5validator-action@v7.2.0
+        with:
+          root: frontend/dist
+          format: text
+          css: true
+          log_level: INFO

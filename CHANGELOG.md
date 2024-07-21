@@ -10,6 +10,33 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+## [API Review & Fixes] - 2024-07-26
+
+### Added
+
+### Changed
+- Moved /api routes to /api/v1 routes to implement versionning
+- Fixed all detected errors & unexpected behaviors on handlers
+- Added & Edited & Reviewed some controllers functionnalities
+
+## [Controller Review & Fixes] - 2024-07-21
+
+### Added
+- Added CI/CD static & dynamic testing workflow to ensure quality
+
+### Changed
+- Fixed all detected errors & unexpected behaviors on controllers
+- Added & Edited & Reviewed some model functionnalities
+
+## [Model Review & Fixes] - 2024-07-05
+
+### Added
+- Added Roles to manage users permissions
+
+### Changed
+- Fixed all detected errors & unexpected behaviors on models
+
+
 ## [Playlist, Artist, Album REST API Release] - 2024-05-14
 
 ### Added
