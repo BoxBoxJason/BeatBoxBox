@@ -1,11 +1,11 @@
 /*
-Package music_handler is the handler for music API
+Package music_handler_v1 is the handler for music API
 
 This package is responsible for handling all the API requests related to music.
 It creates a new router and registers all the handlers for the music API.
 */
 
-package music_handler
+package music_handler_v1
 
 import "github.com/gorilla/mux"
 

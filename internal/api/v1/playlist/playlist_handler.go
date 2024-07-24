@@ -1,4 +1,4 @@
-package playlist_handler
+package playlist_handler_v1
 
 import "github.com/gorilla/mux"
 

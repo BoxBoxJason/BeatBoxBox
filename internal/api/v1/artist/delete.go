@@ -1,4 +1,4 @@
-package artist_handler
+package artist_handler_v1
 
 import (
 	artist_controller "BeatBoxBox/internal/controller/artist"

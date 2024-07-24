@@ -1,4 +1,4 @@
-package playlist_handler
+package playlist_handler_v1
 
 import (
 	music_controller "BeatBoxBox/internal/controller/music"

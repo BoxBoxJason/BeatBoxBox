@@ -1,4 +1,4 @@
-package user_handler
+package user_handler_v1
 
 import "github.com/gorilla/mux"
 

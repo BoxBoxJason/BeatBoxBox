@@ -1,4 +1,4 @@
-package album_handler
+package album_handler_v1
 
 import (
 	album_controller "BeatBoxBox/internal/controller/album"

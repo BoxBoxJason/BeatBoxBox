@@ -1,7 +1,7 @@
 /*
 Contains the handler for the GET requests to the /api/musics endpoint
 */
-package music_handler
+package music_handler_v1
 
 import (
 	music_controller "BeatBoxBox/internal/controller/music"

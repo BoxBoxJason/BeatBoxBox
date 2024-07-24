@@ -1,4 +1,4 @@
-package music_handler
+package music_handler_v1
 
 import (
 	"net/http"

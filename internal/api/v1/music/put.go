@@ -1,7 +1,7 @@
 /*
 Contains the handler for the PUT requests to the /musics endpoint
 */
-package music_handler
+package music_handler_v1
 
 import (
 	album_controller "BeatBoxBox/internal/controller/album"
