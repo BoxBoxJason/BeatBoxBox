@@ -1,0 +1,19 @@
+name: old-workflow-cleanup
+on:
+  workflow_run:
+    workflows: ["go-lint", "go-test","vue-lint","old-workflow-cleanup"]
+    types:
+      - completed
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: API workflows cleanup
+        env:
+          GITHUB_TOKEN: ${{ secrets.API_TOKEN }}
+        run: |
+          OLD_RUNS=$(gh api repos/BoxBoxJason/BeatBoxBox/actions/runs --paginate -q '.workflow_runs[] | select(.head_branch == "main") | select(.status == "completed") | select(.conclusion == "success") | .id' | tail -n +2)
+          for run_id in $OLD_RUNS; do
+            gh api repos/BoxBoxJason/BeatBoxBox/actions/runs/$run_id -X DELETE
+          done
