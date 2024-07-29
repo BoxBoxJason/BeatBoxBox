@@ -1,0 +1,124 @@
+get:
+  summary: Retrieve Artists
+  description: "Retrieve artists from the database given matching filters, if no filters are provided, all artists are returned, available filters are: pseudo(s), id(s), album(s), album(s) id(s), music(s), music(s) id(s)"
+  parameters:
+    - name: pseudos
+      in: query
+      schema:
+        type: array
+        items:
+          type: string
+      description: Artists pseudos
+    - name: ids
+      in: query
+      schema:
+        type: array
+        items:
+          type: integer
+      description: Artists ids
+    - name: albums
+      in: query
+      schema:
+        type: array
+        items:
+          type: string
+      description: Albums titles
+    - name: albums_ids
+      in: query
+      schema:
+        type: array
+        items:
+          type: integer
+      description: Albums ids
+    - name: musics
+      in: query
+      schema:
+        type: array
+        items:
+          type: string
+      description: Musics titles
+    - name: musics_ids
+      in: query
+      schema:
+        type: array
+        items:
+          type: integer
+      description: Musics ids
+  responses:
+    200:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "../../../components/schemas/artist.yaml"
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../../../components/schemas/error.yaml"
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "../../../components/schemas/error.yaml"
+post:
+  summary: Create a new artist
+  description: "Create a new artist in the database"
+  requestBody:
+    required: true
+    content:
+      multipart/form-data:
+        schema:
+            type: object
+            properties:
+              pseudo:
+                type: string
+                description: Artist pseudo
+              biography:
+                type: string
+                description: Artist biography
+              birthdate:
+                type: string
+                format: date
+                description: Artist birthdate
+              illustration:
+                type: string
+                format: binary
+                description: Artist illustration
+            required:
+              - pseudo
+  responses:
+    201:
+      description: Created
+      content:
+        application/json:
+          schema:
+              $ref: "../../../components/schemas/artist.yaml"
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../../../components/schemas/error.yaml"
+    401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    409:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: "../../../components/schemas/error.yaml"

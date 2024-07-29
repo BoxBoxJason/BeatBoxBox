@@ -1,0 +1,161 @@
+get:
+  summary: Retrieve Musics
+  description: "Retrieve musics from the database given matching filters, if no filters are provided, all musics are returned, available filters are: partial_title, title(s), id(s), album(s), album(s) id(s), music(s), music(s) id(s)"
+  parameters:
+    - name: titles
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+      description: Music title
+    - name: partial_title
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Partial music title
+    - name: ids
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: integer
+      description: Music ID
+    - name: albums
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+      description: Albums titles
+    - name: albums_ids
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: integer
+      description: Album ID
+    - name: musics
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+      description: Musics titles
+    - name: musics_ids
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: integer
+      description: Musics IDs
+  responses:
+    200:
+      description: Musics retrieved successfully
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../../../components/schemas/music.yaml'
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+post:
+  summary: Create a new music
+  description: Create a new music in the database given a title, lyrics, release date, album ID, artist(s) ID(s) and genres
+  requestBody:
+    required: true
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          properties:
+            illustration:
+              type: string
+              description: Music illustration
+              format: binary
+            music:
+              type: string
+              description: Music file
+              format: binary
+            title:
+              type: string
+              description: Music title
+            artists_ids:
+              type: array
+              items:
+                type: integer
+              description: Artist ID
+            lyrics:
+              type: string
+              description: Music lyrics
+            release_date:
+              type: string
+              format: date
+              description: Music release date
+            album_id:
+              type: integer
+              description: Album ID
+            genres:
+              type: array
+              items:
+                type: string
+              description: Music genres
+          required:
+            - music
+            - title
+            - artists_ids
+  responses:
+    201:
+      description: Music created successfully
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/music.yaml'
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    409:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+              $ref: '../../../components/schemas/error.yaml'

@@ -21,7 +21,7 @@ func TestPostMusic(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	_, err = PostMusic("Test Music 26", []string{"pop", "funk"}, "Test Lyrics 26", -1, nil, nil, []int{artist.Id})
+	_, err = PostMusic("Test Music 26", []string{"pop", "funk"}, "Test Lyrics 26", "01/01/0001", -1, nil, nil, []int{artist.Id})
 	if err != nil {
 		t.Error(err)
 	}

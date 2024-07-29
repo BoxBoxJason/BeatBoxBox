@@ -1,0 +1,34 @@
+type: object
+properties:
+  id:
+    type: integer
+    description: Playlist ID
+  title:
+    type: string
+    description: Playlist title
+  description:
+    type: string
+    description: Playlist description
+  illustration:
+    type: string
+    description: Path to playlist illustration file
+  musics_ids:
+    type: array
+    description: Playlist musics IDs
+  owners_ids:
+    type: array
+    description: Playlist owners IDs
+  subscribers_ids:
+    type: array
+    description: Playlist subscribers IDs
+  protected:
+    type: boolean
+    description: Playlist protection status
+  created_on:
+    type: string
+    format: date-time
+    description: Playlist creation date
+  updated_on:
+    type: string
+    format: date-time
+    description: Playlist last update date

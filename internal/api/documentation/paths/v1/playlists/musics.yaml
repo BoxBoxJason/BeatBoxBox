@@ -1,0 +1,60 @@
+put:
+  summary: Add/Remove Playlist Musics
+  description: Add or remove musics from a playlist by their ids
+  parameters:
+    - name: playlist_id
+      in: path
+      description: Playlist id
+      required: true
+      schema:
+        type: integer
+    - name: action
+      in: path
+      description: Action to be performed
+      required: true
+      schema:
+        type: string
+        enum:
+          - add
+          - remove
+    - name: music_ids
+      in: query
+      description: Music ids to be added or removed
+      required: true
+      schema:
+        type: array
+        items:
+          type: integer
+  responses:
+    200:
+      description: OK
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    409:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'

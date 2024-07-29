@@ -14,7 +14,7 @@ func TestAlbumCreation(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	id, err := CreateAlbum(db, "Test Album 1", "fake.jpeg")
+	id, err := CreateAlbum(db, "Test Album 1", "description", "fake.jpeg", []*db_tables.Artist{})
 
 	if err != nil {
 		t.Errorf("Error creating album: %s", err)

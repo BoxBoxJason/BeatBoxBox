@@ -1,0 +1,85 @@
+get:
+  summary: Retrieve Users
+  description: "Retrieve users from the database given matching filters, if no filters are provided, all users are returned, available filters are: username(s), id(s)"
+  parameters:
+    - name: usernames
+      in: query
+      schema:
+        type: array
+        items:
+          type: string
+      description: Users usernames
+    - name: ids
+      in: query
+      schema:
+        type: array
+        items:
+          type: integer
+      description: Users ids
+  responses:
+    200:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "../../../components/schemas/user.yaml"
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+post:
+  summary: Create a new user
+  description: Create a new user in the database
+  requestBody:
+    required: true
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          properties:
+            username:
+              type: string
+              description: User username
+            email:
+              type: string
+              description: User email
+            password:
+              type: string
+              description: User password
+            illustration:
+              type: string
+              format: binary
+              description: User illustration
+          required:
+            - username
+            - email
+            - password
+  responses:
+    201:
+      description: Created
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/user.yaml'
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    409:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'

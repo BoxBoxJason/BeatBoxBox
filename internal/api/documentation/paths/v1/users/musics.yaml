@@ -1,0 +1,58 @@
+put:
+  summary: Like/Unlike Music
+  description: Like/Unlike musics in the database using the user ID and the musics IDs
+  parameters:
+    - name: user_id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: User ID or username
+    - name: action
+      in: path
+      required: true
+      schema:
+        type: string
+        enum: [ 'like', 'unlike' ]
+      description: Action to be performed on the musics
+    - name: ids
+      in: query
+      required: true
+      schema:
+        type: array
+        items:
+          type: integer
+      description: Music IDs
+  responses:
+    200:
+      description: OK
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    409:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'

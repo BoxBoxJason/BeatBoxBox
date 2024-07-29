@@ -1,0 +1,74 @@
+post:
+  summary: Request session token
+  description: Request a session authentication JWT for the user
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
+              description: User email
+              format: email
+            username:
+              type: string
+              description: User username
+            username_or_email:
+              type: string
+              description: User username or email (used for login from UI)
+            password:
+              type: string
+              description: User password
+              format: password
+          oneOf:
+            - required: [ 'email', 'password' ]
+            - required: [ 'username', 'password' ]
+            - required: [ 'username_or_email', 'password' ]
+  responses:
+    200:
+      description: Session token created successfully
+      headers:
+        Set-Cookie:
+          description: A cookie to be set on the client side containing the session token
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              access_token:
+                type: string
+                description: Session JWT
+              expires:
+                type: integer
+                description: Session JWT expiration time in seconds
+              user_id:
+                type: integer
+                description: User ID
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    409:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'

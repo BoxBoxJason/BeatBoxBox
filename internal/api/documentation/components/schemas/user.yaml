@@ -1,0 +1,38 @@
+type: object
+properties:
+  id:
+    type: integer
+    description: User ID
+  pseudo:
+    type: string
+    description: User pseudo
+  email:
+    type: string
+    description: User email
+    optional: true
+  illustration:
+    type: string
+    description: Path to user illustration file
+  playlists_ids:
+    type: array
+    description: User playlists IDs
+  subscribed_playlists_ids:
+    type: array
+    description: User subscribed playlists IDs
+  roles_ids:
+    type: array
+    description: User roles IDs
+  uploaded_musics:
+    type: integer
+    description: Number of uploaded musics
+  liked_musics_ids:
+    type: array
+    description: User liked musics IDs
+  created_on:
+    type: string
+    format: date-time
+    description: User creation date
+  updated_on:
+    type: string
+    format: date-time
+    description: User last update date

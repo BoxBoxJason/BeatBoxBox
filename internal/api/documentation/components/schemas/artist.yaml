@@ -1,0 +1,28 @@
+type: object
+properties:
+  id:
+    type: integer
+    description: Artist ID
+  pseudo:
+    type: string
+    description: Artist pseudo
+  bio:
+    type: string
+    description: Artist bio
+  illustration:
+    type: string
+    description: Path to artist illustration file
+  albums_ids:
+    type: array
+    description: Artist albums IDs
+  musics_ids:
+    type: array
+    description: Artists musics IDs
+  created_on:
+    type: string
+    format: date-time
+    description: Artist creation date
+  updated_on:
+    type: string
+    format: date-time
+    description: Artist last update date

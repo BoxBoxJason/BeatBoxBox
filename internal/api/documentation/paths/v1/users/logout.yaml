@@ -1,0 +1,36 @@
+post:
+  summary: Logout User
+  description: Logout user from the system by invalidating the session token
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            access_token:
+              type: string
+              description: Session JWT
+            user_id:
+              type: integer
+              description: User ID
+  responses:
+    200:
+      description: User logged out successfully
+      headers:
+        Set-Cookie:
+          description: Unset the session token cookie
+          schema:
+            type: string
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'

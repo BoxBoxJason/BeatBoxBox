@@ -1,0 +1,42 @@
+openapi: 3.0.3
+info:
+  title: BeatBoxBox
+  description: BeatBoxBox REST API documentation
+  version: 1.0.0
+servers:
+  - url: 'https'
+paths:
+  /api/v1/albums:
+    $ref: './paths/v1/albums/albums.yaml'
+  /api/v1/albums/{album_id}:
+    $ref: './paths/v1/albums/album.yaml'
+  /api/v1/albums/{album_id}/musics/{action}:
+    $ref: './paths/v1/albums/musics.yaml'
+  /api/v1/albums/{album_id}/artists/{action}:
+    $ref: './paths/v1/albums/artists.yaml'
+  /api/v1/artists:
+    $ref: './paths/v1/artists/artists.yaml'
+  /api/v1/artists/{artist_id}:
+    $ref: './paths/v1/artists/artist.yaml'
+  /api/v1/musics:
+    $ref: './paths/v1/musics/musics.yaml'
+  /api/v1/musics/{music_id}:
+    $ref: './paths/v1/musics/music.yaml'
+  /api/v1/playlists:
+    $ref: './paths/v1/playlists/playlists.yaml'
+  /api/v1/playlists/{playlist_id}:
+    $ref: './paths/v1/playlists/playlist.yaml'
+  /api/v1/playlists/{playlist_id}/musics/{action}:
+    $ref: './paths/v1/playlists/musics.yaml'
+  /api/v1/users:
+    $ref: './paths/v1/users/users.yaml'
+  /api/v1/users/login:
+    $ref: './paths/v1/users/login.yaml'
+  /api/v1/users/logout:
+    $ref: './paths/v1/users/logout.yaml'
+  /api/v1/users/{user_id}:
+    $ref: './paths/v1/users/user.yaml'
+  /api/v1/users/{user_id}/playlists/{action}:
+    $ref: './paths/v1/users/playlists.yaml'
+  /api/v1/users/{user_id}/musics/{action}:
+    $ref: './paths/v1/users/musics.yaml'

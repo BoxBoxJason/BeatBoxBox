@@ -1,0 +1,143 @@
+get:
+  summary: Retrieve Playlist
+  description: Retrieve a playlist by its id
+  parameters:
+    - name: playlist_id
+      in: path
+      description: Playlist id
+      required: true
+      schema:
+        type: integer
+  responses:
+    200:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/playlist.yaml'
+    401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+put:
+  summary: Update Playlist
+  description: Update a playlist by its id
+  parameters:
+    - name: playlist_id
+      in: path
+      description: Playlist id
+      required: true
+      schema:
+        type: integer
+    - name: title
+      in: query
+      description: Playlist new title
+      required: false
+      schema:
+        type: string
+    - name: description
+      in: query
+      description: Playlist new description
+      required: false
+      schema:
+        type: string
+    - name: release_date
+      in: query
+      description: Playlist new release date
+      required: false
+      schema:
+        type: string
+        format: date
+    - name: protected
+      in: query
+      description: Playlist new protection status
+      required: false
+      schema:
+        type: boolean
+  requestBody:
+    required: false
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          properties:
+            illustration:
+              type: string
+              format: binary
+              description: Playlist new illustration
+  responses:
+    200:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/playlist.yaml'
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+delete:
+  summary: Delete Playlist
+  description: Delete a playlist by its id
+  parameters:
+    - name: playlist_id
+      in: path
+      description: Playlist id
+      required: true
+      schema:
+        type: integer
+  responses:
+    200:
+      description: OK
+    401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'

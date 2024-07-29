@@ -18,6 +18,7 @@ var (
 	infoLogger     *log.Logger
 	errorLogger    *log.Logger
 	criticalLogger *log.Logger
+	fatalLogger    *log.Logger
 )
 
 func init() {
@@ -38,6 +39,7 @@ func init() {
 	infoLogger = log.New(multi, "INFO: ", log.Ldate|log.Ltime)
 	errorLogger = log.New(multi, "ERROR: ", log.Ldate|log.Ltime)
 	criticalLogger = log.New(multi, "CRITICAL: ", log.Ldate|log.Ltime)
+	fatalLogger = log.New(multi, "FATAL: ", log.Ldate|log.Ltime)
 }
 
 // Debug logs a debug message.
@@ -58,4 +60,9 @@ func Error(v ...interface{}) {
 // Critical logs a critical message but does not exit the application.
 func Critical(v ...interface{}) {
 	criticalLogger.Println(v...)
+}
+
+// Fatal logs a fatal message and exits the application.
+func Fatal(v ...interface{}) {
+	fatalLogger.Fatalln(v...)
 }

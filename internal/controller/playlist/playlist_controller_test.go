@@ -14,9 +14,9 @@ func TestPostPlaylist(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 	user := db_tables.User{
-		Pseudo:          "Test User 29",
-		Hashed_password: "hashed_password",
-		Email:           "Test Email 29",
+		Pseudo:         "Test User 29",
+		HashedPassword: "hashed_password",
+		Email:          "Test Email 29",
 	}
 	err = db.Create(&user).Error
 	if err != nil {

@@ -1,0 +1,56 @@
+put:
+  summary: Add/Remove a playlist owner
+  description: "Add or remove a user as owner of a playlist"
+  parameters:
+    - name: playlist_id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Playlist ID
+    - name: user_id
+      in: query
+      required: true
+      schema:
+        type: integer
+      description: User ID
+    - name: action
+      in: query
+      required: true
+      schema:
+        type: string
+        enum:
+          - add
+          - remove
+      description: Action to perform
+  responses:
+    200:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/playlist.yaml'
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'

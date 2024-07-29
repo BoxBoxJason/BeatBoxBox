@@ -1,0 +1,22 @@
+name: build-documentation
+on:
+  push:
+    tags:
+      - '*'
+jobs:
+  api-documentation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run Redocly CLI
+        run: npm install -g @redocly/cli && npx @redocly/cli build-docs internal/api/documentation/api.yaml -o internal/api/documentation/api.html
+      - name: Upload API documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-documentation
+          path: internal/api/documentation/api.html

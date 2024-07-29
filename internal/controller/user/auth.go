@@ -27,7 +27,7 @@ func AttemptLogin(username_or_email string, raw_password string) (int, string, e
 	user := users[0]
 
 	// Check the password
-	if !auth_utils.CompareHash(user.Hashed_password, raw_password) {
+	if !auth_utils.CompareHash(user.HashedPassword, raw_password) {
 		return -1, "", errors.New("wrong password")
 	}
 

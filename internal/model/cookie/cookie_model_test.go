@@ -21,9 +21,9 @@ func TestCookieCreate(t *testing.T) {
 		t.Errorf("Error generating random token: %s", err)
 	}
 	user := db_tables.User{
-		Pseudo:          "Test User 18",
-		Hashed_password: "password",
-		Email:           "Test email 18",
+		Pseudo:         "Test User 18",
+		HashedPassword: "password",
+		Email:          "Test email 18",
 	}
 	db.Create(&user)
 
@@ -48,9 +48,9 @@ func TestCookieUpdate(t *testing.T) {
 	}
 
 	user := db_tables.User{
-		Pseudo:          "Test User 19",
-		Hashed_password: "password",
-		Email:           "Test email 19",
+		Pseudo:         "Test User 19",
+		HashedPassword: "password",
+		Email:          "Test email 19",
 	}
 	db.Create(&user)
 
@@ -81,9 +81,9 @@ func TestGetUserCookie(t *testing.T) {
 	}
 
 	user := db_tables.User{
-		Pseudo:          "Test User 20",
-		Hashed_password: "password",
-		Email:           "Test email 20",
+		Pseudo:         "Test User 20",
+		HashedPassword: "password",
+		Email:          "Test email 20",
 	}
 	db.Create(&user)
 
@@ -114,9 +114,9 @@ func TestCookieDeleteAuthToken(t *testing.T) {
 	}
 
 	user := db_tables.User{
-		Pseudo:          "Test User 21",
-		Hashed_password: "password",
-		Email:           "Test email 21",
+		Pseudo:         "Test User 21",
+		HashedPassword: "password",
+		Email:          "Test email 21",
 	}
 	db.Create(&user)
 
@@ -152,9 +152,9 @@ func TestCookieDeleteExpiredTokens(t *testing.T) {
 	}
 
 	user := db_tables.User{
-		Pseudo:          "Test User 22",
-		Hashed_password: "password",
-		Email:           "Test email 22",
+		Pseudo:         "Test User 22",
+		HashedPassword: "password",
+		Email:          "Test email 22",
 	}
 	db.Create(&user)
 

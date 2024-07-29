@@ -235,9 +235,9 @@ func TestPlaylistAlreadyExists(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 	user := db_tables.User{
-		Pseudo:          "Test User 47",
-		Email:           "Test Email 47",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 47",
+		Email:          "Test Email 47",
+		HashedPassword: "hashed_password",
 	}
 	err = db.Create(&user).Error
 	if err != nil {

@@ -1,0 +1,66 @@
+put:
+  summary: Update User Subscribed Playlists
+  description: Update user subscribed playlists in the database using the user ID and the new user subscribed playlists
+  parameters:
+    - name: user_id
+      in: path
+      required: true
+      schema:
+          type: integer
+      description: User ID or username
+    - name: action
+      in: query
+      required: true
+      schema:
+        type: string
+        enum: [ 'subscribe', 'unsubscribe' ]
+      description: Action to be performed on the playlists
+    - name: ids
+      in: query
+      required: true
+      schema:
+        type: array
+        items:
+          type: integer
+      description: Playlist IDs
+  responses:
+    200:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "User subscribed playlists updated successfully"
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    409:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'

@@ -1,0 +1,40 @@
+type: object
+properties:
+  id:
+    type: integer
+    description: Music ID
+  title:
+    type: string
+    description: Music title
+  lyrics:
+    type: string
+    description: Music lyrics
+  illustration:
+    type: string
+    description: Path to music illustration file
+  album_id:
+    type: array
+    description: Music album ID
+  artists_ids:
+    type: array
+    description: Music artists IDs
+  genres:
+    type: array
+    description: Music genres
+  nb_listened:
+    type: integer
+    description: Number of times the music has been listened
+  likes:
+    type: integer
+    description: Number of likes
+  path:
+    type: string
+    description: Path to music file
+  created_on:
+    type: string
+    format: date-time
+    description: Album creation date
+  updated_on:
+    type: string
+    format: date-time
+    description: Album last update date

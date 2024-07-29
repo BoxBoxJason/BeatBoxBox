@@ -1,0 +1,56 @@
+put:
+  summary: Add / Remove album musics
+  description: "Add or remove musics from an album in the database given its id"
+  parameters:
+    - name: album_id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Album ID
+    - name: action
+      in: path
+      required: true
+      schema:
+        type: string
+        enum: [ 'add', 'remove' ]
+      description: Action to perform (add or remove)
+    - name: musics_ids
+      in: query
+      required: true
+      schema:
+        type: array
+        items:
+          type: integer
+      description: List of music IDs to add or remove
+  responses:
+    200:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/album.yaml'
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Some musics were not found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'

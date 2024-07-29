@@ -36,9 +36,9 @@ func TestDeleteUser(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 	user := db_tables.User{
-		Pseudo:          "Test User 32",
-		Email:           "Test Email 32",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 32",
+		Email:          "Test Email 32",
+		HashedPassword: "hashed_password",
 	}
 	err = db.Create(&user).Error
 	if err != nil {
@@ -62,9 +62,9 @@ func TestDeleteUsers(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 	user := db_tables.User{
-		Pseudo:          "Test User 33",
-		Email:           "Test Email 33",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 33",
+		Email:          "Test Email 33",
+		HashedPassword: "hashed_password",
 	}
 	err = db.Create(&user).Error
 	if err != nil {
@@ -89,9 +89,9 @@ func TestGetUserJSON(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 	user := db_tables.User{
-		Pseudo:          "Test User 34",
-		Email:           "Test Email 34",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 34",
+		Email:          "Test Email 34",
+		HashedPassword: "hashed_password",
 	}
 	err = db.Create(&user).Error
 	if err != nil {
@@ -112,9 +112,9 @@ func TestGetUsersJSON(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 	user := db_tables.User{
-		Pseudo:          "Test User 35",
-		Email:           "Test Email 35",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 35",
+		Email:          "Test Email 35",
+		HashedPassword: "hashed_password",
 	}
 	err = db.Create(&user).Error
 	if err != nil {
@@ -135,9 +135,9 @@ func TestGetUserIdFromUsername(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 	user := db_tables.User{
-		Pseudo:          "Test User 36",
-		Email:           "Test Email 36",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 36",
+		Email:          "Test Email 36",
+		HashedPassword: "hashed_password",
 	}
 	err = db.Create(&user).Error
 	if err != nil {
@@ -158,9 +158,9 @@ func TestUserExists(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 	user := db_tables.User{
-		Pseudo:          "Test User 37",
-		Email:           "Test Email 37",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 37",
+		Email:          "Test Email 37",
+		HashedPassword: "hashed_password",
 	}
 	err = db.Create(&user).Error
 	if err != nil {
@@ -178,9 +178,9 @@ func TestUsersExist(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 	user := db_tables.User{
-		Pseudo:          "Test User 38",
-		Email:           "Test Email 38",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 38",
+		Email:          "Test Email 38",
+		HashedPassword: "hashed_password",
 	}
 	err = db.Create(&user).Error
 	if err != nil {
@@ -199,9 +199,9 @@ func TestUpdateUser(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 	user := db_tables.User{
-		Pseudo:          "Test User 39",
-		Email:           "Test Email 39",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 39",
+		Email:          "Test Email 39",
+		HashedPassword: "hashed_password",
 	}
 	err = db.Create(&user).Error
 	if err != nil {
@@ -227,9 +227,9 @@ func TestAddMusicsToLikedMusics(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 	user := db_tables.User{
-		Pseudo:          "Test User 40",
-		Email:           "Test Email 40",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 40",
+		Email:          "Test Email 40",
+		HashedPassword: "hashed_password",
 	}
 	err = db.Create(&user).Error
 	if err != nil {
@@ -270,10 +270,10 @@ func TestRemoveMusicsFromLikedMusics(t *testing.T) {
 		t.Error(err)
 	}
 	user := db_tables.User{
-		Pseudo:          "Test User 41",
-		Email:           "Test Email 41",
-		Hashed_password: "hashed_password",
-		LikedMusics:     []db_tables.Music{music},
+		Pseudo:         "Test User 41",
+		Email:          "Test Email 41",
+		HashedPassword: "hashed_password",
+		LikedMusics:    []db_tables.Music{music},
 	}
 	err = db.Create(&user).Error
 	if err != nil {
@@ -298,9 +298,9 @@ func TestAddPlaylistsToOwnedPlaylists(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 	user := db_tables.User{
-		Pseudo:          "Test User 42",
-		Email:           "Test Email 42",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 42",
+		Email:          "Test Email 42",
+		HashedPassword: "hashed_password",
 	}
 	err = db.Create(&user).Error
 	if err != nil {
@@ -339,10 +339,10 @@ func TestRemovePlaylistsFromOwnedPlaylists(t *testing.T) {
 		t.Error(err)
 	}
 	user := db_tables.User{
-		Pseudo:          "Test User 43",
-		Email:           "Test Email 43",
-		Hashed_password: "hashed_password",
-		Playlists:       []db_tables.Playlist{playlist},
+		Pseudo:         "Test User 43",
+		Email:          "Test Email 43",
+		HashedPassword: "hashed_password",
+		Playlists:      []db_tables.Playlist{playlist},
 	}
 	err = db.Create(&user).Error
 	if err != nil {
@@ -367,9 +367,9 @@ func TestAddPlaylistsToSubscribedPlaylists(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 	user := db_tables.User{
-		Pseudo:          "Test User 44",
-		Email:           "Test Email 44",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 44",
+		Email:          "Test Email 44",
+		HashedPassword: "hashed_password",
 	}
 	err = db.Create(&user).Error
 	if err != nil {
@@ -410,7 +410,7 @@ func TestRemovePlaylistsFromSubscribedPlaylists(t *testing.T) {
 	user := db_tables.User{
 		Pseudo:              "Test User 45",
 		Email:               "Test Email 45",
-		Hashed_password:     "hashed_password",
+		HashedPassword:      "hashed_password",
 		SubscribedPlaylists: []db_tables.Playlist{playlist},
 	}
 	err = db.Create(&user).Error

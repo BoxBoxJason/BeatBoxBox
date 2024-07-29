@@ -22,11 +22,11 @@ func CreateUser(db *gorm.DB, pseudo string, email string, hashed_password string
 	}
 
 	new_user := db_model.User{
-		Pseudo:          pseudo,
-		Email:           email,
-		Hashed_password: hashed_password,
-		Illustration:    avatar_file_name,
-		Roles:           roles,
+		Pseudo:         pseudo,
+		Email:          email,
+		HashedPassword: hashed_password,
+		Illustration:   avatar_file_name,
+		Roles:          roles,
 	}
 	err = db.Create(&new_user).Error
 	if err != nil {

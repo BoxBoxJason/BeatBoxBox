@@ -31,9 +31,9 @@ func TestUserUpdate(t *testing.T) {
 	defer db_model.CloseDB(db)
 
 	user := db_tables.User{
-		Pseudo:          "Test user 2",
-		Email:           "Test email 2",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test user 2",
+		Email:          "Test email 2",
+		HashedPassword: "hashed_password",
 	}
 	db.Create(&user)
 
@@ -55,9 +55,9 @@ func TestUserAddSubscribedPlaylistsToUser(t *testing.T) {
 	defer db_model.CloseDB(db)
 
 	user := db_tables.User{
-		Pseudo:          "Test User 14",
-		Email:           "Test email 14",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 14",
+		Email:          "Test email 14",
+		HashedPassword: "hashed_password",
 	}
 	db.Create(&user)
 
@@ -80,9 +80,9 @@ func TestUserRemoveSubscribedPlaylistsFromUser(t *testing.T) {
 	defer db_model.CloseDB(db)
 
 	user := db_tables.User{
-		Pseudo:          "Test User 15",
-		Email:           "Test email 15",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 15",
+		Email:          "Test email 15",
+		HashedPassword: "hashed_password",
 	}
 	db.Create(&user)
 
@@ -108,9 +108,9 @@ func TestUserAddLikedMusicsToUser(t *testing.T) {
 	defer db_model.CloseDB(db)
 
 	user := db_tables.User{
-		Pseudo:          "Test User 16",
-		Email:           "Test email 16",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 16",
+		Email:          "Test email 16",
+		HashedPassword: "hashed_password",
 	}
 	db.Create(&user)
 
@@ -134,9 +134,9 @@ func TestUserRemoveLikedMusicFromUser(t *testing.T) {
 	defer db_model.CloseDB(db)
 
 	user := db_tables.User{
-		Pseudo:          "Test User 17",
-		Email:           "Test email 17",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 17",
+		Email:          "Test email 17",
+		HashedPassword: "hashed_password",
 	}
 	db.Create(&user)
 
@@ -164,9 +164,9 @@ func TestUserGet(t *testing.T) {
 	defer db_model.CloseDB(db)
 
 	user := db_tables.User{
-		Pseudo:          "Test User 3",
-		Email:           "Test email 3",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 3",
+		Email:          "Test email 3",
+		HashedPassword: "hashed_password",
 	}
 	db.Create(&user)
 	user_id := user.Id
@@ -189,17 +189,17 @@ func TestUsersGet(t *testing.T) {
 	defer db_model.CloseDB(db)
 
 	user1 := db_tables.User{
-		Pseudo:          "Test User 4",
-		Email:           "Test email 4",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 4",
+		Email:          "Test email 4",
+		HashedPassword: "hashed_password",
 	}
 	db.Create(&user1)
 	user1_id := user1.Id
 
 	user2 := db_tables.User{
-		Pseudo:          "Test User 5",
-		Email:           "Test email 5",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 5",
+		Email:          "Test email 5",
+		HashedPassword: "hashed_password",
 	}
 	db.Create(&user2)
 	user2_id := user2.Id
@@ -220,16 +220,16 @@ func TestUsersGetFromFilters(t *testing.T) {
 	defer db_model.CloseDB(db)
 
 	user1 := db_tables.User{
-		Pseudo:          "Test User 6",
-		Email:           "Test email 6",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 6",
+		Email:          "Test email 6",
+		HashedPassword: "hashed_password",
 	}
 	db.Create(&user1)
 
 	user2 := db_tables.User{
-		Pseudo:          "Test User 7",
-		Email:           "Test email 7",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 7",
+		Email:          "Test email 7",
+		HashedPassword: "hashed_password",
 	}
 	db.Create(&user2)
 
@@ -247,16 +247,16 @@ func TestUserGetFromPartialName(t *testing.T) {
 	defer db_model.CloseDB(db)
 
 	user1 := db_tables.User{
-		Pseudo:          "Test User 8",
-		Email:           "Test email 8",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 8",
+		Email:          "Test email 8",
+		HashedPassword: "hashed_password",
 	}
 	db.Create(&user1)
 
 	user2 := db_tables.User{
-		Pseudo:          "Test User 9",
-		Email:           "Test email 9",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 9",
+		Email:          "Test email 9",
+		HashedPassword: "hashed_password",
 	}
 	db.Create(&user2)
 
@@ -276,9 +276,9 @@ func TestUserAlreadyExists(t *testing.T) {
 	defer db_model.CloseDB(db)
 
 	user := db_tables.User{
-		Pseudo:          "Test User 30",
-		Email:           "Test email 30",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 30",
+		Email:          "Test email 30",
+		HashedPassword: "hashed_password",
 	}
 	db.Create(&user)
 
@@ -307,9 +307,9 @@ func TestUserDelete(t *testing.T) {
 	defer db_model.CloseDB(db)
 
 	user := db_tables.User{
-		Pseudo:          "Test User 10",
-		Email:           "Test email 10",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 10",
+		Email:          "Test email 10",
+		HashedPassword: "hashed_password",
 	}
 	db.Create(&user)
 	user_id := user.Id
@@ -334,9 +334,9 @@ func TestUserDeleteFromRecord(t *testing.T) {
 	defer db_model.CloseDB(db)
 
 	user := db_tables.User{
-		Pseudo:          "Test User 11",
-		Email:           "Test email 11",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 11",
+		Email:          "Test email 11",
+		HashedPassword: "hashed_password",
 	}
 	db.Create(&user)
 
@@ -360,9 +360,9 @@ func TestUsersDeleteFromIds(t *testing.T) {
 	defer db_model.CloseDB(db)
 
 	user1 := db_tables.User{
-		Pseudo:          "Test User 12",
-		Email:           "Test email 12",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 12",
+		Email:          "Test email 12",
+		HashedPassword: "hashed_password",
 	}
 	db.Create(&user1)
 	user_id := user1.Id
@@ -387,9 +387,9 @@ func TestUsersDeleteFromRecords(t *testing.T) {
 	defer db_model.CloseDB(db)
 
 	user1 := db_tables.User{
-		Pseudo:          "Test User 13",
-		Email:           "Test email 13",
-		Hashed_password: "hashed_password",
+		Pseudo:         "Test User 13",
+		Email:          "Test email 13",
+		HashedPassword: "hashed_password",
 	}
 	db.Create(&user1)
 

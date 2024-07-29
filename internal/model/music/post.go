@@ -7,7 +7,7 @@ import (
 )
 
 // CreateMusic creates a new music in the database
-func CreateMusic(db *gorm.DB, title string, genres []string, lyrics string, album_id int, file_name string, illustration_path string, artists_ptr []*db_tables.Artist) (int, error) {
+func CreateMusic(db *gorm.DB, title string, genres []string, lyrics string, release_date string, album_id int, file_name string, illustration_path string, artists_ptr []*db_tables.Artist) (int, error) {
 	if len(artists_ptr) == 0 {
 		return -1, nil
 	}
@@ -22,6 +22,7 @@ func CreateMusic(db *gorm.DB, title string, genres []string, lyrics string, albu
 		Lyrics:       lyrics,
 		Illustration: illustration_path,
 		Artists:      artists,
+		ReleaseDate:  release_date,
 	}
 	if album_id >= 0 {
 		album_id_uint := uint(album_id)

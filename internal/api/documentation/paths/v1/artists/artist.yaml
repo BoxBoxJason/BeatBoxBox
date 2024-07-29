@@ -1,0 +1,137 @@
+get:
+  summary: Retrieve an artist
+  description: "Retrieve an artist from the database given its id"
+  parameters:
+      - name: artist_id
+        in: path
+        allowEmptyValue: false
+        schema:
+          type: integer
+        description: Artist ID
+  responses:
+    200:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/artist.yaml'
+    400:
+        description: Bad Request
+        content:
+          application/json:
+            schema:
+              $ref: '../../../components/schemas/error.yaml'
+    404:
+        description: Not Found
+        content:
+          application/json:
+            schema:
+              $ref: '../../../components/schemas/error.yaml'
+put:
+  summary: Update an artist
+  description: "Update an artist in the database given its id"
+  parameters:
+    - name: artist_id
+      in: path
+      required: true
+      schema:
+          type: integer
+      description: Artist ID
+    - name: pseudo
+      in: query
+      schema:
+          type: string
+      description: New artist pseudo
+    - name: biography
+      in: query
+      schema:
+        type: string
+      description: New artist biography
+    - name: birthdate
+      in: query
+      schema:
+        type: string
+      description: New artist birthdate
+  requestBody:
+    required: false
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          properties:
+            illustration:
+              type: string
+              description: New artist avatar
+              format: binary
+  responses:
+    200:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/artist.yaml'
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+delete:
+  summary: Delete an artist
+  description: "Delete an artist from the database given its id"
+  parameters:
+    - name: artist_id
+      in: path
+      required: true
+      schema:
+          type: integer
+      description: Artist ID
+  responses:
+    200:
+      description: OK
+      content:
+        application/json:
+          schema:
+              $ref: '../../../components/schemas/artist.yaml'
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'

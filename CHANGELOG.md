@@ -10,9 +10,12 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-## [API Review & Fixes] - 2024-07-26
+## [API Review & Fixes] - 2024-08-??
 
 ### Added
+- OpenAPI documentation for all API endpoints
+- API versioning with `/api/v1` prefix
+- static API documentation
 
 ### Changed
 - Moved /api routes to /api/v1 routes to implement versionning

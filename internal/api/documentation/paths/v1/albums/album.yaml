@@ -1,0 +1,130 @@
+get:
+  summary: Retrieve an album
+  description: "Retrieve an album from the database given its id"
+  parameters:
+    - name: album_id
+      in: path
+      allowEmptyValue: false
+      schema:
+          type: integer
+      description: Album ID
+  responses:
+    200:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/album.yaml'
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+put:
+  summary: Update an album
+  description: "Update an album in the database given its id"
+  parameters:
+    - name: album_id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Album ID
+    - name: title
+      in: query
+      allowEmptyValue: true
+      schema:
+        type: string
+      description: New album title
+    - name: description
+      in: query
+      allowEmptyValue: true
+      schema:
+        type: string
+      description: New album description
+  requestBody:
+    required: false
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          properties:
+            illustration:
+              type: string
+              format: binary
+              description: New album cover
+  responses:
+    200:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/album.yaml'
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+delete:
+  summary: Delete an album
+  description: "Delete an album from the database given its id"
+  parameters:
+    - name: album_id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Album ID
+  responses:
+    200:
+      description: OK
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
+      content:
+        application/json:
+            schema:
+              $ref: '../../../components/schemas/error.yaml'

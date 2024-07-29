@@ -17,9 +17,9 @@ func TestPostAuthToken(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 	user := db_tables.User{
-		Pseudo:          "Test User 23",
-		Hashed_password: "password",
-		Email:           "Test email 23",
+		Pseudo:         "Test User 23",
+		HashedPassword: "password",
+		Email:          "Test email 23",
 	}
 	err = db.Create(&user).Error
 	if err != nil {
@@ -39,9 +39,9 @@ func TestDeleteMatchingAuthToken(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 	user := db_tables.User{
-		Pseudo:          "Test User 24",
-		Hashed_password: "password",
-		Email:           "Test email 24",
+		Pseudo:         "Test User 24",
+		HashedPassword: "password",
+		Email:          "Test email 24",
 	}
 	err = db.Create(&user).Error
 	if err != nil {
@@ -65,9 +65,9 @@ func TestCheckAuthTokenMatches(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 	user := db_tables.User{
-		Pseudo:          "Test User 25",
-		Hashed_password: "password",
-		Email:           "Test email 25",
+		Pseudo:         "Test User 25",
+		HashedPassword: "password",
+		Email:          "Test email 25",
 	}
 	err = db.Create(&user).Error
 	if err != nil {
@@ -101,9 +101,9 @@ func TestGetMatchingAuthTokenId(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 	user := db_tables.User{
-		Pseudo:          "Test User 26",
-		Hashed_password: "password",
-		Email:           "Test email 26",
+		Pseudo:         "Test User 26",
+		HashedPassword: "password",
+		Email:          "Test email 26",
 	}
 	err = db.Create(&user).Error
 	if err != nil {
@@ -137,9 +137,9 @@ func TestUpdateAuthTokenIfNearExpiry(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 	user := db_tables.User{
-		Pseudo:          "Test User 27",
-		Hashed_password: "password",
-		Email:           "Test email 27",
+		Pseudo:         "Test User 27",
+		HashedPassword: "password",
+		Email:          "Test email 27",
 	}
 	err = db.Create(&user).Error
 	if err != nil {

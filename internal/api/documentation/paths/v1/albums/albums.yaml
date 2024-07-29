@@ -1,0 +1,132 @@
+get:
+  summary: Retrieve albums
+  description: "Retrieve albums from the database given matching filters, if no filters are provided, all albums are returned, available filters are: title, id, artist(s) name(s), artist(s) id(s), music(s) title(s), music(s) id(s)"
+  parameters:
+    - in: query
+      name: titles
+      schema:
+        type: array
+        items:
+          type: string
+      description: Albums titles
+    - in: query
+      name: ids
+      schema:
+        type: array
+        items:
+          type: integer
+      description: Albums ids
+    - in: query
+      name: artists
+      schema:
+        type: array
+        items:
+          type: string
+      description: Artists names
+    - in: query
+      name: artists_ids
+      schema:
+        type: array
+        items:
+          type: integer
+      description: Artists ids
+    - in: query
+      name: musics
+      schema:
+        type: array
+        items:
+          type: string
+      description: Musics titles
+    - in: query
+      name: musics_ids
+      schema:
+        type: array
+        items:
+          type: integer
+      description: Musics ids
+  responses:
+    200:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+                $ref: "../../../components/schemas/album.yaml"
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../../../components/schemas/error.yaml"
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "../../../components/schemas/error.yaml"
+post:
+  summary: Create a new album
+  description: "Create a new album in the database"
+  requestBody:
+    required: true
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          properties:
+            title:
+              type: string
+              description: Album title
+            artists_ids:
+              type: array
+              items:
+                type: integer
+              description: Artists ids
+            illustration:
+              type: string
+              format: binary
+              description: Album cover
+            description:
+              type: string
+              description: Album description
+          required:
+            - title
+            - artists_ids
+  responses:
+    201:
+      description: Created
+      content:
+        application/json:
+          schema:
+            $ref: "../../../components/schemas/album.yaml"
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../../../components/schemas/error.yaml"
+    401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "../../../components/schemas/error.yaml"
+    409:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: "../../../components/schemas/error.yaml"

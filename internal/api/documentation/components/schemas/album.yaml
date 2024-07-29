@@ -1,0 +1,28 @@
+type: object
+properties:
+  id:
+    type: integer
+    description: Album ID
+  title:
+    type: string
+    description: Album title
+  description:
+    type: string
+    description: Album description
+  illustration:
+    type: string
+    description: Path to album illustration file
+  artists_ids:
+    type: array
+    description: Album artists
+  musics_ids:
+    type: array
+    description: Album musics
+  created_on:
+    type: string
+    format: date-time
+    description: Album creation date
+  updated_on:
+    type: string
+    format: date-time
+    description: Album last update date

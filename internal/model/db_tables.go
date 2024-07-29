@@ -3,6 +3,7 @@ package db_tables
 import (
 	"BeatBoxBox/pkg/db_model"
 	"BeatBoxBox/pkg/logger"
+
 	"github.com/lib/pq"
 )
 
@@ -45,6 +46,7 @@ type Album struct {
 	Id           int      `gorm:"primaryKey;autoIncrement"`
 	Title        string   `gorm:"type:text;not null"`
 	Description  string   `gorm:"type:text"`
+	ReleaseDate  string   `gorm:"type:text"`
 	Artists      []Artist `gorm:"many2many:album_artists;"`
 	Illustration string   `gorm:"type:text;default:'default.jpg'"`
 	Musics       []Music  `gorm:"foreignKey:AlbumId;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
@@ -56,6 +58,7 @@ type Artist struct {
 	Id           int     `gorm:"primaryKey;autoIncrement"`
 	Pseudo       string  `gorm:"type:varchar(128);unique;not null"`
 	Bio          string  `gorm:"type:text"`
+	BirthDate    string  `gorm:"type:text"`
 	Illustration string  `gorm:"type:text;default:'default.jpg'"`
 	Musics       []Music `gorm:"many2many:artist_musics;"`
 	Albums       []Album `gorm:"many2many:album_artists;"`
@@ -68,6 +71,7 @@ type Music struct {
 	Title        string   `gorm:"type:text;not null"`
 	Lyrics       string   `gorm:"type:text"`
 	Artists      []Artist `gorm:"many2many:artist_musics;"`
+	ReleaseDate  string   `gorm:"type:text"`
 	AlbumId      *uint
 	Album        Album          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Genres       pq.StringArray `gorm:"type:text[]"`
@@ -84,7 +88,7 @@ type User struct {
 	Roles               []Role     `gorm:"many2many:user_roles;"`
 	Pseudo              string     `gorm:"type:varchar(32);unique;not null"`
 	Email               string     `gorm:"type:varchar(256);unique;not null"`
-	Hashed_password     string     `gorm:"type:varchar(64);not null"`
+	HashedPassword      string     `gorm:"type:varchar(64);not null"`
 	Illustration        string     `gorm:"type:text;default:'default.jpg'"`
 	SubscribedPlaylists []Playlist `gorm:"many2many:playlists_subscribers;"`
 	Playlists           []Playlist `gorm:"many2many:playlists_owners;"`

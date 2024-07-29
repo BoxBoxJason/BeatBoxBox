@@ -1,0 +1,136 @@
+get:
+  summary: Retrieve User
+  description: Retrieve user information from the database using the user ID
+  parameters:
+    - name: user_id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: User ID or username
+  responses:
+    200:
+      description: User information retrieved successfully
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/user.yaml'
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+put:
+  summary: Update User
+  description: Update user information in the database using the user ID and the new user information
+  parameters:
+    - name: user_id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: User ID or username
+  requestBody:
+    required: false
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          properties:
+            illustration:
+              type: string
+              description: User illustration
+              format: binary
+  responses:
+    200:
+      description: User information updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/user.yaml'
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    409:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+delete:
+  summary: Delete User
+  description: Delete user information
+  parameters:
+    - name: user_id
+      in: path
+      required: true
+      schema:
+          type: integer
+      description: User ID or username
+  responses:
+    200:
+      description: User information deleted successfully
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
