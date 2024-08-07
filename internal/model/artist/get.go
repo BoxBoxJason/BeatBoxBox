@@ -3,21 +3,43 @@ package artist_model
 import (
 	db_tables "BeatBoxBox/internal/model"
 	"BeatBoxBox/pkg/db_model"
+
 	"gorm.io/gorm"
 )
 
 // GetArtistsFromFilters returns a list of artists from the database
 // Filters can be passed to filter the artists
-func GetArtistsFromFilters(db *gorm.DB, filters map[string]interface{}) []db_tables.Artist {
-	raw_artists := db_model.GetRecordsByFields(db, &db_tables.Artist{}, filters)
-	if raw_artists == nil {
-		return nil
+func GetArtistsFromFilters(db *gorm.DB, pseudos []string, partial_pseudos []string, genres []string, albums_ids []int, albums []string, musics_ids []int, musics []string) []db_tables.Artist {
+	var artists []db_tables.Artist
+	query := db.Model(&db_tables.Artist{})
+	if len(genres) > 0 {
+		for _, genre := range genres {
+			query = query.Where("genres @> ARRAY[?]::text[]", genre)
+		}
 	}
-	artists := make([]db_tables.Artist, len(raw_artists))
-	for i, artist := range raw_artists {
-		artists[i] = artist.(db_tables.Artist)
+	if len(pseudos) > 0 {
+		query = query.Where("pseudo IN ?", pseudos)
+	} else if len(partial_pseudos) > 0 {
+		for _, partial_pseudo := range partial_pseudos {
+			query = query.Or("pseudo LIKE ?", "%"+partial_pseudo+"%")
+		}
 	}
-
+	if len(albums_ids) > 0 {
+		query = query.Joins("JOIN album_artists ON album_artists.artist_id = artists.id").
+			Where("album_artists.album_id IN ?", albums_ids)
+	} else if len(albums) > 0 {
+		query = query.Joins("JOIN album_artists ON album_artists.artist_id = artists.id").
+			Joins("JOIN albums ON albums.id = album_artists.album_id").
+			Where("albums.title IN ?", albums)
+	}
+	if len(musics_ids) > 0 {
+		query = query.Joins("JOIN musics ON musics.album_id = albums.id").
+			Where("musics.id IN ?", musics_ids)
+	} else if len(musics) > 0 {
+		query = query.Joins("JOIN musics ON musics.album_id = albums.id").
+			Where("musics.title IN ?", musics)
+	}
+	query.Group("artists.id").Find(&artists)
 	return artists
 }
 

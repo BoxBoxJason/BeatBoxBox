@@ -5,12 +5,11 @@ import (
 	"net/http"
 )
 
-func RespondWithJSON(w http.ResponseWriter, status int, content []byte) error {
+func RespondWithJSON(w http.ResponseWriter, status int, content []byte) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	_, err := w.Write(content)
 	if err != nil {
-		return custom_errors.NewInternalServerError("Error writing response: " + err.Error())
+		custom_errors.SendErrorToClient(w, custom_errors.NewInternalServerError("Error writing response: "+err.Error()))
 	}
-	return nil
 }

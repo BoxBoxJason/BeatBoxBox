@@ -4,6 +4,7 @@ import (
 	db_tables "BeatBoxBox/internal/model"
 	artist_model "BeatBoxBox/internal/model/artist"
 	"BeatBoxBox/pkg/db_model"
+	custom_errors "BeatBoxBox/pkg/errors"
 )
 
 // ArtistExists checks if an artist with the given artist_id exists
@@ -35,7 +36,7 @@ func IsPseudoTaken(pseudo string) bool {
 		return false
 	}
 	defer db_model.CloseDB(db)
-	artists := artist_model.GetArtistsFromFilters(db, map[string]interface{}{"pseudo": pseudo})
+	artists := artist_model.GetArtistsFromFilters(db, []string{pseudo}, nil, nil, nil, nil, nil, nil)
 	return artists == nil && len(artists) > 0
 }
 
@@ -71,13 +72,20 @@ func GetArtistsJSON(artists_ids []int) ([]byte, error) {
 	return ConvertArtistsToJSON(artists_ptr)
 }
 
-func GetArtistsJSONFromFilters(filters map[string]interface{}) ([]byte, error) {
+func GetArtistsJSONFromFilters(pseudos []string, partial_pseudos []string, genres []string, albums_ids []int, albums []string, musics_ids []int, musics []string) ([]byte, error) {
+	if len(pseudos)*len(partial_pseudos) != 0 {
+		return []byte{}, custom_errors.NewBadRequestError("Can't use pseudo and partial_pseudo at the same time")
+	} else if len(albums_ids)*len(albums) != 0 {
+		return []byte{}, custom_errors.NewBadRequestError("Can't use album_id and album at the same time")
+	} else if len(musics_ids)*len(musics) != 0 {
+		return []byte{}, custom_errors.NewBadRequestError("Can't use music_id and music at the same time")
+	}
 	db, err := db_model.OpenDB()
 	if err != nil {
 		return nil, err
 	}
 	defer db_model.CloseDB(db)
-	artists := artist_model.GetArtistsFromFilters(db.Preload("Musics").Preload("Albums"), filters)
+	artists := artist_model.GetArtistsFromFilters(db.Preload("Musics").Preload("Albums"), pseudos, partial_pseudos, genres, albums_ids, albums, musics_ids, musics)
 	artists_ptr := make([]*db_tables.Artist, len(artists))
 	for i, artist := range artists {
 		artists_ptr[i] = &artist

@@ -2,12 +2,11 @@ get:
   summary: Retrieve an artist
   description: "Retrieve an artist from the database given its id"
   parameters:
-      - name: artist_id
-        in: path
-        allowEmptyValue: false
-        schema:
-          type: integer
-        description: Artist ID
+    - name: artist_id
+      in: path
+      schema:
+        type: integer
+      description: Artist ID
   responses:
     200:
       description: OK
@@ -35,13 +34,20 @@ patch:
       in: path
       required: true
       schema:
-          type: integer
+        type: integer
       description: Artist ID
     - name: pseudo
       in: query
       schema:
-          type: string
+        type: string
       description: New artist pseudo
+    - name: genre
+      in: query
+      schema:
+        type: array
+        items:
+          type: string
+      description: New artist genre
     - name: biography
       in: query
       schema:
@@ -106,12 +112,8 @@ delete:
           type: integer
       description: Artist ID
   responses:
-    200:
-      description: OK
-      content:
-        application/json:
-          schema:
-              $ref: '../../../components/schemas/artist.yaml'
+    204:
+      description: No Content
     400:
       description: Bad Request
       content:

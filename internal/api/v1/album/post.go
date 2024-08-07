@@ -52,8 +52,5 @@ func postAlbumHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		custom_errors.SendErrorToClient(w, err)
 	}
-	err = httputils.RespondWithJSON(w, http.StatusCreated, album)
-	if err != nil {
-		custom_errors.SendErrorToClient(w, err)
-	}
+	httputils.RespondWithJSON(w, http.StatusCreated, album)
 }

@@ -3,68 +3,60 @@ package artist_handler_v1
 import (
 	artist_controller "BeatBoxBox/internal/controller/artist"
 	custom_errors "BeatBoxBox/pkg/errors"
-	format_utils "BeatBoxBox/pkg/utils/formatutils"
+	"BeatBoxBox/pkg/utils/httputils"
+	"fmt"
+	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
-
-	"github.com/gorilla/mux"
 )
 
-// getArtistsHandler returns a list of artists
-// @Summary Returns a list of artists
-// @Description Returns a list of artists
-// @Tags artists
-// @Accept  json
-// @Produce  json
-// @Param artists_ids query string true "Artists ids"
-// @Success 200 {object} string
-// @Failure 400 {object} string
-// @Router /api/artists [get]
-func getArtistsHandler(w http.ResponseWriter, r *http.Request) {
-	artists_ids_str := r.URL.Query().Get("artists_ids")
-	if artists_ids_str == "" {
-		http.Error(w, "artists_ids must be a list of positive integers", http.StatusBadRequest)
-		return
-	}
-	artists_ids, err := format_utils.ConvertStringToIntArray(artists_ids_str, ",")
+func getArtistHandler(w http.ResponseWriter, r *http.Request) {
+	artist_id, err := strconv.Atoi(mux.Vars(r)["artist_id"])
 	if err != nil {
-		http.Error(w, "artists_ids must be a list of positive integers", http.StatusBadRequest)
+		custom_errors.SendErrorToClient(w, custom_errors.NewBadRequestError("Invalid artist ID"))
+		return
+	} else if artist_id < 0 {
+		custom_errors.SendErrorToClient(w, custom_errors.NewBadRequestError(fmt.Sprintf("Invalid artist ID: %d", artist_id)))
 		return
 	}
-
-	artists, err := artist_controller.GetArtists(artists_ids)
+	artist, err := artist_controller.GetArtistJSON(artist_id)
 	if err != nil {
-		custom_errors.SendErrorToClient(err, w, "")
+		custom_errors.SendErrorToClient(w, err)
 		return
 	}
-
-	w.Write(artists)
+	httputils.RespondWithJSON(w, http.StatusOK, artist)
 }
 
-// getArtistHandler returns an artist given an id
-// @Summary Returns an artist given an id
-// @Description Returns an artist given an id
-// @Tags artists
-// @Accept  json
-// @Produce  json
-// @Param artist_id path int true "Artist ID"
-// @Success 200 {object} string
-// @Failure 400 {object} string
-// @Failure 404 {object} string
-// @Router /api/artists/{artist_id} [get]
-func getArtistHandler(w http.ResponseWriter, r *http.Request) {
-	artist_id_str := mux.Vars(r)["artist_id"]
-	artist_id, err := strconv.Atoi(artist_id_str)
+func getArtistsHandler(w http.ResponseWriter, r *http.Request) {
+	params, err := httputils.ParseQueryParams(r, []string{}, []string{}, []string{"pseudo", "partial_pseudo", "genre", "album", "music"}, []string{"artist_id", "album_id", "music_id"})
 	if err != nil {
-		http.Error(w, "artist id must be a positive integer", http.StatusBadRequest)
+		custom_errors.SendErrorToClient(w, err)
 		return
 	}
-
-	artist, err := artist_controller.GetArtist(artist_id)
-	if err != nil {
-		custom_errors.SendErrorToClient(err, w, "")
+	var artists []byte
+	if params["artist_id"] != nil && len(params) > 1 {
+		custom_errors.SendErrorToClient(w, custom_errors.NewBadRequestError("Can't use artist_id with other parameters"))
 		return
+	} else if params["artist_id"] != nil {
+		artists_ids := params["artist_id"].([]int)
+		artists, err = artist_controller.GetArtistsJSON(artists_ids)
+		if err != nil {
+			custom_errors.SendErrorToClient(w, err)
+			return
+		}
+	} else {
+		pseudos := params["pseudo"].([]string)
+		partial_pseudos := params["partial_pseudo"].([]string)
+		genres := params["genre"].([]string)
+		albums_ids := params["album_id"].([]int)
+		albums_titles := params["album"].([]string)
+		musics_ids := params["music_id"].([]int)
+		musics_titles := params["music"].([]string)
+		artists, err = artist_controller.GetArtistsJSONFromFilters(pseudos, partial_pseudos, genres, albums_ids, albums_titles, musics_ids, musics_titles)
+		if err != nil {
+			custom_errors.SendErrorToClient(w, err)
+			return
+		}
 	}
-
-	w.Write(artist)
+	httputils.RespondWithJSON(w, http.StatusOK, artists)
 }

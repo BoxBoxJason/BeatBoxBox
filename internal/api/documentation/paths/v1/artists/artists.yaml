@@ -1,6 +1,6 @@
 get:
   summary: Retrieve Artists
-  description: "Retrieve artists from the database given matching filters, if no filters are provided, all artists are returned, available filters are: pseudo(s), id(s), album(s), album(s) id(s), music(s), music(s) id(s)"
+  description: "Retrieve artists from the database given matching filters, if no filters are provided, all artists are returned, available filters are: pseudo(s), id(s), genre(s), album(s), album(s) id(s), music(s), music(s) id(s)"
   parameters:
     - name: pseudo
       in: query
@@ -9,7 +9,7 @@ get:
         items:
           type: string
       description: Artists pseudos
-    - name: id
+    - name: artist_id
       in: query
       schema:
         type: array
@@ -81,6 +81,11 @@ post:
               biography:
                 type: string
                 description: Artist biography
+              genre:
+                type: array
+                items:
+                  type: string
+                description: Artist genres
               birthdate:
                 type: string
                 format: date
@@ -118,6 +123,44 @@ post:
             $ref: '../../../components/schemas/error.yaml'
     409:
       description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: "../../../components/schemas/error.yaml"
+delete:
+  summary: Delete Artists
+  description: Delete artists that match the provided ids from the database
+  parameters:
+    - in: query
+      name: id
+      schema:
+        type: array
+        items:
+          type: integer
+      description: Artists ids
+  responses:
+    204:
+      description: No Content
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../../../components/schemas/error.yaml"
+    401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
       content:
         application/json:
           schema:

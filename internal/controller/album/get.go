@@ -127,7 +127,7 @@ func GetAlbumsJSONFromFilters(titles []string, partial_titles []string, genres [
 	} else if len(musics_names)*len(musics_ids) > 0 {
 		return nil, custom_errors.NewBadRequestError("Can't use music with music_id")
 	}
-	albums := album_model.GetAlbumsFromFilters(db, titles, partial_titles, genres, artists_names, musics_names, artists_ids, musics_ids)
+	albums := album_model.GetAlbumsFromFilters(db.Preload("Musics").Preload("Artists"), titles, partial_titles, genres, artists_names, musics_names, artists_ids, musics_ids)
 	albums_ptr := make([]*db_tables.Album, len(albums))
 	for i, album := range albums {
 		albums_ptr[i] = &album

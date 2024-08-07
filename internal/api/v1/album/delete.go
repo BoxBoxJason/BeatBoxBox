@@ -34,15 +34,15 @@ func deleteAlbumHandler(w http.ResponseWriter, r *http.Request) {
 
 func deleteAlbumsHandler(w http.ResponseWriter, r *http.Request) {
 	// Parse the query parameters
-	params, err := httputils.ParseQueryParams(r, []string{}, []string{}, []string{}, []string{"album_id"})
+	params, err := httputils.ParseQueryParams(r, []string{}, []string{}, []string{}, []string{"id"})
 	if err != nil {
 		custom_errors.SendErrorToClient(w, err)
 		return
 	}
 	// Validate album ids
-	album_ids, ok := params["album_id"].([]int)
+	album_ids, ok := params["id"].([]int)
 	if !ok {
-		custom_errors.SendErrorToClient(w, custom_errors.NewBadRequestError("Error parsing album_ids, it should be an array of integers"))
+		custom_errors.SendErrorToClient(w, custom_errors.NewBadRequestError("Error parsing id, it should be an array of integers"))
 		return
 	}
 	err = auth_middleware.HasWritePrivileges(r)

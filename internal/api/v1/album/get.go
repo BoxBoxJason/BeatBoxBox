@@ -20,10 +20,7 @@ func getAlbumHandler(w http.ResponseWriter, r *http.Request) {
 		custom_errors.SendErrorToClient(w, err)
 		return
 	}
-	err = httputils.RespondWithJSON(w, http.StatusOK, album)
-	if err != nil {
-		custom_errors.SendErrorToClient(w, err)
-	}
+	httputils.RespondWithJSON(w, http.StatusOK, album)
 }
 
 func getAlbumsHandler(w http.ResponseWriter, r *http.Request) {
@@ -61,9 +58,5 @@ func getAlbumsHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-
-	err = httputils.RespondWithJSON(w, http.StatusOK, albums)
-	if err != nil {
-		custom_errors.SendErrorToClient(w, err)
-	}
+	httputils.RespondWithJSON(w, http.StatusOK, albums)
 }

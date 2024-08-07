@@ -65,10 +65,7 @@ func patchAlbumHandler(w http.ResponseWriter, r *http.Request) {
 		custom_errors.SendErrorToClient(w, err)
 		return
 	}
-	err = httputils.RespondWithJSON(w, http.StatusOK, album)
-	if err != nil {
-		custom_errors.SendErrorToClient(w, custom_errors.NewInternalServerError("Error encoding response"))
-	}
+	httputils.RespondWithJSON(w, http.StatusOK, album)
 }
 
 func patchAlbumArtistsHandler(w http.ResponseWriter, r *http.Request) {
@@ -98,10 +95,7 @@ func patchAlbumArtistsHandler(w http.ResponseWriter, r *http.Request) {
 		custom_errors.SendErrorToClient(w, err)
 		return
 	}
-	err = httputils.RespondWithJSON(w, http.StatusOK, album)
-	if err != nil {
-		custom_errors.SendErrorToClient(w, custom_errors.NewInternalServerError("Error encoding response"))
-	}
+	httputils.RespondWithJSON(w, http.StatusOK, album)
 }
 
 func patchAlbumMusicsHandler(w http.ResponseWriter, r *http.Request) {
@@ -143,8 +137,5 @@ func patchAlbumMusicsHandler(w http.ResponseWriter, r *http.Request) {
 		custom_errors.SendErrorToClient(w, custom_errors.NewBadRequestError("action must be 'add' or 'remove'"))
 		return
 	}
-	err = httputils.RespondWithJSON(w, http.StatusOK, album)
-	if err != nil {
-		custom_errors.SendErrorToClient(w, custom_errors.NewInternalServerError("Error encoding response"))
-	}
+	httputils.RespondWithJSON(w, http.StatusOK, album)
 }

@@ -3,44 +3,54 @@ package artist_handler_v1
 import (
 	artist_controller "BeatBoxBox/internal/controller/artist"
 	custom_errors "BeatBoxBox/pkg/errors"
-	file_utils "BeatBoxBox/pkg/utils/fileutils"
+	format_utils "BeatBoxBox/pkg/utils/formatutils"
+	"BeatBoxBox/pkg/utils/httputils"
+	"mime/multipart"
 	"net/http"
 )
 
-// postArtistHandler creates a new artist
-// @Summary Creates a new artist
-// @Description Creates a new artist
-// @Tags artists
-// @Accept  json
-// @Produce  json
-// @Param artist_name formData string true "Artist name"
-// @Param illustration formData file false "Illustration"
-// @Success 201 {object} string
-// @Failure 400 {object} string
-// @Router /api/artists [post]
 func postArtistHandler(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseMultipartForm(file_utils.MAX_REQUEST_SIZE)
+	params, err := httputils.ParseMultiPartFormParams(r, []string{"pseudo", "birthdate", "biography"}, []string{}, []string{"genre"}, []string{}, map[string]string{"illustration": "image"})
 	if err != nil {
-		http.Error(w, "Request too large", http.StatusBadRequest)
+		custom_errors.SendErrorToClient(w, err)
 		return
 	}
-
-	artist_name := r.FormValue("artist_name")
-	if artist_name == "" {
-		http.Error(w, "Artist name is required", http.StatusBadRequest)
-		return
+	// Validate pseudo
+	pseudo := ""
+	birthdate := ""
+	biography := ""
+	genres := []string{}
+	if params["pseudo"] != nil {
+		pseudo, ok := params["pseudo"].(string)
+		if ok && pseudo == "" {
+			custom_errors.SendErrorToClient(w, custom_errors.NewBadRequestError("pseudo cannot be empty"))
+			return
+		}
 	}
-
-	illustration_file_name := file_utils.DEFAULT_ILLUSTRATION_FILE
-	illustration_file, illustration_file_header, err := r.FormFile("illustration")
-	if err == nil {
-		defer illustration_file.Close()
-		illustration_file_name, _ = file_utils.UploadIllustrationToServer(illustration_file_header, illustration_file, "artists")
+	// Validate birthdate
+	if params["birthdate"] != nil {
+		birthdate, ok := params["birthdate"].(string)
+		if ok && !format_utils.IsValidDate(birthdate) {
+			custom_errors.SendErrorToClient(w, custom_errors.NewBadRequestError("birthdate must be in the format YYYY-MM-DD"))
+			return
+		}
 	}
-	_, err = artist_controller.PostArtist(artist_name, illustration_file_name)
+	// Validate biography
+	biography, _ = params["biography"].(string)
+	// Validate genres
+	if params["genre"] != nil {
+		raw_genres, ok := params["genre"].([]string)
+		if !ok {
+			custom_errors.SendErrorToClient(w, custom_errors.NewBadRequestError("genre must be a list of strings"))
+			return
+		} else {
+			genres = raw_genres
+		}
+	}
+	artist, err := artist_controller.PostArtist(pseudo, genres, biography, birthdate, params["illustration"].(*multipart.FileHeader))
 	if err != nil {
-		custom_errors.SendErrorToClient(err, w, "")
+		custom_errors.SendErrorToClient(w, err)
 		return
 	}
-	w.WriteHeader(http.StatusCreated)
+	httputils.RespondWithJSON(w, http.StatusCreated, artist)
 }

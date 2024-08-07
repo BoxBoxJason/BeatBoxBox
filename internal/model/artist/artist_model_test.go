@@ -14,11 +14,9 @@ func TestArtistCreate(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	artist_id, err := CreateArtist(db, "Test Artist 5", "test_bio", "default.jpg")
+	_, err = CreateArtist(db, "Test Artist 5", []string{}, "test_bio", "0001-01-01", "default.jpg")
 	if err != nil {
 		t.Errorf("Error creating artist: %s", err)
-	} else if artist_id < 0 {
-		t.Errorf("Expected artist Id to be a positive integer, got %d", artist_id)
 	}
 }
 
@@ -158,7 +156,7 @@ func TestArtistGetFromFilters(t *testing.T) {
 	}
 	db.Create(&artist)
 
-	artists := GetArtistsFromFilters(db, map[string]interface{}{"pseudo": "Test Artist 11"})
+	artists := GetArtistsFromFilters(db, []string{artist.Pseudo}, nil, nil, nil, nil, nil, nil)
 	if artists == nil {
 		t.Errorf("Expected at least 1 artist, got 0")
 	}

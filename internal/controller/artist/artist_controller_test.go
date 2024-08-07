@@ -8,11 +8,9 @@ import (
 
 // POST FUNCTIONS
 func TestPostArtist(t *testing.T) {
-	id, err := PostArtist("Test Artist 23", "description", nil)
+	_, err := PostArtist("Test Artist 23", []string{}, "description", "0001-01-01", nil)
 	if err != nil {
 		t.Error(err)
-	} else if id < 0 {
-		t.Error("id is negative")
 	}
 }
 
@@ -83,7 +81,7 @@ func TestUpdateArtist(t *testing.T) {
 		t.Error(err)
 	}
 	artist_id := artist.Id
-	err = UpdateArtist(artist_id, map[string]interface{}{"pseudo": "Test Artist 26 New"})
+	_, err = UpdateArtist(artist_id, map[string]interface{}{"pseudo": "Test Artist 26 New"})
 	if err != nil {
 		t.Error(err)
 	}
@@ -152,7 +150,7 @@ func TestGetArtistsJSONFromFilters(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	_, err = GetArtistsJSONFromFilters(map[string]interface{}{"pseudo": "Test Artist 32"})
+	_, err = GetArtistsJSONFromFilters([]string{"Test Artist 32"}, nil, nil, nil, nil, nil, nil)
 	if err != nil {
 		t.Error(err)
 	}
