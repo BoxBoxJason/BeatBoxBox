@@ -1,7 +1,9 @@
 package music_controller
 
 import (
+	album_controller "BeatBoxBox/internal/controller/album"
 	db_tables "BeatBoxBox/internal/model"
+	album_model "BeatBoxBox/internal/model/album"
 	artist_model "BeatBoxBox/internal/model/artist"
 	music_model "BeatBoxBox/internal/model/music"
 	db_model "BeatBoxBox/pkg/db_model"
@@ -68,4 +70,64 @@ func RemoveArtistsFromMusic(music_id int, artists_ids []int) error {
 		return custom_errors.NewNotFoundError("some artists were not found")
 	}
 	return music_model.RemoveArtistsFromMusic(db, &music, artists_ptr)
+}
+
+func RemoveAlbumFromMusics(musics_ids []int, album_id int) ([]byte, error) {
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return []byte{}, err
+	}
+	defer db_model.CloseDB(db)
+	musics, err := music_model.GetMusics(db, musics_ids)
+	if err != nil {
+		return []byte{}, err
+	} else if len(musics) != len(musics_ids) {
+		return []byte{}, custom_errors.NewNotFoundError("some musics were not found")
+	}
+	album, err := album_model.GetAlbum(db, album_id)
+	if err != nil {
+		return []byte{}, err
+	}
+	musics_ptr := make([]*db_tables.Music, len(musics))
+	for i, music := range musics {
+		musics_ptr[i] = &music
+	}
+	err = music_model.RemoveAlbumFromMusics(db, musics_ptr, &album)
+	if err != nil {
+		return []byte{}, err
+	}
+	album_json, err := album_controller.ConvertAlbumToJSON(&album)
+	if err != nil {
+		return []byte{}, err
+	}
+	return album_json, nil
+}
+
+func AddMusicsToAlbum(musics_ids []int, album_id int) ([]byte, error) {
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return []byte{}, err
+	}
+	defer db_model.CloseDB(db)
+	musics, err := music_model.GetMusics(db, musics_ids)
+	if err != nil {
+		return []byte{}, err
+	}
+	album, err := album_model.GetAlbum(db, album_id)
+	if err != nil {
+		return []byte{}, err
+	}
+	musics_ptr := make([]*db_tables.Music, len(musics))
+	for i, music := range musics {
+		musics_ptr[i] = &music
+	}
+	err = music_model.AddAlbumToMusics(db, musics_ptr, &album)
+	if err != nil {
+		return []byte{}, err
+	}
+	album_json, err := album_controller.ConvertAlbumToJSON(&album)
+	if err != nil {
+		return []byte{}, err
+	}
+	return album_json, nil
 }

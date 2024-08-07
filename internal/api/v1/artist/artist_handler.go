@@ -10,8 +10,8 @@ func SetupArtistsAPIRoutes(artist_api_router *mux.Router) {
 	artist_api_router.HandleFunc("/", getArtistsHandler).Methods("GET")
 	artist_api_router.HandleFunc("/{artist_id:[0-9]+}", getArtistHandler).Methods("GET")
 
-	// PUT
-	artist_api_router.HandleFunc("/{artist_id:[0-9]+}", putArtistHandler).Methods("PUT")
+	// PATCH
+	artist_api_router.HandleFunc("/{artist_id:[0-9]+}", putArtistHandler).Methods("PATCH")
 
 	// DELETE
 	artist_api_router.HandleFunc("/{artist_id:[0-9]+}", deleteArtistHandler).Methods("DELETE")

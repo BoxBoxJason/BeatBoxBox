@@ -4,6 +4,7 @@ import (
 	db_tables "BeatBoxBox/internal/model"
 	album_model "BeatBoxBox/internal/model/album"
 	"BeatBoxBox/pkg/db_model"
+	custom_errors "BeatBoxBox/pkg/errors"
 )
 
 // AlbumExists checks if an album exists in the database
@@ -106,6 +107,27 @@ func GetAlbumsJSONFromPartialTitle(partial_title string) ([]byte, error) {
 	}
 	defer db_model.CloseDB(db)
 	albums := album_model.GetAlbumsFromPartialTitle(db.Preload("Musics").Preload("Artists"), map[string]interface{}{}, partial_title)
+	albums_ptr := make([]*db_tables.Album, len(albums))
+	for i, album := range albums {
+		albums_ptr[i] = &album
+	}
+	return ConvertAlbumsToJSON(albums_ptr)
+}
+
+func GetAlbumsJSONFromFilters(titles []string, partial_titles []string, genres []string, artists_names []string, musics_names []string, artists_ids []int, musics_ids []int) ([]byte, error) {
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return nil, err
+	}
+	defer db_model.CloseDB(db)
+	if len(titles) > 0 && len(partial_titles) > 0 {
+		return nil, custom_errors.NewBadRequestError("Can't use title with partial_title")
+	} else if len(artists_names)*len(artists_ids) > 0 {
+		return nil, custom_errors.NewBadRequestError("Can't use artist with artist_id")
+	} else if len(musics_names)*len(musics_ids) > 0 {
+		return nil, custom_errors.NewBadRequestError("Can't use music with music_id")
+	}
+	albums := album_model.GetAlbumsFromFilters(db, titles, partial_titles, genres, artists_names, musics_names, artists_ids, musics_ids)
 	albums_ptr := make([]*db_tables.Album, len(albums))
 	for i, album := range albums {
 		albums_ptr[i] = &album

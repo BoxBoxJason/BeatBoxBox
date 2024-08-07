@@ -43,27 +43,29 @@ type Playlist struct {
 }
 
 type Album struct {
-	Id           int      `gorm:"primaryKey;autoIncrement"`
-	Title        string   `gorm:"type:text;not null"`
-	Description  string   `gorm:"type:text"`
-	ReleaseDate  string   `gorm:"type:text"`
-	Artists      []Artist `gorm:"many2many:album_artists;"`
-	Illustration string   `gorm:"type:text;default:'default.jpg'"`
-	Musics       []Music  `gorm:"foreignKey:AlbumId;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	CreatedOn    int      `gorm:"autoCreateTime" json:"created_on"`
-	ModifiedOn   int      `gorm:"autoUpdateTime:milli" json:"modified_on"`
+	Id           int            `gorm:"primaryKey;autoIncrement"`
+	Title        string         `gorm:"type:text;not null"`
+	Description  string         `gorm:"type:text"`
+	ReleaseDate  string         `gorm:"type:text"`
+	Artists      []Artist       `gorm:"many2many:album_artists;"`
+	Genres       pq.StringArray `gorm:"type:text[]"`
+	Illustration string         `gorm:"type:text;default:'default.jpg'"`
+	Musics       []Music        `gorm:"foreignKey:AlbumId;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	CreatedOn    int            `gorm:"autoCreateTime" json:"created_on"`
+	ModifiedOn   int            `gorm:"autoUpdateTime:milli" json:"modified_on"`
 }
 
 type Artist struct {
-	Id           int     `gorm:"primaryKey;autoIncrement"`
-	Pseudo       string  `gorm:"type:varchar(128);unique;not null"`
-	Bio          string  `gorm:"type:text"`
-	BirthDate    string  `gorm:"type:text"`
-	Illustration string  `gorm:"type:text;default:'default.jpg'"`
-	Musics       []Music `gorm:"many2many:artist_musics;"`
-	Albums       []Album `gorm:"many2many:album_artists;"`
-	CreatedOn    int     `gorm:"autoCreateTime" json:"created_on"`
-	ModifiedOn   int     `gorm:"autoUpdateTime:milli" json:"modified_on"`
+	Id           int            `gorm:"primaryKey;autoIncrement"`
+	Pseudo       string         `gorm:"type:varchar(128);unique;not null"`
+	Bio          string         `gorm:"type:text"`
+	BirthDate    string         `gorm:"type:text"`
+	Illustration string         `gorm:"type:text;default:'default.jpg'"`
+	Genres       pq.StringArray `gorm:"type:text[]"`
+	Musics       []Music        `gorm:"many2many:artist_musics;"`
+	Albums       []Album        `gorm:"many2many:album_artists;"`
+	CreatedOn    int            `gorm:"autoCreateTime" json:"created_on"`
+	ModifiedOn   int            `gorm:"autoUpdateTime:milli" json:"modified_on"`
 }
 
 type Music struct {

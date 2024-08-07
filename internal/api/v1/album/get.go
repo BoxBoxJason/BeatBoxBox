@@ -3,144 +3,67 @@ package album_handler_v1
 import (
 	album_controller "BeatBoxBox/internal/controller/album"
 	custom_errors "BeatBoxBox/pkg/errors"
-	file_utils "BeatBoxBox/pkg/utils/fileutils"
-	format_utils "BeatBoxBox/pkg/utils/formatutils"
+	"BeatBoxBox/pkg/utils/httputils"
+	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
-
-	"github.com/gorilla/mux"
 )
 
-// getAlbumHandler returns the album with the given ID
-// @ Summary: Get an album by its ID
-// @ Description: Get an album by its ID
-// @ Tags: albums
-// @ Accept: json
-// @ Produces: json
-// @ Param: album_id path int true "Album Id"
-// @ Success 200 {string} string "OK"
-// @ Failure 400 {string} string "Invalid album ID provided, please use a valid integer album ID"
-// @ Failure 404 {string} string "Album does not exist"
-// @ Failure 500 {string} string "Unexpected error while getting album"
-// @ Router /api/albums/{album_id} [get]
 func getAlbumHandler(w http.ResponseWriter, r *http.Request) {
-	album_id_str := mux.Vars(r)["album_id"]
-	album_id, err := strconv.Atoi(album_id_str)
-	if err != nil {
-		http.Error(w, "Invalid album ID provided, please use a valid integer album ID", http.StatusBadRequest)
+	album_id, err := strconv.Atoi(mux.Vars(r)["album_id"])
+	if err != nil || album_id < 0 {
+		custom_errors.SendErrorToClient(w, custom_errors.NewBadRequestError("Invalid album_id, it must be a positive integer"))
 		return
 	}
-	album_json, err := album_controller.GetAlbum(album_id)
+	album, err := album_controller.GetAlbumJSON(album_id)
 	if err != nil {
-		custom_errors.SendErrorToClient(err, w, "")
+		custom_errors.SendErrorToClient(w, err)
 		return
 	}
-
-	w.Write(album_json)
+	err = httputils.RespondWithJSON(w, http.StatusOK, album)
+	if err != nil {
+		custom_errors.SendErrorToClient(w, err)
+	}
 }
 
-// getAlbumsHandler returns the albums with the given IDs
-// @ Summary: Get albums by their IDs
-// @ Description: Get albums by their IDs
-// @ Tags: albums
-// @ Accept: json
-// @ Produces: json
-// @ Param: albums_ids query []int true "Albums Ids"
-// @ Success 200 {string} string "OK"
-// @ Failure 400 {string} string "albums_ids must be comma separated integers"
-// @ Failure 500 {string} string "Unexpected error while getting albums"
-// @ Router /api/albums [get]
 func getAlbumsHandler(w http.ResponseWriter, r *http.Request) {
-	albums_ids_str := r.URL.Query().Get("albums_ids")
-	albums_ids, err := format_utils.ConvertStringToIntArray(albums_ids_str, ",")
+	// Parse the query parameters
+	params, err := httputils.ParseQueryParams(r, []string{}, []string{}, []string{"title", "partial_title", "artist", "music", "genre"}, []string{"album_id", "artist_id", "music_id"})
 	if err != nil {
-		http.Error(w, "albums_ids must be comma separated integers", http.StatusBadRequest)
+		custom_errors.SendErrorToClient(w, err)
 		return
 	}
-	albums_json, err := album_controller.GetAlbums(albums_ids)
-	if err != nil {
-		custom_errors.SendErrorToClient(err, w, "")
+	var albums []byte
+	// Filter request if incompatible parameters are used
+	if params["album_id"] != nil && len(params) > 1 {
+		custom_errors.SendErrorToClient(w, custom_errors.NewBadRequestError("Can't use album_id with other parameters"))
 		return
-	}
-	w.Write(albums_json)
-}
-
-// downloadAlbumHandler downloads the album with the given ID
-// @ Summary: Download an album by its ID
-// @ Description: Download an album by its ID
-// @ Tags: albums
-// @ Accept: json
-// @ Produces: zip
-// @ Param: album_id path int true "Album Id"
-// @ Success 200 {string} string "OK"
-// @ Failure 400 {string} string "Invalid album ID provided, please use a valid integer album ID"
-// @ Failure 404 {string} string "Album does not exist"
-// @ Failure 500 {string} string "Unexpected error while downloading album"
-// @ Router /api/albums/{album_id}/download [get]
-func downloadAlbumHandler(w http.ResponseWriter, r *http.Request) {
-	album_id_str := mux.Vars(r)["album_id"]
-	album_id, err := strconv.Atoi(album_id_str)
-	if err != nil {
-		http.Error(w, "Invalid album ID provided, please use a valid integer album ID", http.StatusBadRequest)
-		return
-	}
-	if !album_controller.AlbumExists(album_id) {
-		http.Error(w, "Album does not exist", http.StatusNotFound)
-		return
+	} else if params["album_id"] != nil {
+		albums_ids := params["album_id"].([]int)
+		if len(albums_ids) > 0 {
+			albums, err = album_controller.GetAlbumsJSON(albums_ids)
+			if err != nil {
+				custom_errors.SendErrorToClient(w, err)
+				return
+			}
+		}
+	} else {
+		titles := params["title"].([]string)
+		partial_titles := params["partial_title"].([]string)
+		genres := params["genre"].([]string)
+		artists_names := params["artist"].([]string)
+		musics_names := params["music"].([]string)
+		artists_ids := params["artist_id"].([]int)
+		musics_ids := params["music_id"].([]int)
+		albums, err = album_controller.GetAlbumsJSONFromFilters(titles, partial_titles, genres, artists_names, musics_names, artists_ids, musics_ids)
+		if err != nil {
+			custom_errors.SendErrorToClient(w, err)
+			return
+		}
 	}
 
-	title, musics_paths, err := album_controller.GetMusicsPathFromAlbum(album_id)
+	err = httputils.RespondWithJSON(w, http.StatusOK, albums)
 	if err != nil {
-		custom_errors.SendErrorToClient(err, w, "")
-		return
+		custom_errors.SendErrorToClient(w, err)
 	}
-
-	file_utils.ServeZip(w, musics_paths, title+".zip")
-}
-
-// downloadAlbumsHandler downloads the albums with the given IDs
-// @ Summary: Download albums by their IDs
-// @ Description: Download albums by their IDs
-// @ Tags: albums
-// @ Accept: json
-// @ Produces: zip
-// @ Param: albums_ids query []int true "Albums Ids"
-// @ Success 200 {string} string "OK"
-// @ Failure 400 {string} string "albums_ids must be comma separated integers"
-// @ Failure 500 {string} string "Unexpected error while downloading albums"
-// @ Router /api/albums/download [get]
-func downloadAlbumsHandler(w http.ResponseWriter, r *http.Request) {
-	albums_ids_str := r.URL.Query().Get("albums_ids")
-	albums_ids, err := format_utils.ConvertStringToIntArray(albums_ids_str, ",")
-	if err != nil {
-		http.Error(w, "albums_ids must be comma separated integers", http.StatusBadRequest)
-		return
-	}
-	musics_paths, err := album_controller.GetMusicsPathFromAlbums(albums_ids)
-	if err != nil {
-		custom_errors.SendErrorToClient(err, w, "")
-		return
-	}
-
-	file_utils.ServeTreeZip(w, musics_paths, "albums")
-}
-
-// getAlbumsByPartialTitleHandler returns the albums with the given partial title
-// @ Summary: Get albums by their partial title
-// @ Description: Get albums by their partial title
-// @ Tags: albums
-// @ Accept: json
-// @ Produces: json
-// @ Param: album_partial_title path string true "Album Partial Title"
-// @ Success 200 {string} string "OK"
-// @ Failure 500 {string} string "Unexpected error while getting albums"
-// @ Router /api/albums/partial/{album_partial_title} [get]
-func getAlbumsByPartialTitleHandler(w http.ResponseWriter, r *http.Request) {
-	album_partial_title := mux.Vars(r)["album_partial_title"]
-	albums_json, err := album_controller.GetAlbumsFromPartialTitle(album_partial_title)
-	if err != nil {
-		custom_errors.SendErrorToClient(err, w, "")
-		return
-	}
-	w.Write(albums_json)
 }

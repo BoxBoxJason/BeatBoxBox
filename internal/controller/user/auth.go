@@ -18,10 +18,10 @@ func AttemptLogin(username_or_email string, raw_password string) (int, string, e
 
 	// Get the user from the database
 	users := user_model.GetUsersFromFilters(db, map[string]interface{}{"email": username_or_email})
-	if users == nil || len(users) == 0 {
+	if len(users) == 0 {
 		users = user_model.GetUsersFromFilters(db, map[string]interface{}{"pseudo": username_or_email})
 	}
-	if users == nil || len(users) == 0 {
+	if len(users) == 0 {
 		return -1, "", errors.New("user not found")
 	}
 	user := users[0]

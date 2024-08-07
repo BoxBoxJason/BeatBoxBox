@@ -8,7 +8,7 @@ import (
 	"mime/multipart"
 )
 
-func PostArtist(pseudo string, bio string, illustration_file *multipart.File) (int, error) {
+func PostArtist(pseudo string, bio string, illustration_file *multipart.FileHeader) (int, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		return -1, err

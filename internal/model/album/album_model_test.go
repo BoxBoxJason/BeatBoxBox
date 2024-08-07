@@ -14,12 +14,10 @@ func TestAlbumCreation(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	id, err := CreateAlbum(db, "Test Album 1", "description", "fake.jpeg", []*db_tables.Artist{})
+	_, err = CreateAlbum(db, "Test Album 1", "description", "fake.jpeg", "0001-01-01", []*db_tables.Artist{})
 
 	if err != nil {
 		t.Errorf("Error creating album: %s", err)
-	} else if id < 0 {
-		t.Errorf("Error creating album: id is negative")
 	}
 }
 
@@ -164,7 +162,7 @@ func TestAlbumGetFromFilters(t *testing.T) {
 	}
 	db.Create(&album)
 
-	albums := GetAlbumsFromFilters(db, map[string]interface{}{"title": "Test Album 9"})
+	albums := GetAlbumsFromFilters(db, []string{"Test Album 9"}, []string{}, []string{}, []string{}, []string{}, []int{}, []int{})
 	if albums == nil {
 		t.Errorf("Error retrieving album")
 	} else if len(albums) < 1 {

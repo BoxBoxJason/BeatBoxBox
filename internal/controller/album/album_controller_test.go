@@ -20,11 +20,9 @@ func TestPostAlbum(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	id, err := PostAlbum("Test Album 13", []int{artist.Id}, "description", nil)
+	_, err = PostAlbum("Test Album 13", []int{artist.Id}, "description", "0001-01-01", nil)
 	if err != nil {
 		t.Error(err)
-	} else if id < 0 {
-		t.Error("id is negative")
 	}
 }
 
@@ -79,6 +77,9 @@ func TestDeleteAlbums(t *testing.T) {
 		Title: "Test Album 15",
 	}
 	err = db.Create(&album).Error
+	if err != nil {
+		t.Error(err)
+	}
 	album_id := album.Id
 	err = DeleteAlbums([]int{album_id})
 	if err != nil {
@@ -109,8 +110,11 @@ func TestUpdateAlbum(t *testing.T) {
 		Title: "Test Album 16",
 	}
 	err = db.Create(&album).Error
+	if err != nil {
+		t.Error(err)
+	}
 	album_id := album.Id
-	err = UpdateAlbum(album_id, map[string]interface{}{
+	_, err = UpdateAlbum(album_id, map[string]interface{}{
 		"description":  "Updated description",
 		"illustration": "Updated illustration",
 	})

@@ -30,6 +30,7 @@ func ConvertAlbumToJSON(album *db_tables.Album) ([]byte, error) {
 		"illustration": filepath.Base(album.Illustration),
 		"artists_ids":  artists_ids,
 		"musics_ids":   musics_ids,
+		"release_date": album.ReleaseDate,
 		"created_on":   album.CreatedOn,
 		"modified_on":  album.ModifiedOn,
 	}
@@ -55,6 +56,7 @@ func ConvertAlbumsToJSON(albums []*db_tables.Album) ([]byte, error) {
 			"illustration": filepath.Base(album.Illustration),
 			"artists_ids":  artists_ids,
 			"musics_ids":   musics_ids,
+			"release_date": album.ReleaseDate,
 			"created_on":   album.CreatedOn,
 			"modified_on":  album.ModifiedOn,
 		}

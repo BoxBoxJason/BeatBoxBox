@@ -11,7 +11,7 @@ import (
 )
 
 // Checks that all fields are valid, and posts the music to the database and saves the file to the server
-func PostMusic(title string, genres []string, lyrics string, release_date string, album_id int, music_file *multipart.File, illustration_file *multipart.File, artists_ids []int) (int, error) {
+func PostMusic(title string, genres []string, lyrics string, release_date string, album_id int, music_file *multipart.FileHeader, illustration_file *multipart.FileHeader, artists_ids []int) (int, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		return -1, err

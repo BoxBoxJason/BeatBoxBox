@@ -21,3 +21,11 @@ func AddArtistsToMusic(db *gorm.DB, music *db_tables.Music, artists []*db_tables
 func RemoveArtistsFromMusic(db *gorm.DB, music *db_tables.Music, artists []*db_tables.Artist) error {
 	return db_model.RemoveElementsFromAssociation(db, music, "Artists", artists)
 }
+
+func RemoveAlbumFromMusics(db *gorm.DB, musics []*db_tables.Music, album *db_tables.Album) error {
+	return db.Model(album).Association("Musics").Delete(musics)
+}
+
+func AddAlbumToMusics(db *gorm.DB, musics []*db_tables.Music, album *db_tables.Album) error {
+	return db.Model(album).Association("Musics").Append(musics)
+}

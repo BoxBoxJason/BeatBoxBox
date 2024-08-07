@@ -10,7 +10,7 @@ import (
 	"mime/multipart"
 )
 
-func PostPlaylist(title string, owners_ids []int, description string, illustration_file *multipart.File) (int, error) {
+func PostPlaylist(title string, owners_ids []int, description string, illustration_file *multipart.FileHeader) (int, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		return -1, err

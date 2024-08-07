@@ -11,7 +11,7 @@ import (
 	"mime/multipart"
 )
 
-func PostUser(username string, email string, raw_password string, avatar_file *multipart.File) (int, error) {
+func PostUser(username string, email string, raw_password string, avatar_file *multipart.FileHeader) (int, error) {
 	if !format_utils.CheckPseudoValidity(username) {
 		return -1, custom_errors.NewBadRequestError("pseudo is invalid, must be between 3 and 32 characters")
 	}

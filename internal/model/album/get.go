@@ -9,20 +9,49 @@ import (
 
 // GetAlbumsFromFilters returns a list of albums from the database
 // Filters can be passed to filter the albums
-func GetAlbumsFromFilters(db *gorm.DB, filters map[string]interface{}) []db_tables.Album {
-	raw_albums := db_model.GetRecordsByFields(db, &db_tables.Album{}, filters)
-	if raw_albums == nil {
-		return nil
+func GetAlbumsFromFilters(db *gorm.DB, titles []string, partial_titles []string, genres []string, artists_names []string, musics_names []string, artists_ids []int, musics_ids []int) []db_tables.Album {
+	var albums []db_tables.Album
+	query := db.Model(&db_tables.Album{})
+	if len(genres) > 0 {
+		for _, genre := range genres {
+			query = query.Where("genres @> ARRAY[?]::text[]", genre)
+		}
 	}
-	albums := make([]db_tables.Album, len(raw_albums))
-	for i, album := range raw_albums {
-		albums[i] = album.(db_tables.Album)
+	if len(titles) > 0 {
+		query = query.Where("title IN ?", titles)
+	} else if len(partial_titles) > 0 {
+		for _, partial_title := range partial_titles {
+			query = query.Or("title LIKE ?", "%"+partial_title+"%")
+		}
 	}
-
+	if len(artists_names) > 0 {
+		query = query.Joins("JOIN album_artists ON album_artists.album_id = albums.id").
+			Joins("JOIN artists ON artists.id = album_artists.artist_id")
+		for _, artist_name := range artists_names {
+			query = query.Where("artists.pseudo = ?", artist_name)
+		}
+	} else if len(artists_ids) > 0 {
+		db.Joins("JOIN album_artists ON album_artists.album_id = albums.id")
+		for _, artist_id := range artists_ids {
+			db.Where("album_artists.artist_id ", artist_id)
+		}
+	}
+	if len(musics_names) > 0 {
+		db.Joins("JOIN musics ON musics.album_id = albums.id")
+		for _, music_name := range musics_names {
+			db.Where("musics.title = ?", music_name)
+		}
+	} else if len(musics_ids) > 0 {
+		db.Joins("JOIN musics ON musics.album_id = albums.id")
+		for _, music_id := range musics_ids {
+			db.Where("musics.id = ?", music_id)
+		}
+	}
+	db.Group("albums.id").Find(&albums)
 	return albums
 }
 
-// GetAlbum returns a album from the database
+// GetAlbum returns an album from the database
 // Selects the album with the given album_id
 func GetAlbum(db *gorm.DB, album_id int) (db_tables.Album, error) {
 	album := db_model.GetRecordFromId(db, &db_tables.Album{}, album_id)

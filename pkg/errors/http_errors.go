@@ -67,7 +67,7 @@ func NewConflictError(message string) *ConflictError { return &ConflictError{Mes
 func (e *ConflictError) Error() string               { return e.Message }
 func (e *ConflictError) StatusCode() int             { return http.StatusConflict }
 
-func SendErrorToClient(err error, w http.ResponseWriter) {
+func SendErrorToClient(w http.ResponseWriter, err error) {
 	if http_err, ok := err.(HTTPError); ok {
 		http.Error(w, http_err.Error(), http_err.StatusCode())
 	} else {

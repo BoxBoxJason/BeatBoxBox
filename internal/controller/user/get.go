@@ -73,7 +73,7 @@ func GetUserIdFromUsername(username string) (int, error) {
 	}
 	defer db_model.CloseDB(db)
 	users := user_model.GetUsersFromFilters(db, map[string]interface{}{"pseudo": username})
-	if users == nil || len(users) == 0 {
+	if len(users) == 0 {
 		return -1, custom_errors.NewNotFoundError("user not found")
 	}
 	return users[0].Id, nil

@@ -7,7 +7,7 @@ import (
 )
 
 // PostAlbum is a function that creates a new album in the database.
-func CreateAlbum(db *gorm.DB, title string, description string, illustration_path string, artists_ptr []*db_tables.Artist) (int, error) {
+func CreateAlbum(db *gorm.DB, title string, description string, illustration_path string, release_date string, artists_ptr []*db_tables.Artist) (db_tables.Album, error) {
 	artists := make([]db_tables.Artist, len(artists_ptr))
 	for i, artist := range artists_ptr {
 		artists[i] = *artist
@@ -17,10 +17,11 @@ func CreateAlbum(db *gorm.DB, title string, description string, illustration_pat
 		Illustration: illustration_path,
 		Description:  description,
 		Artists:      artists,
+		ReleaseDate:  release_date,
 	}
 	err := db.Create(&album).Error
 	if err != nil {
-		return -1, err
+		return db_tables.Album{}, err
 	}
-	return album.Id, nil
+	return album, nil
 }

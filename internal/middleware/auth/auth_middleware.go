@@ -2,6 +2,7 @@ package auth_middleware
 
 import (
 	cookie_controller "BeatBoxBox/internal/controller/cookie"
+	custom_errors "BeatBoxBox/pkg/errors"
 	auth_utils "BeatBoxBox/pkg/utils/authutils"
 	"net/http"
 	"time"
@@ -53,4 +54,19 @@ func AuthenticateUser(r *http.Request) (int, string) {
 		return -1, ""
 	}
 	return user_id, new_token
+}
+
+func HasWritePrivileges(r *http.Request) error { // TODO
+	jwt_token := ""
+	// Attempt to retrieve cookie & jwt info
+	cookie, err := r.Cookie("session_token")
+	if err != nil {
+		jwt_token = r.Header.Get("Authorization")
+	} else {
+		jwt_token = cookie.Value
+	}
+	if jwt_token == "" {
+		return custom_errors.NewUnauthorizedError("No auth JWT token found")
+	}
+	return nil
 }
