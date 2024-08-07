@@ -33,7 +33,7 @@ get:
         application/json:
           schema:
             $ref: '../../../components/schemas/error.yaml'
-put:
+patch:
   summary: Update Playlist
   description: Update a playlist by its id
   parameters:

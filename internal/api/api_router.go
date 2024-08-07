@@ -6,7 +6,6 @@ import (
 	music_handler_v1 "BeatBoxBox/internal/api/v1/music"
 	playlist_handler_v1 "BeatBoxBox/internal/api/v1/playlist"
 	user_handler_v1 "BeatBoxBox/internal/api/v1/user"
-
 	"github.com/gorilla/mux"
 )
 

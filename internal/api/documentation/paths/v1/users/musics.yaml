@@ -1,4 +1,4 @@
-put:
+patch:
   summary: Like/Unlike Music
   description: Like/Unlike musics in the database using the user ID and the musics IDs
   parameters:
@@ -15,7 +15,7 @@ put:
         type: string
         enum: [ 'like', 'unlike' ]
       description: Action to be performed on the musics
-    - name: ids
+    - name: music_id
       in: query
       required: true
       schema:

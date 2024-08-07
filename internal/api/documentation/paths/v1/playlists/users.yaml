@@ -1,4 +1,4 @@
-put:
+patch:
   summary: Add/Remove a playlist owner
   description: "Add or remove a user as owner of a playlist"
   parameters:

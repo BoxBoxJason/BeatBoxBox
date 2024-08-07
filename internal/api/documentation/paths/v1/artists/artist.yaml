@@ -27,7 +27,7 @@ get:
           application/json:
             schema:
               $ref: '../../../components/schemas/error.yaml'
-put:
+patch:
   summary: Update an artist
   description: "Update an artist in the database given its id"
   parameters:
@@ -51,6 +51,7 @@ put:
       in: query
       schema:
         type: string
+        format: date
       description: New artist birthdate
   requestBody:
     required: false

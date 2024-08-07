@@ -3,35 +3,35 @@ get:
   description: "Retrieve playlists from the database using filters, if no filters are provided, all playlists will be returned. Available filters are: title(s), id(s), owners_ids, owners_names musics_ids"
   parameters:
     - in: query
-      name: titles
+      name: title
       schema:
         type: array
         items:
           type: string
       description: The titles of the playlists
     - in: query
-      name: ids
+      name: id
       schema:
         type: array
         items:
           type: integer
       description: The ids of the playlists
     - in: query
-      name: owners_ids
+      name: owner_id
       schema:
         type: array
         items:
           type: integer
       description: The ids of the owners of the playlist
     - in: query
-      name: owners_names
+      name: owner_name
       schema:
         type: array
         items:
           type: string
       description: The usernames of the owners of the playlist
     - in: query
-      name: musics_ids
+      name: music_id
       schema:
         type: array
         items:
@@ -93,12 +93,12 @@ post:
               type: string
               format: binary
               description: The illustration of the playlist
-            musics_ids:
+            music_id:
               type: array
               items:
                 type: integer
               description: The ids of the musics in the playlist
-            owners_ids:
+            owner_id:
               type: array
               items:
                 type: integer
@@ -108,7 +108,7 @@ post:
                 description: Whether the playlist is protected or not
           required:
             - title
-            - owners_ids
+            - owner_id
   responses:
     201:
       description: Created

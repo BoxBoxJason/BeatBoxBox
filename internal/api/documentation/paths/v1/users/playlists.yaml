@@ -1,4 +1,4 @@
-put:
+patch:
   summary: Update User Subscribed Playlists
   description: Update user subscribed playlists in the database using the user ID and the new user subscribed playlists
   parameters:
@@ -15,7 +15,7 @@ put:
         type: string
         enum: [ 'subscribe', 'unsubscribe' ]
       description: Action to be performed on the playlists
-    - name: ids
+    - name: playlist_id
       in: query
       required: true
       schema:

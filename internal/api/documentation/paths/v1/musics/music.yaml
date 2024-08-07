@@ -27,7 +27,7 @@ get:
         application/json:
           schema:
             $ref: "../../../components/schemas/error.yaml"
-put:
+patch:
   summary: Update a music
   description: Update a music by its ID
   parameters:
@@ -62,7 +62,7 @@ put:
       schema:
         type: integer
       description: New music album ID
-    - name: genres
+    - name: genre
       in: query
       required: false
       schema:

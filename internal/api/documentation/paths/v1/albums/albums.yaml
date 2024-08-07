@@ -1,49 +1,63 @@
 get:
   summary: Retrieve albums
-  description: "Retrieve albums from the database given matching filters, if no filters are provided, all albums are returned, available filters are: title, id, artist(s) name(s), artist(s) id(s), music(s) title(s), music(s) id(s)"
+  description: "Retrieve albums from the database given matching filters, if no filters are provided, all albums are returned, available filters are: title(s), album_id(s), partial_title(s), artist(s) name(s), artist(s) id(s), music(s) title(s), music(s) id(s), genre(s)"
   parameters:
     - in: query
-      name: titles
+      name: title
       schema:
         type: array
         items:
           type: string
       description: Albums titles
     - in: query
-      name: ids
+      name: partial_title
+      schema:
+        type: array
+        items:
+          type: string
+      description: Partial albums titles
+    - in: query
+      name: album_id
       schema:
         type: array
         items:
           type: integer
       description: Albums ids
     - in: query
-      name: artists
+      name: artist
       schema:
         type: array
         items:
           type: string
       description: Artists names
     - in: query
-      name: artists_ids
+      name: artists_id
       schema:
         type: array
         items:
           type: integer
       description: Artists ids
     - in: query
-      name: musics
+      name: music
       schema:
         type: array
         items:
           type: string
       description: Musics titles
     - in: query
-      name: musics_ids
+      name: music_id
       schema:
         type: array
         items:
           type: integer
       description: Musics ids
+    - name: genre
+      in: query
+      schema:
+        type: array
+        items:
+          type: string
+      description: Album genres
   responses:
     200:
       description: OK
@@ -78,7 +92,7 @@ post:
             title:
               type: string
               description: Album title
-            artists_ids:
+            artist_id:
               type: array
               items:
                 type: integer
@@ -90,9 +104,14 @@ post:
             description:
               type: string
               description: Album description
+            genre:
+              type: array
+              items:
+                type: string
+              description: Album genres
           required:
             - title
-            - artists_ids
+            - artist_id
   responses:
     201:
       description: Created
@@ -126,6 +145,44 @@ post:
             $ref: "../../../components/schemas/error.yaml"
     409:
       description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: "../../../components/schemas/error.yaml"
+delete:
+  summary: Delete Albums
+  description: Delete albums that match the provided ids from the database
+  parameters:
+    - in: query
+      name: id
+      schema:
+        type: array
+        items:
+          type: integer
+      description: Albums ids
+  responses:
+    204:
+      description: No Content
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../../../components/schemas/error.yaml"
+    401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
       content:
         application/json:
           schema:

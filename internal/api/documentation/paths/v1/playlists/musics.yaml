@@ -1,4 +1,4 @@
-put:
+patch:
   summary: Add/Remove Playlist Musics
   description: Add or remove musics from a playlist by their ids
   parameters:
@@ -17,9 +17,9 @@ put:
         enum:
           - add
           - remove
-    - name: music_ids
+    - name: music_id
       in: query
-      description: Music ids to be added or removed
+      description: Musics ids to be added or removed
       required: true
       schema:
         type: array

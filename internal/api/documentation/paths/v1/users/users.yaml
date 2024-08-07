@@ -2,14 +2,14 @@ get:
   summary: Retrieve Users
   description: "Retrieve users from the database given matching filters, if no filters are provided, all users are returned, available filters are: username(s), id(s)"
   parameters:
-    - name: usernames
+    - name: username
       in: query
       schema:
         type: array
         items:
           type: string
       description: Users usernames
-    - name: ids
+    - name: id
       in: query
       schema:
         type: array

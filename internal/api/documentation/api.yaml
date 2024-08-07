@@ -28,6 +28,8 @@ paths:
     $ref: './paths/v1/playlists/playlist.yaml'
   /api/v1/playlists/{playlist_id}/musics/{action}:
     $ref: './paths/v1/playlists/musics.yaml'
+  /api/v1/playlists/{playlist_id}/owners/{action}:
+    $ref: './paths/v1/playlists/users.yaml'
   /api/v1/users:
     $ref: './paths/v1/users/users.yaml'
   /api/v1/users/login:

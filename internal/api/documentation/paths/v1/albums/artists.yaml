@@ -1,4 +1,4 @@
-put:
+patch:
   summary: Add / Remove album artists
   description: "Add or remove albums from an album in the database given its id"
   parameters:
@@ -15,7 +15,7 @@ put:
         type: string
         enum: [ 'add', 'remove' ]
       description: Action to perform (add or remove)
-    - name: artists_ids
+    - name: artist_id
       in: query
       required: true
       schema:

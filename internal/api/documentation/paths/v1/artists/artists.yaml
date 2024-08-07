@@ -2,42 +2,42 @@ get:
   summary: Retrieve Artists
   description: "Retrieve artists from the database given matching filters, if no filters are provided, all artists are returned, available filters are: pseudo(s), id(s), album(s), album(s) id(s), music(s), music(s) id(s)"
   parameters:
-    - name: pseudos
+    - name: pseudo
       in: query
       schema:
         type: array
         items:
           type: string
       description: Artists pseudos
-    - name: ids
+    - name: id
       in: query
       schema:
         type: array
         items:
           type: integer
       description: Artists ids
-    - name: albums
+    - name: album
       in: query
       schema:
         type: array
         items:
           type: string
       description: Albums titles
-    - name: albums_ids
+    - name: album_id
       in: query
       schema:
         type: array
         items:
           type: integer
       description: Albums ids
-    - name: musics
+    - name: music
       in: query
       schema:
         type: array
         items:
           type: string
       description: Musics titles
-    - name: musics_ids
+    - name: music_id
       in: query
       schema:
         type: array

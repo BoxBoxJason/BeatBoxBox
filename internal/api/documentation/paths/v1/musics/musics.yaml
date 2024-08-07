@@ -2,7 +2,7 @@ get:
   summary: Retrieve Musics
   description: "Retrieve musics from the database given matching filters, if no filters are provided, all musics are returned, available filters are: partial_title, title(s), id(s), album(s), album(s) id(s), music(s), music(s) id(s)"
   parameters:
-    - name: titles
+    - name: title
       in: query
       required: false
       schema:
@@ -16,7 +16,7 @@ get:
       schema:
         type: string
       description: Partial music title
-    - name: ids
+    - name: id
       in: query
       required: false
       schema:
@@ -24,7 +24,7 @@ get:
         items:
           type: integer
       description: Music ID
-    - name: albums
+    - name: album
       in: query
       required: false
       schema:
@@ -32,7 +32,7 @@ get:
         items:
           type: string
       description: Albums titles
-    - name: albums_ids
+    - name: album_id
       in: query
       required: false
       schema:
@@ -40,7 +40,7 @@ get:
         items:
           type: integer
       description: Album ID
-    - name: musics
+    - name: music
       in: query
       required: false
       schema:
@@ -48,7 +48,7 @@ get:
         items:
           type: string
       description: Musics titles
-    - name: musics_ids
+    - name: music_id
       in: query
       required: false
       schema:
@@ -98,7 +98,7 @@ post:
             title:
               type: string
               description: Music title
-            artists_ids:
+            artist_id:
               type: array
               items:
                 type: integer
@@ -113,7 +113,7 @@ post:
             album_id:
               type: integer
               description: Album ID
-            genres:
+            genre:
               type: array
               items:
                 type: string
@@ -121,7 +121,7 @@ post:
           required:
             - music
             - title
-            - artists_ids
+            - artist_id
   responses:
     201:
       description: Music created successfully
