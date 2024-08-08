@@ -5,3 +5,5 @@ dist/
 .idea/
 go.sum
 .golangci.yaml
+sonar-project.properties
+.scannerwork/

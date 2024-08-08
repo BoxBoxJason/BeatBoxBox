@@ -6,7 +6,6 @@ import (
 	"io"
 	"math/rand"
 	"mime/multipart"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -170,10 +169,18 @@ func CheckDirExists(dir_path string) error {
 	return nil
 }
 
-func ServeZip(w http.ResponseWriter, files_paths []string, zip_file_name string) {
-
+func DeleteFile(file_path string) error {
+	return os.Remove(file_path)
 }
 
-func ServeTreeZip(w http.ResponseWriter, files_paths map[string][]string, zip_file_name string) {
+func DeleteMusicFile(music_path string) error {
+	return DeleteFile(filepath.Join(MUSICS_DIR, music_path))
+}
 
+func DeleteIllustrationFile(illustration_path string, illustration_directory string) error {
+	return DeleteFile(filepath.Join(ILLUSTRATIONS_DIRS[illustration_directory], illustration_path))
+}
+
+func GetAbsoluteMusicPath(music_path string) string {
+	return filepath.Join(MUSICS_DIR, music_path)
 }

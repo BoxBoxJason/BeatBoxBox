@@ -10,17 +10,21 @@ import (
 	custom_errors "BeatBoxBox/pkg/errors"
 )
 
-func UpdateMusic(music_id int, music_map map[string]interface{}) error {
+func UpdateMusic(music_id int, music_map map[string]interface{}) ([]byte, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
-		return err
+		return []byte{}, err
 	}
 	defer db_model.CloseDB(db)
 	music, err := music_model.GetMusic(db, music_id)
 	if err != nil {
-		return err
+		return []byte{}, err
 	}
-	return music_model.UpdateMusic(db, &music, music_map)
+	err = music_model.UpdateMusic(db, &music, music_map)
+	if err != nil {
+		return []byte{}, err
+	}
+	return ConvertMusicToJSON(&music)
 }
 
 func AddArtistsToMusic(music_id int, artists_ids []int) error {

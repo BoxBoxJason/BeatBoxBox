@@ -1,10 +1,9 @@
 get:
   summary: Retrieve Musics
-  description: "Retrieve musics from the database given matching filters, if no filters are provided, all musics are returned, available filters are: partial_title, title(s), id(s), album(s), album(s) id(s), music(s), music(s) id(s)"
+  description: "Retrieve musics from the database given matching filters, if no filters are provided, all musics are returned, available filters are: partial_title, title(s), id(s), partial_lyrics, album(s), album(s) id(s), artist(s), artist(s) id(s)"
   parameters:
     - name: title
       in: query
-      required: false
       schema:
         type: array
         items:
@@ -12,21 +11,23 @@ get:
       description: Music title
     - name: partial_title
       in: query
-      required: false
       schema:
         type: string
       description: Partial music title
-    - name: id
+    - name: music_id
       in: query
-      required: false
       schema:
         type: array
         items:
           type: integer
       description: Music ID
+    - name: partial_lyrics
+      in: query
+      schema:
+        type: string
+      description: Partial music lyrics
     - name: album
       in: query
-      required: false
       schema:
         type: array
         items:
@@ -34,28 +35,25 @@ get:
       description: Albums titles
     - name: album_id
       in: query
-      required: false
       schema:
         type: array
         items:
           type: integer
       description: Album ID
-    - name: music
+    - name: artist
       in: query
-      required: false
       schema:
         type: array
         items:
           type: string
-      description: Musics titles
-    - name: music_id
+      description: Artists names
+    - name: artist_id
       in: query
-      required: false
       schema:
         type: array
         items:
           type: integer
-      description: Musics IDs
+      description: Artist ID
   responses:
     200:
       description: Musics retrieved successfully
@@ -159,3 +157,42 @@ post:
         application/json:
           schema:
               $ref: '../../../components/schemas/error.yaml'
+delete:
+  summary: Delete Musics
+  description: "Delete musics from the database given matching ids"
+  parameters:
+    - name: id
+      in: query
+      required: true
+      schema:
+        type: array
+        items:
+          type: integer
+      description: Musics Ids
+  responses:
+    204:
+      description: No Content
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'

@@ -1,0 +1,30 @@
+get:
+  summary: Download Music
+  description: Download a music by its ID
+  parameters:
+    - name: music_id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Music ID
+  responses:
+    200:
+      description: OK
+      content:
+        application/zip:
+          schema:
+            type: string
+            format: binary
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'

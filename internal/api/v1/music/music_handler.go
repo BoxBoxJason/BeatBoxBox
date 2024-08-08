@@ -11,16 +11,16 @@ import "github.com/gorilla/mux"
 
 func SetupMusicsRoutes(music_api_router *mux.Router) {
 	// POST requests
-	music_api_router.HandleFunc("/", uploadHandler).Methods("POST")
+	music_api_router.HandleFunc("/", postMusicHandler).Methods("POST")
 
 	// GET requests
 	music_api_router.HandleFunc("/", getMusicsHandler).Methods("GET")
 	music_api_router.HandleFunc("/download", downloadMusicsHandler).Methods("GET")
-	music_api_router.HandleFunc("/download/{music_id:[0-9]+}", downloadMusicHandler).Methods("GET")
+	music_api_router.HandleFunc("/{music_id:[0-9]+}/download", downloadMusicHandler).Methods("GET")
 	music_api_router.HandleFunc("/{music_id:[0-9]+}", getMusicHandler).Methods("GET")
 
-	// PUT requests
-	music_api_router.HandleFunc("/{music_id:[0-9]+}", putMusicsHandler).Methods("PUT")
+	// PATCH requests
+	music_api_router.HandleFunc("/{music_id:[0-9]+}", patchMusicHandler).Methods("PATCH")
 
 	// DELETE requests
 	music_api_router.HandleFunc("/{music_id:[0-9]+}", deleteMusicHandler).Methods("DELETE")

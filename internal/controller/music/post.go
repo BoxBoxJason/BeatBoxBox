@@ -11,22 +11,22 @@ import (
 )
 
 // Checks that all fields are valid, and posts the music to the database and saves the file to the server
-func PostMusic(title string, genres []string, lyrics string, release_date string, album_id int, music_file *multipart.FileHeader, illustration_file *multipart.FileHeader, artists_ids []int) (int, error) {
+func PostMusic(title string, genres []string, lyrics string, release_date string, album_id int, music_file *multipart.FileHeader, illustration_file *multipart.FileHeader, artists_ids []int) ([]byte, error) {
 	db, err := db_model.OpenDB()
 	if err != nil {
-		return -1, err
+		return []byte{}, err
 	}
 	defer db_model.CloseDB(db)
 
 	if music_model.MusicAlreadyExists(db, title, artists_ids) {
-		return -1, custom_errors.NewConflictError("music already exists")
+		return []byte{}, custom_errors.NewConflictError("music already exists")
 	}
 
 	artists, err := artist_model.GetArtists(db, artists_ids)
 	if err != nil {
-		return -1, err
+		return []byte{}, err
 	} else if artists == nil || len(artists) != len(artists_ids) {
-		return -1, custom_errors.NewNotFoundError("some artists were not found")
+		return []byte{}, custom_errors.NewNotFoundError("some artists were not found")
 	}
 	artists_ptr := make([]*db_tables.Artist, len(artists))
 	for i, artist := range artists {
@@ -35,12 +35,16 @@ func PostMusic(title string, genres []string, lyrics string, release_date string
 
 	illustration_file_name, err := file_utils.UploadIllustrationToServer(illustration_file, "musics")
 	if err != nil {
-		return -1, custom_errors.NewInternalServerError("could not upload illustration")
+		return []byte{}, custom_errors.NewInternalServerError("could not upload illustration")
 	}
 	music_file_name, err := file_utils.UploadMusicToServer(music_file)
 	if err != nil {
-		return -1, custom_errors.NewInternalServerError("could not upload music")
+		return []byte{}, custom_errors.NewInternalServerError("could not upload music")
 	}
 
-	return music_model.CreateMusic(db, title, genres, lyrics, release_date, album_id, music_file_name, illustration_file_name, artists_ptr)
+	music, err := music_model.CreateMusic(db, title, genres, lyrics, release_date, album_id, music_file_name, illustration_file_name, artists_ptr)
+	if err != nil {
+		return []byte{}, err
+	}
+	return ConvertMusicToJSON(&music)
 }

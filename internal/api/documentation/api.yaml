@@ -20,8 +20,12 @@ paths:
     $ref: './paths/v1/artists/artist.yaml'
   /api/v1/musics:
     $ref: './paths/v1/musics/musics.yaml'
+  /api/v1/musics/download:
+    $ref: './paths/v1/musics/downloads.yaml'
   /api/v1/musics/{music_id}:
     $ref: './paths/v1/musics/music.yaml'
+  /api/v1/musics/{music_id}/download:
+    $ref: './paths/v1/musics/download.yaml'
   /api/v1/playlists:
     $ref: './paths/v1/playlists/playlists.yaml'
   /api/v1/playlists/{playlist_id}:

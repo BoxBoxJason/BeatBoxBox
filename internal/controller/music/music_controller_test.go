@@ -94,7 +94,7 @@ func TestUpdateMusic(t *testing.T) {
 		t.Error(err)
 	}
 	music_id := music.Id
-	err = UpdateMusic(music_id, map[string]interface{}{"title": "Test Music 29 Updated"})
+	_, err = UpdateMusic(music_id, map[string]interface{}{"title": "Test Music 29 Updated"})
 	if err != nil {
 		t.Error(err)
 	}

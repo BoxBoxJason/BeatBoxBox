@@ -85,8 +85,6 @@ patch:
               type: string
               description: Music file
               format: binary
-          required:
-            - music
   responses:
     200:
       description: OK

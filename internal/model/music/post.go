@@ -7,9 +7,9 @@ import (
 )
 
 // CreateMusic creates a new music in the database
-func CreateMusic(db *gorm.DB, title string, genres []string, lyrics string, release_date string, album_id int, file_name string, illustration_path string, artists_ptr []*db_tables.Artist) (int, error) {
+func CreateMusic(db *gorm.DB, title string, genres []string, lyrics string, release_date string, album_id int, file_name string, illustration_path string, artists_ptr []*db_tables.Artist) (db_tables.Music, error) {
 	if len(artists_ptr) == 0 {
-		return -1, nil
+		return db_tables.Music{}, nil
 	}
 	artists := make([]db_tables.Artist, len(artists_ptr))
 	for i, artist := range artists_ptr {
@@ -30,7 +30,7 @@ func CreateMusic(db *gorm.DB, title string, genres []string, lyrics string, rele
 	}
 	err := db.Create(&new_music).Error
 	if err != nil {
-		return -1, err
+		return db_tables.Music{}, err
 	}
-	return new_music.Id, nil
+	return new_music, nil
 }

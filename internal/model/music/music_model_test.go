@@ -156,7 +156,10 @@ func TestGetMusicsFromFilters(t *testing.T) {
 	}
 	db.Create(&music)
 
-	musics := GetMusicsFromFilters(db, map[string]interface{}{"title": "Test Music 6"})
+	musics, err := GetMusicsFromFilters(db, []string{"Test Music 6"}, []string{}, "", []string{}, []string{}, []int{}, []int{})
+	if err != nil {
+		t.Errorf("Error getting music: %s", err)
+	}
 	if len(musics) < 1 {
 		t.Errorf("Expected at least 1 music, got %d", len(musics))
 	} else {
