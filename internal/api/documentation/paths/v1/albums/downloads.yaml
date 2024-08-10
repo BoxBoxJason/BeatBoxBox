@@ -1,0 +1,32 @@
+get:
+  summary: Download Albums
+  description: Download all of the musics in albums by theirs IDs
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: array
+        items:
+          type: integer
+      description: Albums IDs
+  responses:
+    200:
+      description: OK
+      content:
+        application/zip:
+          schema:
+            type: string
+            format: binary
+    400:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'
+    404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/schemas/error.yaml'

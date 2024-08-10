@@ -5,6 +5,9 @@ import (
 	album_model "BeatBoxBox/internal/model/album"
 	"BeatBoxBox/pkg/db_model"
 	custom_errors "BeatBoxBox/pkg/errors"
+	file_utils "BeatBoxBox/pkg/utils/fileutils"
+	"BeatBoxBox/pkg/utils/httputils"
+	"net/http"
 )
 
 // AlbumExists checks if an album exists in the database
@@ -133,4 +136,41 @@ func GetAlbumsJSONFromFilters(titles []string, partial_titles []string, genres [
 		albums_ptr[i] = &album
 	}
 	return ConvertAlbumsToJSON(albums_ptr)
+}
+
+func ServeAlbumFiles(w http.ResponseWriter, album_id int) error {
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return err
+	}
+	album, err := album_model.GetAlbum(db.Preload("Musics"), album_id)
+	if err != nil {
+		return err
+	}
+	paths := make([]string, len(album.Musics))
+	for i, music := range album.Musics {
+		paths[i] = file_utils.GetAbsoluteMusicPath(music.Path)
+	}
+	httputils.ServeZip(w, paths, album.Title+".zip")
+	return nil
+}
+
+func ServeAlbumsFiles(w http.ResponseWriter, album_id int) error {
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return err
+	}
+	albums, err := album_model.GetAlbums(db.Preload("Musics"), []int{album_id})
+	if err != nil {
+		return err
+	}
+	paths := make(map[string][]string, len(albums))
+	for _, album := range albums {
+		paths[album.Title] = make([]string, len(album.Musics))
+		for j, music := range album.Musics {
+			paths[album.Title][j] = file_utils.GetAbsoluteMusicPath(music.Path)
+		}
+	}
+	httputils.ServeSubdirsZip(w, paths, "albums.zip")
+	return nil
 }

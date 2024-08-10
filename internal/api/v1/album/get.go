@@ -60,3 +60,33 @@ func getAlbumsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	httputils.RespondWithJSON(w, http.StatusOK, albums)
 }
+
+func downloadAlbumHandler(w http.ResponseWriter, r *http.Request) {
+	album_id, err := strconv.Atoi(mux.Vars(r)["album_id"])
+	if err != nil || album_id < 0 {
+		custom_errors.SendErrorToClient(w, custom_errors.NewBadRequestError("Invalid album_id, it must be a positive integer"))
+		return
+	}
+	err = album_controller.ServeAlbumFiles(w, album_id)
+	if err != nil {
+		custom_errors.SendErrorToClient(w, err)
+	}
+}
+
+func downloadAlbumsHandler(w http.ResponseWriter, r *http.Request) {
+	// Parse the query parameters
+	params, err := httputils.ParseQueryParams(r, []string{}, []string{}, []string{}, []string{"id"})
+	if err != nil {
+		custom_errors.SendErrorToClient(w, err)
+		return
+	}
+	album_id := params["id"].([]int)
+	if len(album_id) == 0 {
+		custom_errors.SendErrorToClient(w, custom_errors.NewBadRequestError("No album_id provided"))
+		return
+	}
+	err = album_controller.ServeAlbumsFiles(w, album_id[0])
+	if err != nil {
+		custom_errors.SendErrorToClient(w, err)
+	}
+}

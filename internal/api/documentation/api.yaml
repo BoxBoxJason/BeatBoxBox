@@ -8,8 +8,12 @@ servers:
 paths:
   /api/v1/albums:
     $ref: './paths/v1/albums/albums.yaml'
+  /api/v1/albums/download:
+    $ref: './paths/v1/albums/downloads.yaml'
   /api/v1/albums/{album_id}:
     $ref: './paths/v1/albums/album.yaml'
+  /api/v1/albums/{album_id}/download:
+    $ref: './paths/v1/albums/download.yaml'
   /api/v1/albums/{album_id}/musics/{action}:
     $ref: './paths/v1/albums/musics.yaml'
   /api/v1/albums/{album_id}/artists/{action}:
@@ -28,8 +32,12 @@ paths:
     $ref: './paths/v1/musics/download.yaml'
   /api/v1/playlists:
     $ref: './paths/v1/playlists/playlists.yaml'
+  /api/v1/playlists/download:
+    $ref: './paths/v1/playlists/downloads.yaml'
   /api/v1/playlists/{playlist_id}:
     $ref: './paths/v1/playlists/playlist.yaml'
+  /api/v1/playlists/{playlist_id}/download:
+    $ref: './paths/v1/playlists/download.yaml'
   /api/v1/playlists/{playlist_id}/musics/{action}:
     $ref: './paths/v1/playlists/musics.yaml'
   /api/v1/playlists/{playlist_id}/owners/{action}:
