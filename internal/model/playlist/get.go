@@ -70,3 +70,29 @@ func PlaylistAlreadyExists(db *gorm.DB, playlist_name string, owners_ids []int) 
 		First(&album).Error
 	return err == nil
 }
+
+func GetPlaylistsByFilters(db *gorm.DB, titles []string, musics []string, owners []string, music_ids []int, owner_ids []int) ([]db_tables.Playlist, error) {
+	query := db.Model(&db_tables.Playlist{})
+	if len(titles) > 0 {
+		query = query.Where("title IN ?", titles)
+	}
+	if len(music_ids) > 0 {
+		query = query.Joins("JOIN playlist_musics ON playlist_musics.playlist_id = playlists.id").
+			Where("playlist_musics.music_id IN ?", music_ids)
+	} else if len(musics) > 0 {
+		query = query.Joins("JOIN playlist_musics ON playlist_musics.playlist_id = playlists.id").
+			Joins("JOIN musics ON musics.id = playlist_musics.music_id").
+			Where("musics.title IN ?", musics)
+	}
+	if len(owner_ids) > 0 {
+		query = query.Joins("JOIN playlists_owners ON playlists_owners.playlist_id = playlists.id").
+			Where("playlists_owners.user_id IN ?", owner_ids)
+	} else if len(owners) > 0 {
+		query = query.Joins("JOIN playlists_owners ON playlists_owners.playlist_id = playlists.id").
+			Joins("JOIN users ON users.id = playlists_owners.user_id").
+			Where("users.pseudo IN ?", owners)
+	}
+	var playlists []db_tables.Playlist
+	err := query.Group("playlists.id").Find(&playlists).Error
+	return playlists, err
+}

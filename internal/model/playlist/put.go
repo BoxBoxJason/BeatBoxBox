@@ -18,3 +18,11 @@ func AddMusicsToPlaylist(db *gorm.DB, playlist *db_tables.Playlist, musics []*db
 func RemoveMusicsFromPlaylist(db *gorm.DB, playlist *db_tables.Playlist, musics []*db_tables.Music) error {
 	return db_model.RemoveElementsFromAssociation(db, playlist, "Musics", musics)
 }
+
+func AddOwnersToPlaylist(db *gorm.DB, playlist *db_tables.Playlist, owners []*db_tables.User) error {
+	return db_model.AddElementsToAssociation(db, playlist, "Owners", owners)
+}
+
+func RemoveOwnersFromPlaylist(db *gorm.DB, playlist *db_tables.Playlist, owners []*db_tables.User) error {
+	return db_model.RemoveElementsFromAssociation(db, playlist, "Owners", owners)
+}

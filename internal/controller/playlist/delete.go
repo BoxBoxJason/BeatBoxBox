@@ -4,7 +4,7 @@ import (
 	db_tables "BeatBoxBox/internal/model"
 	playlist_model "BeatBoxBox/internal/model/playlist"
 	"BeatBoxBox/pkg/db_model"
-	custom_errors "BeatBoxBox/pkg/errors"
+	httputils "BeatBoxBox/pkg/utils/httputils"
 )
 
 // DeletePlaylist deletes a playlist from the database
@@ -32,7 +32,7 @@ func DeletePlaylists(playlist_ids []int) error {
 	if err != nil {
 		return err
 	} else if playlists == nil || len(playlists) != len(playlist_ids) {
-		return custom_errors.NewNotFoundError("not all playlists found")
+		return httputils.NewNotFoundError("not all playlists found")
 	}
 	playlists_ptr := make([]*db_tables.Playlist, len(playlists))
 	for i, playlist := range playlists {

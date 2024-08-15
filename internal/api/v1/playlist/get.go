@@ -2,143 +2,85 @@ package playlist_handler_v1
 
 import (
 	playlist_controller "BeatBoxBox/internal/controller/playlist"
-	custom_errors "BeatBoxBox/pkg/errors"
-	file_utils "BeatBoxBox/pkg/utils/fileutils"
-	format_utils "BeatBoxBox/pkg/utils/formatutils"
+	httputils "BeatBoxBox/pkg/utils/httputils"
 	"net/http"
 	"strconv"
 
 	"github.com/gorilla/mux"
 )
 
-// getPlaylistHandler returns the playlist with the given ID
-// @Summary Get a playlist by its ID
-// @Description Get a playlist by its ID
-// @Tags playlists
-// @Accept json
-// @Produce json
-// @Param playlist_id path int true "Playlist Id"
-// @Success 200 {string} string "OK"
-// @Failure 400 {string} string "Invalid playlist ID provided, please use a valid integer playlist ID"
-// @Failure 404 {string} string "Playlist does not exist"
-// @Failure 500 {string} string "Internal server error when getting playlist"
-// @Router /api/playlists/{playlist_id} [get]
-func downloadPlaylistHandler(w http.ResponseWriter, r *http.Request) {
-	playlist_id_str := mux.Vars(r)["playlist_id"]
-	playlist_id, err := strconv.Atoi(playlist_id_str)
-	if err != nil {
-		http.Error(w, "Invalid playlist ID provided, please use a valid integer playlist ID", http.StatusBadRequest)
-		return
-	}
-	if !playlist_controller.PlaylistExists(playlist_id) {
-		http.Error(w, "Playlist does not exist", http.StatusNotFound)
-		return
-	}
-
-	title, musics_paths, err := playlist_controller.GetMusicsPathFromPlaylist(playlist_id)
-	if err != nil {
-		custom_errors.SendErrorToClient(err, w, "")
-		return
-	}
-
-	file_utils.ServeZip(w, musics_paths, title+".zip")
-}
-
-// getPlaylistsHandler returns the playlists with the given IDs
-// @Summary Get playlists by their IDs
-// @Description Get playlists by their IDs
-// @Tags playlists
-// @Accept json
-// @Produce json
-// @Param playlist_ids query string true "Playlist Ids"
-// @Success 200 {string} string "OK"
-// @Failure 400 {string} string "Invalid playlist IDs provided, please use a valid integer playlist IDs"
-// @Failure 404 {string} string "At least one playlist does not exist"
-// @Failure 500 {string} string "Internal server error when getting playlists"
-// @Router /api/playlists [get]
-func downloadPlaylistsHandler(w http.ResponseWriter, r *http.Request) {
-	playlist_ids_str := r.URL.Query().Get("playlist_ids")
-	playlist_ids, err := format_utils.ConvertStringToIntArray(playlist_ids_str, ",")
-	if err != nil {
-		http.Error(w, "Invalid playlist IDs provided, please use a valid integer playlist IDs", http.StatusBadRequest)
-		return
-	}
-	if !playlist_controller.PlaylistsExist(playlist_ids) {
-		http.Error(w, "At least one playlist does not exist", http.StatusNotFound)
-		return
-	}
-
-	musics_paths, err := playlist_controller.GetMusicsPathFromPlaylists(playlist_ids)
-	if err != nil {
-		custom_errors.SendErrorToClient(err, w, "")
-		return
-	}
-
-	file_utils.ServeTreeZip(w, musics_paths, "playlists")
-}
-
-// getPlaylistHandler returns the playlist with the given ID
-// @Summary Get a playlist by its ID
-// @Description Get a playlist by its ID
-// @Tags playlists
-// @Accept json
-// @Produce json
-// @Param playlist_id path int true "Playlist Id"
-// @Success 200 {string} string "OK"
-// @Failure 400 {string} string "Invalid playlist ID provided, please use a valid integer playlist ID"
-// @Failure 404 {string} string "Playlist does not exist"
-// @Failure 500 {string} string "Internal server error when getting playlist"
-// @Router /api/playlists/{playlist_id} [get]
 func getPlaylistHandler(w http.ResponseWriter, r *http.Request) {
-	playlist_id_str := mux.Vars(r)["playlist_id"]
-	playlist_id, err := strconv.Atoi(playlist_id_str)
+	playlist_id, err := strconv.Atoi(mux.Vars(r)["playlist_id"])
+	if err != nil || playlist_id < 0 {
+		httputils.SendErrorToClient(w, httputils.NewBadRequestError("Invalid playlist ID, must be a positive integer"))
+		return
+	}
+	playlist_json, err := playlist_controller.GetPlaylistJSON(playlist_id)
 	if err != nil {
-		http.Error(w, "Invalid playlist ID provided, please use a valid integer playlist ID", http.StatusBadRequest)
+		httputils.SendErrorToClient(w, err)
 		return
 	}
-	if !playlist_controller.PlaylistExists(playlist_id) {
-		http.Error(w, "Playlist does not exist", http.StatusNotFound)
-		return
-	}
-
-	playlist_json, err := playlist_controller.GetPlaylist(playlist_id)
-	if err != nil {
-		custom_errors.SendErrorToClient(err, w, "")
-		return
-	}
-
-	w.Write(playlist_json)
+	httputils.RespondWithJSON(w, http.StatusOK, playlist_json)
 }
 
-// getPlaylistsHandler returns the playlists with the given IDs
-// @Summary Get playlists by their IDs
-// @Description Get playlists by their IDs
-// @Tags playlists
-// @Accept json
-// @Produce json
-// @Param playlist_ids query string true "Playlist Ids"
-// @Success 200 {string} string "OK"
-// @Failure 400 {string} string "Invalid playlist IDs provided, please use a valid integer playlist IDs"
-// @Failure 404 {string} string "At least one playlist does not exist"
-// @Failure 500 {string} string "Internal server error when getting playlists"
-// @Router /api/playlists [get]
+func downloadPlaylistHandler(w http.ResponseWriter, r *http.Request) {
+	// Get the playlist ID from the URL
+	playlist_id, err := strconv.Atoi(mux.Vars(r)["playlist_id"])
+	if err != nil || playlist_id < 0 {
+		httputils.SendErrorToClient(w, httputils.NewBadRequestError("Invalid playlist ID, must be a positive integer"))
+		return
+	}
+	err = playlist_controller.ServePlaylistFiles(w, playlist_id)
+	if err != nil {
+		httputils.SendErrorToClient(w, err)
+	}
+}
+
 func getPlaylistsHandler(w http.ResponseWriter, r *http.Request) {
-	playlist_ids_str := r.URL.Query().Get("playlist_ids")
-	playlist_ids, err := format_utils.ConvertStringToIntArray(playlist_ids_str, ",")
+	// Parse the query parameters
+	params, err := httputils.ParseQueryParams(r, nil, nil, []string{"title", "music", "owner"}, []string{"id", "music_id", "owner_id"})
 	if err != nil {
-		http.Error(w, "Invalid playlist IDs provided, please use a valid integer playlist IDs", http.StatusBadRequest)
+		httputils.SendErrorToClient(w, err)
 		return
 	}
-	if !playlist_controller.PlaylistsExist(playlist_ids) {
-		http.Error(w, "At least one playlist does not exist", http.StatusNotFound)
+	var playlists []byte
+	if params["id"] != nil && len(params) > 1 {
+		httputils.SendErrorToClient(w, httputils.NewBadRequestError("Invalid query parameters: id cannot be used with other parameters"))
 		return
+	} else if params["id"] != nil {
+		playlists, err = playlist_controller.GetPlaylistsJSON(params["id"].([]int))
+		if err != nil {
+			httputils.SendErrorToClient(w, err)
+			return
+		}
+	} else {
+		titles := params["title"].([]string)
+		musics := params["music"].([]string)
+		owners := params["owner"].([]string)
+		music_ids := params["music_id"].([]int)
+		owner_ids := params["owner_id"].([]int)
+		playlists, err = playlist_controller.GetPlaylistsJSONByFilters(titles, musics, owners, music_ids, owner_ids)
+		if err != nil {
+			httputils.SendErrorToClient(w, err)
+			return
+		}
 	}
+	httputils.RespondWithJSON(w, http.StatusOK, playlists)
 
-	playlists_json, err := playlist_controller.GetPlaylists(playlist_ids)
+}
+
+func downloadPlaylistsHandler(w http.ResponseWriter, r *http.Request) {
+	params, err := httputils.ParseQueryParams(r, []string{}, []string{}, []string{}, []string{"id"})
 	if err != nil {
-		custom_errors.SendErrorToClient(err, w, "")
+		httputils.SendErrorToClient(w, err)
+		return
+	} else if len(params) == 0 || len(params["id"].([]int)) == 0 {
+		httputils.SendErrorToClient(w, httputils.NewBadRequestError("No playlist ID provided"))
 		return
 	}
-
-	w.Write(playlists_json)
+	playlist_ids := params["id"].([]int)
+	err = playlist_controller.ServePlaylistsFiles(w, playlist_ids)
+	if err != nil {
+		httputils.SendErrorToClient(w, err)
+	}
 }

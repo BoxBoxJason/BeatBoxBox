@@ -15,7 +15,7 @@ func TestPlaylistCreate(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	_, err = CreatePlaylist(db, "Test Playlist 3", []*db_tables.User{}, "", "default.jpg")
+	_, err = CreatePlaylist(db, "Test Playlist 3", []*db_tables.User{}, "", true, "default.jpg", nil)
 	if err != nil {
 		t.Errorf("Error creating playlist: %s", err)
 	}
@@ -196,6 +196,9 @@ func TestPlaylistDelete(t *testing.T) {
 	playlist_id := playlist.Id
 
 	err = DeletePlaylist(db, &playlist)
+	if err != nil {
+		t.Errorf("Error deleting playlist: %s", err)
+	}
 	playlist = db_tables.Playlist{}
 	result := db.Where("id = ?", playlist_id).First(&playlist)
 

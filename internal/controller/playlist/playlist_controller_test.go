@@ -22,7 +22,7 @@ func TestPostPlaylist(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	_, err = PostPlaylist("Test Playlist 13", []int{user.Id}, "description", nil)
+	_, err = PostPlaylist("Test Playlist 13", "description", true, []int{user.Id}, nil, nil)
 	if err != nil {
 		t.Error(err)
 	}
@@ -152,68 +152,6 @@ func TestGetPlaylistsJSON(t *testing.T) {
 	}
 }
 
-func TestGetMusicsPathFromPlaylist(t *testing.T) {
-	db, err := db_model.OpenDB()
-	if err != nil {
-		t.Error(err)
-	}
-	defer db_model.CloseDB(db)
-	music := db_tables.Music{
-		Title: "Test Music 38",
-		Path:  "test.mp3",
-	}
-	err = db.Create(&music).Error
-	if err != nil {
-		t.Error(err)
-	}
-	playlist := db_tables.Playlist{
-		Title:  "Test Playlist 21",
-		Musics: []db_tables.Music{music},
-	}
-	err = db.Create(&playlist).Error
-	if err != nil {
-		t.Error(err)
-	}
-	_, musics_path, err := GetMusicsPathFromPlaylist(playlist.Id)
-	if err != nil {
-		t.Error(err)
-	} else if len(musics_path) == 0 {
-		t.Error("No musics path found")
-	}
-}
-
-func TestGetMusicsPathFromPlaylists(t *testing.T) {
-	db, err := db_model.OpenDB()
-	if err != nil {
-		t.Error(err)
-	}
-	defer db_model.CloseDB(db)
-	music := db_tables.Music{
-		Title: "Test Music 39",
-		Path:  "test.mp3",
-	}
-	err = db.Create(&music).Error
-	if err != nil {
-		t.Error(err)
-	}
-	playlist := db_tables.Playlist{
-		Title:  "Test Playlist 22",
-		Musics: []db_tables.Music{music},
-	}
-	err = db.Create(&playlist).Error
-	if err != nil {
-		t.Error(err)
-	}
-	musics_map, err := GetMusicsPathFromPlaylists([]int{playlist.Id})
-	if err != nil {
-		t.Error(err)
-	} else if len(musics_map) == 0 {
-		t.Error("No playlist found")
-	} else if len(musics_map[playlist.Title]) == 0 {
-		t.Error("No musics path found")
-	}
-}
-
 // PUT FUNCTIONS
 func TestUpdatePlaylist(t *testing.T) {
 	db, err := db_model.OpenDB()
@@ -231,7 +169,7 @@ func TestUpdatePlaylist(t *testing.T) {
 	playlist_map := map[string]interface{}{
 		"title": "Test Playlist 23 updated",
 	}
-	err = UpdatePlaylist(playlist.Id, playlist_map)
+	_, err = UpdatePlaylist(playlist.Id, playlist_map)
 	if err != nil {
 		t.Error(err)
 	}
@@ -264,7 +202,7 @@ func TestAddMusicsToPlaylist(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	err = AddMusicsToPlaylist(playlist.Id, []int{music.Id})
+	_, err = AddMusicsToPlaylist(playlist.Id, []int{music.Id})
 	if err != nil {
 		t.Error(err)
 	}
@@ -298,7 +236,7 @@ func TestRemoveMusicsFromPlaylist(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	err = RemoveMusicsFromPlaylist(playlist.Id, []int{music.Id})
+	_, err = RemoveMusicsFromPlaylist(playlist.Id, []int{music.Id})
 	if err != nil {
 		t.Error(err)
 	}

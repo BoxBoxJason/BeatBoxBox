@@ -4,9 +4,10 @@ import (
 	db_tables "BeatBoxBox/internal/model"
 	playlist_model "BeatBoxBox/internal/model/playlist"
 	db_model "BeatBoxBox/pkg/db_model"
-	custom_errors "BeatBoxBox/pkg/errors"
+	file_utils "BeatBoxBox/pkg/utils/fileutils"
+	httputils "BeatBoxBox/pkg/utils/httputils"
 	"fmt"
-	"path"
+	"net/http"
 )
 
 // PlaylistExists returns whether a playlist exists in the database
@@ -40,7 +41,7 @@ func GetPlaylistJSON(playlist_id int) ([]byte, error) {
 	defer db_model.CloseDB(db)
 	playlist, err := playlist_model.GetPlaylist(db.Preload("Musics").Preload("Subscribers").Preload("Owners"), playlist_id)
 	if err != nil {
-		return nil, custom_errors.NewNotFoundError(fmt.Sprintf("Playlist id %d not found", playlist_id))
+		return nil, httputils.NewNotFoundError(fmt.Sprintf("Playlist id %d not found", playlist_id))
 	}
 	return ConvertPlaylistToJSON(&playlist)
 }
@@ -55,8 +56,8 @@ func GetPlaylistsJSON(playlists_ids []int) ([]byte, error) {
 	playlists, err := playlist_model.GetPlaylists(db.Preload("Musics").Preload("Subscribers").Preload("Owners"), playlists_ids)
 	if err != nil {
 		return nil, err
-	} else if playlists == nil || len(playlists) == 0 {
-		return nil, custom_errors.NewNotFoundError("some playlists were not found")
+	} else if len(playlists) == 0 {
+		return nil, httputils.NewNotFoundError("some playlists were not found")
 	}
 	playlists_ptr := make([]*db_tables.Playlist, len(playlists))
 	for i, playlist := range playlists {
@@ -65,39 +66,56 @@ func GetPlaylistsJSON(playlists_ids []int) ([]byte, error) {
 	return ConvertPlaylistsToJSON(playlists_ptr)
 }
 
-func GetMusicsPathFromPlaylist(playlist_id int) (string, []string, error) {
+func ServePlaylistsFiles(w http.ResponseWriter, playlists_ids []int) error {
 	db, err := db_model.OpenDB()
 	if err != nil {
-		return "", nil, err
+		return err
 	}
-	defer db_model.CloseDB(db)
-	playlist, err := playlist_model.GetPlaylist(db.Preload("Musics"), playlist_id)
+	playlists, err := playlist_model.GetPlaylists(db.Preload("Musics"), playlists_ids)
 	if err != nil {
-		return "", nil, err
+		return err
 	}
-	musics_paths := []string{}
-	for _, music := range playlist.Musics {
-		musics_paths = append(musics_paths, path.Join("data", "musics", music.Path))
-	}
-	return playlist.Title, musics_paths, nil
-}
-
-func GetMusicsPathFromPlaylists(playlist_ids []int) (map[string][]string, error) {
-	db, err := db_model.OpenDB()
-	if err != nil {
-		return nil, err
-	}
-	defer db_model.CloseDB(db)
-	playlists, err := playlist_model.GetPlaylists(db.Preload("Musics"), playlist_ids)
-	if err != nil {
-		return nil, err
-	}
-	musics_paths := make(map[string][]string, len(playlists))
+	paths := make(map[string][]string, len(playlists))
 	for _, playlist := range playlists {
-		musics_paths[playlist.Title] = make([]string, len(playlist.Musics))
-		for i, music := range playlist.Musics {
-			musics_paths[playlist.Title][i] = path.Join("data", "musics", music.Path)
+		paths[playlist.Title] = make([]string, len(playlist.Musics))
+		for j, music := range playlist.Musics {
+			paths[playlist.Title][j] = file_utils.GetAbsoluteMusicPath(music.Path)
 		}
 	}
-	return musics_paths, nil
+	httputils.ServeSubdirsZip(w, paths, "playlists.zip")
+	return nil
+}
+
+func ServePlaylistFiles(w http.ResponseWriter, playlist_id int) error {
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return err
+	}
+	playlist, err := playlist_model.GetPlaylist(db.Preload("Musics"), playlist_id)
+	if err != nil {
+		return err
+	}
+	paths := make([]string, len(playlist.Musics))
+	for j, music := range playlist.Musics {
+		paths[j] = file_utils.GetAbsoluteMusicPath(music.Path)
+	}
+	httputils.ServeZip(w, paths, playlist.Title+".zip")
+	return nil
+}
+
+func GetPlaylistsJSONByFilters(titles []string, musics []string, owners []string, music_ids []int, owner_ids []int) ([]byte, error) {
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return nil, err
+	}
+	defer db_model.CloseDB(db)
+	playlists, err := playlist_model.GetPlaylistsByFilters(db.Preload("Musics").Preload("Subscribers").Preload("Owners"), titles, musics, owners, music_ids, owner_ids)
+	if err != nil {
+		return nil, err
+	}
+	playlists_ptr := make([]*db_tables.Playlist, len(playlists))
+	for i, playlist := range playlists {
+		playlists_ptr[i] = &playlist
+	}
+	return ConvertPlaylistsToJSON(playlists_ptr)
 }

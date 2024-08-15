@@ -2,72 +2,39 @@ package playlist_handler_v1
 
 import (
 	playlist_controller "BeatBoxBox/internal/controller/playlist"
-	auth_middleware "BeatBoxBox/internal/middleware/auth"
-	custom_errors "BeatBoxBox/pkg/errors"
-	file_utils "BeatBoxBox/pkg/utils/fileutils"
-	format_utils "BeatBoxBox/pkg/utils/formatutils"
+	httputils "BeatBoxBox/pkg/utils/httputils"
+	"mime/multipart"
 	"net/http"
 )
 
-// createPlaylistHandler creates a new playlist
-// @Summary Create a new playlist
-// @Description Create a new playlist
-// @Tags playlists
-// @Accept json
-// @Produce json
-// @Param title formData string true "Title"
-// @Param description formData string false "Description"
-// @Param illustration formData file false "Illustration"
-// @Param musics_ids formData []int false "Musics Ids"
-// @Success 201 {string} string "Created"
-// @Success 202 {string} string "Accepted"
-// @Failure 400 {string} string "title is empty"
-// @Failure 401 {string} string "Unauthorized"
-// @Failure 413 {string} string "Request too large"
-// @Router /api/playlists [post]
-func createPlaylistHandler(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseMultipartForm(file_utils.MAX_REQUEST_SIZE)
+func postPlaylistHandler(w http.ResponseWriter, r *http.Request) {
+	// Parse the request
+	params, err := httputils.ParseMultiPartFormParams(r, []string{"title", "description", "public"}, []string{}, []string{}, []string{"owner_id", "music_id"}, map[string]string{"illustration": "image"})
 	if err != nil {
-		http.Error(w, "Request too large", http.StatusRequestEntityTooLarge)
+		httputils.SendErrorToClient(w, err)
 		return
 	}
-	user_id, _ := auth_middleware.AuthenticateUser(r)
-	if user_id < 0 {
-		http.Redirect(w, r, "/auth", http.StatusUnauthorized)
+	// Validate title
+	if params["title"] == nil || params["title"].(string) == "" {
+		httputils.SendErrorToClient(w, httputils.NewBadRequestError("Title cannot be empty"))
 		return
 	}
-
-	title := r.FormValue("title")
-	if title == "" {
-		http.Error(w, "title is empty", http.StatusBadRequest)
+	// Validate owners ids
+	if params["owner_id"] == nil || len(params["owner_id"].([]int)) == 0 {
+		httputils.SendErrorToClient(w, httputils.NewBadRequestError("Owner id cannot be empty"))
 		return
 	}
-	description := r.FormValue("description")
-
-	// Check if illustration file is valid
-	illustration_file_name := file_utils.DEFAULT_ILLUSTRATION_FILE
-	illustration_file, illustration_file_header, err := r.FormFile("illustration")
-	if err == nil {
-		defer illustration_file.Close()
-		illustration_file_name, _ = file_utils.UploadIllustrationToServer(illustration_file_header, illustration_file, "playlists")
-	}
-
-	playlist_id, err := playlist_controller.PostPlaylist(title, user_id, description, illustration_file_name)
+	title := params["title"].(string)
+	description := params["description"].(string)
+	public := params["public"].(string) == "true"
+	owners_ids := params["owner_id"].([]int)
+	musics_ids := params["music_id"].([]int)
+	illustration := params["illustration"].(*multipart.FileHeader)
+	playlist, err := playlist_controller.PostPlaylist(title, description, public, owners_ids, illustration, musics_ids)
 	if err != nil {
-		custom_errors.SendErrorToClient(err, w, "")
+		httputils.SendErrorToClient(w, err)
 		return
 	}
+	httputils.RespondWithJSON(w, http.StatusCreated, playlist)
 
-	musics_ids_str := r.Form["musics_ids"]
-	musics_ids, err := format_utils.ConvertStringArrayToIntArray(musics_ids_str)
-	if err != nil {
-		http.Error(w, "musics_ids must be integers", http.StatusBadRequest)
-		return
-	}
-	if len(musics_ids) > 0 {
-		go playlist_controller.AddMusicsToPlaylist(playlist_id, musics_ids) // Do not wait for the musics to be added to the album
-		w.WriteHeader(http.StatusAccepted)
-	} else {
-		w.WriteHeader(http.StatusCreated)
-	}
 }

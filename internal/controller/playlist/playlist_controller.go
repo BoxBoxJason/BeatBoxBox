@@ -33,7 +33,7 @@ func ConvertPlaylistToJSON(playlist *db_tables.Playlist) ([]byte, error) {
 		"owners_ids":   owners_ids,
 		"subscribers":  subscribers_ids,
 		"musics_ids":   musics_ids,
-		"protected":    playlist.Protected,
+		"public":       playlist.Public,
 		"created_on":   playlist.CreatedOn,
 		"modified_on":  playlist.ModifiedOn,
 	}
@@ -63,7 +63,7 @@ func ConvertPlaylistsToJSON(playlists []*db_tables.Playlist) ([]byte, error) {
 			"owners_ids":   owners_ids,
 			"subscribers":  subscribers_ids,
 			"musics_ids":   musics_ids,
-			"protected":    playlist.Protected,
+			"public":       playlist.Public,
 			"created_on":   playlist.CreatedOn,
 			"modified_on":  playlist.ModifiedOn,
 		}
