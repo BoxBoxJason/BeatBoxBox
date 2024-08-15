@@ -1,7 +1,6 @@
 package httputils
 
 import (
-	custom_errors "BeatBoxBox/pkg/errors"
 	"BeatBoxBox/pkg/logger"
 	"archive/zip"
 	"net/http"
@@ -14,7 +13,7 @@ func RespondWithJSON(w http.ResponseWriter, status int, content []byte) {
 	w.WriteHeader(status)
 	_, err := w.Write(content)
 	if err != nil {
-		custom_errors.SendErrorToClient(w, custom_errors.NewInternalServerError("Error writing response: "+err.Error()))
+		SendErrorToClient(w, NewInternalServerError("Error writing response: "+err.Error()))
 	}
 }
 
@@ -33,7 +32,7 @@ func ServeZip(w http.ResponseWriter, files_paths []string, zip_file_name string)
 	for _, file_path := range files_paths {
 		err := addFileToZipWriter(zip_writer, file_path)
 		if err != nil {
-			custom_errors.SendErrorToClient(w, custom_errors.NewInternalServerError("Error adding file to zip: "+err.Error()))
+			SendErrorToClient(w, NewInternalServerError("Error adding file to zip: "+err.Error()))
 			return
 		}
 	}
@@ -54,20 +53,20 @@ func ServeSubdirsZip(w http.ResponseWriter, files_paths map[string][]string, zip
 	for subdir, files := range files_paths {
 		subdir_writer, err := zip_writer.Create(subdir)
 		if err != nil {
-			custom_errors.SendErrorToClient(w, custom_errors.NewInternalServerError("Error creating subdir in zip: "+err.Error()))
+			SendErrorToClient(w, NewInternalServerError("Error creating subdir in zip: "+err.Error()))
 			return
 		}
 		subdir_zip_writer := zip.NewWriter(subdir_writer)
 		for _, file_path := range files {
 			err := addFileToZipWriter(subdir_zip_writer, file_path)
 			if err != nil {
-				custom_errors.SendErrorToClient(w, custom_errors.NewInternalServerError("Error adding file to zip: "+err.Error()))
+				SendErrorToClient(w, NewInternalServerError("Error adding file to zip: "+err.Error()))
 				return
 			}
 		}
 		err = subdir_zip_writer.Close()
 		if err != nil {
-			custom_errors.SendErrorToClient(w, custom_errors.NewInternalServerError("Error closing subdir zip writer: "+err.Error()))
+			SendErrorToClient(w, NewInternalServerError("Error closing subdir zip writer: "+err.Error()))
 			return
 		}
 	}
