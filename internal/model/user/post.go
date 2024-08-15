@@ -3,7 +3,7 @@ package user_model
 import (
 	db_model "BeatBoxBox/internal/model"
 	role_model "BeatBoxBox/internal/model/roles"
-	custom_errors "BeatBoxBox/pkg/errors"
+	httputils "BeatBoxBox/pkg/utils/httputils"
 	"fmt"
 
 	"gorm.io/gorm"
@@ -18,7 +18,7 @@ func CreateUser(db *gorm.DB, pseudo string, email string, hashed_password string
 	if err != nil {
 		return -1, err
 	} else if len(roles) != len(roles_names) {
-		return -1, custom_errors.NewNotFoundError(fmt.Sprintf("some roles not found: %v", roles_names))
+		return -1, httputils.NewNotFoundError(fmt.Sprintf("some roles not found: %v", roles_names))
 	}
 
 	new_user := db_model.User{

@@ -12,8 +12,8 @@ func SetupAlbumAPIRoutes(album_api_router *mux.Router) {
 
 	// PATCH requests
 	album_api_router.HandleFunc("/{album_id:[0-9]+}", patchAlbumHandler).Methods("PATCH")
-	album_api_router.HandleFunc("/{album_id:[0-9]+}/artists/{action}", patchAlbumArtistsHandler).Methods("PATCH")
-	album_api_router.HandleFunc("/{album_id:[0-9]+}/musics/{action}", patchAlbumMusicsHandler).Methods("PATCH")
+	album_api_router.HandleFunc("/{album_id:[0-9]+}/artists/{action:(add|remove)}", patchAlbumArtistsHandler).Methods("PATCH")
+	album_api_router.HandleFunc("/{album_id:[0-9]+}/musics/{action:(add|remove)}", patchAlbumMusicsHandler).Methods("PATCH")
 
 	// GET requests
 	album_api_router.HandleFunc("/", getAlbumsHandler).Methods("GET")

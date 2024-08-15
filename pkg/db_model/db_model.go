@@ -1,8 +1,8 @@
 package db_model
 
 import (
-	custom_errors "BeatBoxBox/pkg/errors"
 	"BeatBoxBox/pkg/logger"
+	httputils "BeatBoxBox/pkg/utils/httputils"
 	"fmt"
 	"os"
 
@@ -20,13 +20,13 @@ func OpenDB() (*gorm.DB, error) {
 	sslmode := os.Getenv("DB_SSLMODE")
 	if host == "" || port == "" || user == "" || password == "" || dbname == "" || sslmode == "" {
 		logger.Critical("Missing environment variables")
-		return nil, custom_errors.NewDatabaseError("Missing at least one of the required environment variables: DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME, DB_SSLMODE")
+		return nil, httputils.NewDatabaseError("Missing at least one of the required environment variables: DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME, DB_SSLMODE")
 	}
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s", host, user, password, dbname, port, sslmode)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		logger.Critical("failed to connect database")
-		return nil, custom_errors.NewDatabaseError(err.Error())
+		return nil, httputils.NewDatabaseError(err.Error())
 	}
 	return db, nil
 }

@@ -3,9 +3,9 @@ package cookie_controller
 import (
 	cookie_model "BeatBoxBox/internal/model/cookie"
 	db_model "BeatBoxBox/pkg/db_model"
-	custom_errors "BeatBoxBox/pkg/errors"
 	"BeatBoxBox/pkg/logger"
 	auth_utils "BeatBoxBox/pkg/utils/authutils"
+	httputils "BeatBoxBox/pkg/utils/httputils"
 	"fmt"
 )
 
@@ -31,7 +31,7 @@ func DeleteMatchingAuthToken(user_id int, attempt_token string) error {
 
 	auth_tokens := cookie_model.GetUserCookies(db, user_id)
 	if auth_tokens == nil {
-		return custom_errors.NewNotFoundError(fmt.Sprintf("no auth tokens found for user %d", user_id))
+		return httputils.NewNotFoundError(fmt.Sprintf("no auth tokens found for user %d", user_id))
 	}
 
 	for _, auth_token := range auth_tokens {
@@ -40,5 +40,5 @@ func DeleteMatchingAuthToken(user_id int, attempt_token string) error {
 		}
 	}
 
-	return custom_errors.NewNotFoundError(fmt.Sprintf("no matching auth tokens found for user %d", user_id))
+	return httputils.NewNotFoundError(fmt.Sprintf("no matching auth tokens found for user %d", user_id))
 }

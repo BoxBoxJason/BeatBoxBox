@@ -4,7 +4,7 @@ import (
 	db_tables "BeatBoxBox/internal/model"
 	user_model "BeatBoxBox/internal/model/user"
 	db_model "BeatBoxBox/pkg/db_model"
-	custom_errors "BeatBoxBox/pkg/errors"
+	httputils "BeatBoxBox/pkg/utils/httputils"
 )
 
 // UserExists returns whether a user exists in the database
@@ -57,7 +57,7 @@ func GetUsersJSON(user_ids []int) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	} else if users == nil || len(users) != len(user_ids) {
-		return nil, custom_errors.NewNotFoundError("some users were not found")
+		return nil, httputils.NewNotFoundError("some users were not found")
 	}
 	users_ptr := make([]*db_tables.User, len(users))
 	for i, user := range users {
@@ -74,7 +74,7 @@ func GetUserIdFromUsername(username string) (int, error) {
 	defer db_model.CloseDB(db)
 	users := user_model.GetUsersFromFilters(db, map[string]interface{}{"pseudo": username})
 	if len(users) == 0 {
-		return -1, custom_errors.NewNotFoundError("user not found")
+		return -1, httputils.NewNotFoundError("user not found")
 	}
 	return users[0].Id, nil
 }

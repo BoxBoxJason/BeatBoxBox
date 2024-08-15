@@ -2,9 +2,8 @@ package music_handler_v1
 
 import (
 	music_controller "BeatBoxBox/internal/controller/music"
-	custom_errors "BeatBoxBox/pkg/errors"
 	format_utils "BeatBoxBox/pkg/utils/formatutils"
-	"BeatBoxBox/pkg/utils/httputils"
+	httputils "BeatBoxBox/pkg/utils/httputils"
 	"mime/multipart"
 	"net/http"
 )
@@ -12,26 +11,26 @@ import (
 func postMusicHandler(w http.ResponseWriter, r *http.Request) {
 	params, err := httputils.ParseMultiPartFormParams(r, []string{"title", "lyrics", "release_date"}, []string{"album_id"}, []string{"genre"}, []string{"artist_id"}, map[string]string{"illustration": "image", "music": "audio"})
 	if err != nil {
-		custom_errors.SendErrorToClient(w, err)
+		httputils.SendErrorToClient(w, err)
 	}
 	// Validate title
 	if params["title"].(string) == "" {
-		custom_errors.SendErrorToClient(w, custom_errors.NewBadRequestError("Title is required and cannot be empty"))
+		httputils.SendErrorToClient(w, httputils.NewBadRequestError("Title is required and cannot be empty"))
 		return
 	}
 	// Validate release date
 	if params["release_date"] != nil && !format_utils.IsValidDate(params["release_date"].(string)) {
-		custom_errors.SendErrorToClient(w, custom_errors.NewBadRequestError("Invalid release date format, must be YYYY-MM-DD"))
+		httputils.SendErrorToClient(w, httputils.NewBadRequestError("Invalid release date format, must be YYYY-MM-DD"))
 		return
 	}
 	// Validate Music file
 	if params["music"] == nil {
-		custom_errors.SendErrorToClient(w, custom_errors.NewBadRequestError("Music file is required"))
+		httputils.SendErrorToClient(w, httputils.NewBadRequestError("Music file is required"))
 		return
 	}
 	// Validate artists IDs
 	if params["artist_id"] == nil || len(params["artist_id"].([]int)) == 0 {
-		custom_errors.SendErrorToClient(w, custom_errors.NewBadRequestError("Artist ID is required"))
+		httputils.SendErrorToClient(w, httputils.NewBadRequestError("Artist ID is required"))
 		return
 	}
 	title := params["title"].(string)
@@ -44,7 +43,7 @@ func postMusicHandler(w http.ResponseWriter, r *http.Request) {
 	illustration_file := params["illustration"].(*multipart.FileHeader)
 	music_json, err := music_controller.PostMusic(title, genres, lyrics, release_date, album_id, music_file, illustration_file, artists_ids)
 	if err != nil {
-		custom_errors.SendErrorToClient(w, err)
+		httputils.SendErrorToClient(w, err)
 		return
 	}
 	httputils.RespondWithJSON(w, http.StatusCreated, music_json)

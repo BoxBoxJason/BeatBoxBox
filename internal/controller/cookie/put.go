@@ -4,8 +4,8 @@ import (
 	db_tables "BeatBoxBox/internal/model"
 	cookie_model "BeatBoxBox/internal/model/cookie"
 	db_model "BeatBoxBox/pkg/db_model"
-	custom_errors "BeatBoxBox/pkg/errors"
 	auth_utils "BeatBoxBox/pkg/utils/authutils"
+	httputils "BeatBoxBox/pkg/utils/httputils"
 )
 
 func updateAuthTokenIfNearExpiry(auth_cookie *db_tables.AuthCookie) (string, error) {
@@ -13,7 +13,7 @@ func updateAuthTokenIfNearExpiry(auth_cookie *db_tables.AuthCookie) (string, err
 		// Generate a new token
 		new_token, new_hash, err := auth_utils.GenerateRandomTokenWithHash()
 		if err != nil {
-			return "", custom_errors.NewInternalServerError("failed to generate new token")
+			return "", httputils.NewInternalServerError("failed to generate new token")
 		}
 
 		// Update the token in the database

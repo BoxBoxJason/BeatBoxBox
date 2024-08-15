@@ -4,7 +4,7 @@ import (
 	db_tables "BeatBoxBox/internal/model"
 	music_model "BeatBoxBox/internal/model/music"
 	"BeatBoxBox/pkg/db_model"
-	custom_errors "BeatBoxBox/pkg/errors"
+	httputils "BeatBoxBox/pkg/utils/httputils"
 )
 
 // DeleteMusic deletes a music by its id
@@ -32,7 +32,7 @@ func DeleteMusics(music_ids []int) error {
 	if err != nil {
 		return err
 	} else if musics == nil || len(musics) != len(music_ids) {
-		return custom_errors.NewNotFoundError("some musics were not found")
+		return httputils.NewNotFoundError("some musics were not found")
 	}
 	musics_ptr := make([]*db_tables.Music, len(musics))
 	for i, music := range musics {

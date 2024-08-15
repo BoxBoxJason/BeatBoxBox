@@ -2,8 +2,8 @@ package auth_middleware
 
 import (
 	cookie_controller "BeatBoxBox/internal/controller/cookie"
-	custom_errors "BeatBoxBox/pkg/errors"
 	auth_utils "BeatBoxBox/pkg/utils/authutils"
+	httputils "BeatBoxBox/pkg/utils/httputils"
 	"net/http"
 	"time"
 )
@@ -66,7 +66,7 @@ func HasWritePrivileges(r *http.Request) error { // TODO
 		jwt_token = cookie.Value
 	}
 	if jwt_token == "" {
-		return custom_errors.NewUnauthorizedError("No auth JWT token found")
+		return httputils.NewUnauthorizedError("No auth JWT token found")
 	}
 	return nil
 }

@@ -4,9 +4,8 @@ import (
 	db_tables "BeatBoxBox/internal/model"
 	album_model "BeatBoxBox/internal/model/album"
 	"BeatBoxBox/pkg/db_model"
-	custom_errors "BeatBoxBox/pkg/errors"
 	file_utils "BeatBoxBox/pkg/utils/fileutils"
-	"BeatBoxBox/pkg/utils/httputils"
+	httputils "BeatBoxBox/pkg/utils/httputils"
 	"net/http"
 )
 
@@ -124,11 +123,11 @@ func GetAlbumsJSONFromFilters(titles []string, partial_titles []string, genres [
 	}
 	defer db_model.CloseDB(db)
 	if len(titles) > 0 && len(partial_titles) > 0 {
-		return nil, custom_errors.NewBadRequestError("Can't use title with partial_title")
+		return nil, httputils.NewBadRequestError("Can't use title with partial_title")
 	} else if len(artists_names)*len(artists_ids) > 0 {
-		return nil, custom_errors.NewBadRequestError("Can't use artist with artist_id")
+		return nil, httputils.NewBadRequestError("Can't use artist with artist_id")
 	} else if len(musics_names)*len(musics_ids) > 0 {
-		return nil, custom_errors.NewBadRequestError("Can't use music with music_id")
+		return nil, httputils.NewBadRequestError("Can't use music with music_id")
 	}
 	albums := album_model.GetAlbumsFromFilters(db.Preload("Musics").Preload("Artists"), titles, partial_titles, genres, artists_names, musics_names, artists_ids, musics_ids)
 	albums_ptr := make([]*db_tables.Album, len(albums))
@@ -155,12 +154,12 @@ func ServeAlbumFiles(w http.ResponseWriter, album_id int) error {
 	return nil
 }
 
-func ServeAlbumsFiles(w http.ResponseWriter, album_id int) error {
+func ServeAlbumsFiles(w http.ResponseWriter, albums_ids []int) error {
 	db, err := db_model.OpenDB()
 	if err != nil {
 		return err
 	}
-	albums, err := album_model.GetAlbums(db.Preload("Musics"), []int{album_id})
+	albums, err := album_model.GetAlbums(db.Preload("Musics"), albums_ids)
 	if err != nil {
 		return err
 	}

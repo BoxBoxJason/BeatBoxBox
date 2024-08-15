@@ -3,8 +3,8 @@ package cookie_controller
 import (
 	cookie_model "BeatBoxBox/internal/model/cookie"
 	db_model "BeatBoxBox/pkg/db_model"
-	custom_errors "BeatBoxBox/pkg/errors"
 	auth_utils "BeatBoxBox/pkg/utils/authutils"
+	httputils "BeatBoxBox/pkg/utils/httputils"
 	"fmt"
 )
 
@@ -17,7 +17,7 @@ func CheckAuthTokenMatches(user_id int, attempt_token string) (bool, string, err
 
 	auth_tokens := cookie_model.GetUserCookies(db, user_id)
 	if auth_tokens == nil || len(auth_tokens) == 0 {
-		return false, "", custom_errors.NewNotFoundError(fmt.Sprintf("no auth tokens found for user %d", user_id))
+		return false, "", httputils.NewNotFoundError(fmt.Sprintf("no auth tokens found for user %d", user_id))
 	}
 
 	for _, auth_token := range auth_tokens {
@@ -42,7 +42,7 @@ func GetMatchingAuthTokenId(user_id int, attempt_token string) (int, error) {
 
 	auth_tokens := cookie_model.GetUserCookies(db, user_id)
 	if auth_tokens == nil || len(auth_tokens) == 0 {
-		return -1, custom_errors.NewNotFoundError(fmt.Sprintf("no auth tokens found for user %d", user_id))
+		return -1, httputils.NewNotFoundError(fmt.Sprintf("no auth tokens found for user %d", user_id))
 	}
 
 	for _, auth_token := range auth_tokens {
@@ -51,5 +51,5 @@ func GetMatchingAuthTokenId(user_id int, attempt_token string) (int, error) {
 		}
 	}
 
-	return -1, custom_errors.NewNotFoundError(fmt.Sprintf("no matching auth token found for user %d", user_id))
+	return -1, httputils.NewNotFoundError(fmt.Sprintf("no matching auth token found for user %d", user_id))
 }

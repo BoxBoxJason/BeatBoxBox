@@ -6,7 +6,7 @@ import (
 	playlist_model "BeatBoxBox/internal/model/playlist"
 	user_model "BeatBoxBox/internal/model/user"
 	db_model "BeatBoxBox/pkg/db_model"
-	custom_errors "BeatBoxBox/pkg/errors"
+	httputils "BeatBoxBox/pkg/utils/httputils"
 )
 
 func UpdateUser(user_id int, user_map map[string]interface{}) error {
@@ -64,7 +64,7 @@ func RemoveMusicsFromLikedMusics(user_id int, musics_ids []int) error {
 		}
 	}
 	if len(musics_ptr) != len(musics_ids) {
-		return custom_errors.NewNotFoundError("some musics were not found in the liked musics")
+		return httputils.NewNotFoundError("some musics were not found in the liked musics")
 	}
 	return user_model.RemoveLikedMusicsFromUser(db, &user, musics_ptr)
 }
@@ -111,7 +111,7 @@ func RemovePlaylistsFromSubscribedPlaylists(user_id int, playlists_ids []int) er
 		}
 	}
 	if len(playlists_ptr) != len(playlists_ids) {
-		return custom_errors.NewNotFoundError("some playlists were not found in the subscribed playlists")
+		return httputils.NewNotFoundError("some playlists were not found in the subscribed playlists")
 	}
 	return user_model.RemoveSubscribedPlaylistsFromUser(db, &user, playlists_ptr)
 }
@@ -158,7 +158,7 @@ func RemovePlaylistsFromOwnedPlaylists(user_id int, playlists_ids []int) error {
 		}
 	}
 	if len(playlists_ptr) != len(playlists_ids) {
-		return custom_errors.NewNotFoundError("some playlists were not found in the owned playlists")
+		return httputils.NewNotFoundError("some playlists were not found in the owned playlists")
 	}
 	return user_model.RemoveOwnedPlaylistsFromUser(db, &user, playlists_ptr)
 }

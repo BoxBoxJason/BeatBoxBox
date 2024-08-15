@@ -7,7 +7,7 @@ import (
 	artist_model "BeatBoxBox/internal/model/artist"
 	music_model "BeatBoxBox/internal/model/music"
 	db_model "BeatBoxBox/pkg/db_model"
-	custom_errors "BeatBoxBox/pkg/errors"
+	httputils "BeatBoxBox/pkg/utils/httputils"
 )
 
 func UpdateMusic(music_id int, music_map map[string]interface{}) ([]byte, error) {
@@ -41,7 +41,7 @@ func AddArtistsToMusic(music_id int, artists_ids []int) error {
 	if err != nil {
 		return err
 	} else if artists == nil || len(artists) != len(artists_ids) {
-		return custom_errors.NewNotFoundError("some artists were not found")
+		return httputils.NewNotFoundError("some artists were not found")
 	}
 	artists_ptr := make([]*db_tables.Artist, len(artists))
 	for i, artist := range artists {
@@ -71,7 +71,7 @@ func RemoveArtistsFromMusic(music_id int, artists_ids []int) error {
 		}
 	}
 	if len(artists_ptr) != len(artists_ids) {
-		return custom_errors.NewNotFoundError("some artists were not found")
+		return httputils.NewNotFoundError("some artists were not found")
 	}
 	return music_model.RemoveArtistsFromMusic(db, &music, artists_ptr)
 }
@@ -86,7 +86,7 @@ func RemoveAlbumFromMusics(musics_ids []int, album_id int) ([]byte, error) {
 	if err != nil {
 		return []byte{}, err
 	} else if len(musics) != len(musics_ids) {
-		return []byte{}, custom_errors.NewNotFoundError("some musics were not found")
+		return []byte{}, httputils.NewNotFoundError("some musics were not found")
 	}
 	album, err := album_model.GetAlbum(db, album_id)
 	if err != nil {

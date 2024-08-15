@@ -4,7 +4,7 @@ import (
 	db_tables "BeatBoxBox/internal/model"
 	artist_model "BeatBoxBox/internal/model/artist"
 	"BeatBoxBox/pkg/db_model"
-	custom_errors "BeatBoxBox/pkg/errors"
+	httputils "BeatBoxBox/pkg/utils/httputils"
 )
 
 // ArtistExists checks if an artist with the given artist_id exists
@@ -74,11 +74,11 @@ func GetArtistsJSON(artists_ids []int) ([]byte, error) {
 
 func GetArtistsJSONFromFilters(pseudos []string, partial_pseudos []string, genres []string, albums_ids []int, albums []string, musics_ids []int, musics []string) ([]byte, error) {
 	if len(pseudos)*len(partial_pseudos) != 0 {
-		return []byte{}, custom_errors.NewBadRequestError("Can't use pseudo and partial_pseudo at the same time")
+		return []byte{}, httputils.NewBadRequestError("Can't use pseudo and partial_pseudo at the same time")
 	} else if len(albums_ids)*len(albums) != 0 {
-		return []byte{}, custom_errors.NewBadRequestError("Can't use album_id and album at the same time")
+		return []byte{}, httputils.NewBadRequestError("Can't use album_id and album at the same time")
 	} else if len(musics_ids)*len(musics) != 0 {
-		return []byte{}, custom_errors.NewBadRequestError("Can't use music_id and music at the same time")
+		return []byte{}, httputils.NewBadRequestError("Can't use music_id and music at the same time")
 	}
 	db, err := db_model.OpenDB()
 	if err != nil {

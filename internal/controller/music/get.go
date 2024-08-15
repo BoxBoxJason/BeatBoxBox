@@ -4,9 +4,8 @@ import (
 	db_tables "BeatBoxBox/internal/model"
 	music_model "BeatBoxBox/internal/model/music"
 	db_model "BeatBoxBox/pkg/db_model"
-	custom_errors "BeatBoxBox/pkg/errors"
 	file_utils "BeatBoxBox/pkg/utils/fileutils"
-	"BeatBoxBox/pkg/utils/httputils"
+	httputils "BeatBoxBox/pkg/utils/httputils"
 	"net/http"
 	"path/filepath"
 )
@@ -92,7 +91,7 @@ func GetMusicsPathFromIds(music_ids []int) (map[int]string, error) {
 	if err != nil {
 		return nil, err
 	} else if musics == nil || len(musics) != len(music_ids) {
-		return nil, custom_errors.NewNotFoundError("some musics were not found")
+		return nil, httputils.NewNotFoundError("some musics were not found")
 	}
 	paths := make(map[int]string, len(musics))
 	for _, music := range musics {

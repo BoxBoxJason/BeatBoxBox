@@ -5,8 +5,8 @@ import (
 	artist_model "BeatBoxBox/internal/model/artist"
 	music_model "BeatBoxBox/internal/model/music"
 	db_model "BeatBoxBox/pkg/db_model"
-	custom_errors "BeatBoxBox/pkg/errors"
 	file_utils "BeatBoxBox/pkg/utils/fileutils"
+	httputils "BeatBoxBox/pkg/utils/httputils"
 	"mime/multipart"
 )
 
@@ -19,14 +19,14 @@ func PostMusic(title string, genres []string, lyrics string, release_date string
 	defer db_model.CloseDB(db)
 
 	if music_model.MusicAlreadyExists(db, title, artists_ids) {
-		return []byte{}, custom_errors.NewConflictError("music already exists")
+		return []byte{}, httputils.NewConflictError("music already exists")
 	}
 
 	artists, err := artist_model.GetArtists(db, artists_ids)
 	if err != nil {
 		return []byte{}, err
 	} else if artists == nil || len(artists) != len(artists_ids) {
-		return []byte{}, custom_errors.NewNotFoundError("some artists were not found")
+		return []byte{}, httputils.NewNotFoundError("some artists were not found")
 	}
 	artists_ptr := make([]*db_tables.Artist, len(artists))
 	for i, artist := range artists {
@@ -35,11 +35,11 @@ func PostMusic(title string, genres []string, lyrics string, release_date string
 
 	illustration_file_name, err := file_utils.UploadIllustrationToServer(illustration_file, "musics")
 	if err != nil {
-		return []byte{}, custom_errors.NewInternalServerError("could not upload illustration")
+		return []byte{}, httputils.NewInternalServerError("could not upload illustration")
 	}
 	music_file_name, err := file_utils.UploadMusicToServer(music_file)
 	if err != nil {
-		return []byte{}, custom_errors.NewInternalServerError("could not upload music")
+		return []byte{}, httputils.NewInternalServerError("could not upload music")
 	}
 
 	music, err := music_model.CreateMusic(db, title, genres, lyrics, release_date, album_id, music_file_name, illustration_file_name, artists_ptr)

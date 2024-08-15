@@ -4,7 +4,7 @@ import (
 	db_tables "BeatBoxBox/internal/model"
 	user_model "BeatBoxBox/internal/model/user"
 	"BeatBoxBox/pkg/db_model"
-	custom_errors "BeatBoxBox/pkg/errors"
+	httputils "BeatBoxBox/pkg/utils/httputils"
 )
 
 // DeleteUser deletes a user by its id
@@ -32,7 +32,7 @@ func DeleteUsers(user_ids []int) error {
 	if err != nil {
 		return err
 	} else if users == nil || len(users) != len(user_ids) {
-		return custom_errors.NewNotFoundError("some users were not found")
+		return httputils.NewNotFoundError("some users were not found")
 	}
 	users_ptr := make([]*db_tables.User, len(users))
 	for i, user := range users {

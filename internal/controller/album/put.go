@@ -5,7 +5,7 @@ import (
 	album_model "BeatBoxBox/internal/model/album"
 	artist_model "BeatBoxBox/internal/model/artist"
 	"BeatBoxBox/pkg/db_model"
-	custom_errors "BeatBoxBox/pkg/errors"
+	httputils "BeatBoxBox/pkg/utils/httputils"
 )
 
 // UpdateAlbum updates an album by its id with the given map
@@ -36,7 +36,7 @@ func UpdateAlbumArtists(album_id int, artists_ids []int, action string) ([]byte,
 	if err != nil {
 		return []byte{}, err
 	} else if len(raw_artists) != len(artists_ids) {
-		return []byte{}, custom_errors.NewNotFoundError("Some artists were not found")
+		return []byte{}, httputils.NewNotFoundError("Some artists were not found")
 	}
 	album, err := album_model.GetAlbum(db, album_id)
 	if err != nil {
@@ -51,7 +51,7 @@ func UpdateAlbumArtists(album_id int, artists_ids []int, action string) ([]byte,
 	} else if action == "remove" {
 		err = album_model.RemoveArtistsFromAlbum(db, &album, artists)
 	} else {
-		return []byte{}, custom_errors.NewBadRequestError("Invalid action: " + action)
+		return []byte{}, httputils.NewBadRequestError("Invalid action: " + action)
 	}
 	if err != nil {
 		return []byte{}, err

@@ -4,7 +4,7 @@ import (
 	db_tables "BeatBoxBox/internal/model"
 	artist_model "BeatBoxBox/internal/model/artist"
 	"BeatBoxBox/pkg/db_model"
-	custom_errors "BeatBoxBox/pkg/errors"
+	httputils "BeatBoxBox/pkg/utils/httputils"
 	"fmt"
 )
 
@@ -16,7 +16,7 @@ func DeleteArtist(artist_id int) error {
 	}
 	artist, err := artist_model.GetArtist(db, artist_id)
 	if err != nil {
-		return custom_errors.NewNotFoundError(fmt.Sprintf("artist with id %d not found", artist_id))
+		return httputils.NewNotFoundError(fmt.Sprintf("artist with id %d not found", artist_id))
 	}
 	return artist_model.DeleteArtistFromRecord(db, &artist)
 }
@@ -30,9 +30,9 @@ func DeleteArtists(artist_ids []int) error {
 	}
 	artists, err := artist_model.GetArtists(db, artist_ids)
 	if err != nil {
-		return custom_errors.NewNotFoundError("no artist found")
+		return httputils.NewNotFoundError("no artist found")
 	} else if len(artists) != len(artist_ids) {
-		return custom_errors.NewNotFoundError("some artists were not found")
+		return httputils.NewNotFoundError("some artists were not found")
 	}
 
 	artists_ptr := make([]*db_tables.Artist, len(artists))
