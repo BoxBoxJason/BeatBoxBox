@@ -37,7 +37,7 @@ type Playlist struct {
 	Musics       []Music `gorm:"many2many:playlist_musics;"`
 	Owners       []User  `gorm:"many2many:playlists_owners;"`
 	Subscribers  []User  `gorm:"many2many:playlists_subscribers;"`
-	Protected    bool    `gorm:"default:true"`
+	Public       bool    `gorm:"default:false"`
 	CreatedOn    int     `gorm:"autoCreateTime" json:"created_on"`
 	ModifiedOn   int     `gorm:"autoUpdateTime:milli" json:"modified_on"`
 }

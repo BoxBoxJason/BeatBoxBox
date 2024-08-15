@@ -62,9 +62,9 @@ patch:
       schema:
         type: string
         format: date
-    - name: protected
+    - name: public
       in: query
-      description: Playlist new protection status
+      description: Playlist new public / private status
       required: false
       schema:
         type: boolean

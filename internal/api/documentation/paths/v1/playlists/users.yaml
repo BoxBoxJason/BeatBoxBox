@@ -12,8 +12,10 @@ patch:
       in: query
       required: true
       schema:
-        type: integer
-      description: User ID
+        type: array
+        items:
+          type: integer
+      description: Users IDs
     - name: action
       in: query
       required: true

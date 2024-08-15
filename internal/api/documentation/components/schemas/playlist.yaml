@@ -21,9 +21,9 @@ properties:
   subscribers_ids:
     type: array
     description: Playlist subscribers IDs
-  protected:
+  public:
     type: boolean
-    description: Playlist protection status
+    description: Playlist public / private status
   created_on:
     type: string
     format: date-time
