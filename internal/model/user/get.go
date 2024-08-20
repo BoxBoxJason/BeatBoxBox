@@ -78,3 +78,22 @@ func UserAlreadyExists(db *gorm.DB, pseudo string, email string) (bool, []string
 		return true, fields, nil
 	}
 }
+
+func GetUsersFromPseudos(db *gorm.DB, pseudos []string) ([]db_tables.User, error) {
+	var users []db_tables.User
+	err := db.Where("pseudo IN ?", pseudos).Find(&users).Error
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
+func GetUsersFromPartialPseudos(db *gorm.DB, partial_pseudos []string) ([]db_tables.User, error) {
+	var users []db_tables.User
+	query := db.Model(&db_tables.User{})
+	for _, partial_pseudo := range partial_pseudos {
+		query = query.Or("pseudo LIKE ?", "%"+partial_pseudo+"%")
+	}
+	err := query.Find(&users).Error
+	return users, err
+}

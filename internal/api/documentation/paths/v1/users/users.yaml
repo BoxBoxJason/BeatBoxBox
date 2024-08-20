@@ -1,8 +1,8 @@
 get:
   summary: Retrieve Users
-  description: "Retrieve users from the database given matching filters, if no filters are provided, all users are returned, available filters are: username(s), id(s)"
+  description: "Retrieve users from the database given matching filters, if no filters are provided, all users are returned, available filters are: pseudo(s), id(s)"
   parameters:
-    - name: username
+    - name: pseudo
       in: query
       schema:
         type: array
@@ -16,6 +16,13 @@ get:
         items:
           type: integer
       description: Users ids
+    - name: partial_pseudo
+      in: query
+      schema:
+        type: array
+        items:
+          type: string
+      description: Partial usernames
   responses:
     200:
       description: OK
@@ -56,6 +63,9 @@ post:
             password:
               type: string
               description: User password
+            bio:
+              type: string
+              description: User bio
             illustration:
               type: string
               format: binary

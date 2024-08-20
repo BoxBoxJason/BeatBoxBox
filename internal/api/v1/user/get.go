@@ -2,80 +2,57 @@ package user_handler_v1
 
 import (
 	user_controller "BeatBoxBox/internal/controller/user"
-	custom_errors "BeatBoxBox/pkg/errors"
-	format_utils "BeatBoxBox/pkg/utils/formatutils"
-	"encoding/json"
+	"BeatBoxBox/pkg/utils/httputils"
+	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
-
-	"github.com/gorilla/mux"
 )
 
-// getUserHandler gets a user by their ID
-// @Summary Get a user by their ID
-// @Description Get a user by their ID
-// @Tags users
-// @Accept json
-// @Produce json
-// @Param user_id path int true "User ID"
-// @Success 200 {object} User "OK"
-// @Failure 400 {string} string "Invalid user ID provided"
-// @Failure 404 {string} string "User not found"
-// @Failure 500 {string} string "Internal Server Error"
-// @Router /api/users/{user_id} [get]
-func getUsersHandler(w http.ResponseWriter, r *http.Request) {
-	user_ids_str := r.URL.Query().Get("users_ids")
-	users_ids, err := format_utils.ConvertStringToIntArray(user_ids_str, ",")
+func getUserHandler(w http.ResponseWriter, r *http.Request) {
+	// Get the user id from the URL
+	user_id, err := strconv.Atoi(mux.Vars(r)["user_id"])
+	if err != nil || user_id < 0 {
+		httputils.SendErrorToClient(w, httputils.NewBadRequestError("Invalid user id, must be a positive integer"))
+		return
+	}
+	user_json, err := user_controller.GetUserJSON(user_id)
 	if err != nil {
-		http.Error(w, "No user IDs provided, please use user_ids request parameter", http.StatusBadRequest)
+		httputils.SendErrorToClient(w, err)
 		return
 	}
-	if !user_controller.UsersExist(users_ids) {
-		http.Error(w, "One or more users do not exist", http.StatusNotFound)
-		return
-	}
-
-	users, err := user_controller.GetUsers(users_ids)
-	if err != nil {
-		custom_errors.SendErrorToClient(err, w, "")
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(users)
+	httputils.RespondWithJSON(w, http.StatusOK, user_json)
 }
 
-// getUserHandler gets a user by their ID
-// @Summary Get a user by their ID
-// @Description Get a user by their ID
-// @Tags users
-// @Accept json
-// @Produce json
-// @Param user_id path int true "User ID"
-// @Success 200 {object} User "OK"
-// @Failure 400 {string} string "Invalid user ID provided"
-// @Failure 404 {string} string "User not found"
-// @Failure 500 {string} string "Internal Server Error"
-// @Router /api/users/{user_id} [get]
-func getUserHandler(w http.ResponseWriter, r *http.Request) {
-	// Get user ID from URL
-	user_id_str := mux.Vars(r)["user_id"]
-	user_id, err := strconv.Atoi(user_id_str)
+func getUsersHandler(w http.ResponseWriter, r *http.Request) {
+	params, err := httputils.ParseQueryParams(r, nil, nil, []string{"pseudo", "partial_pseudo"}, []string{"id"})
 	if err != nil {
-		http.Error(w, "Invalid user ID provided, please use a valid integer user ID", http.StatusBadRequest)
+		httputils.SendErrorToClient(w, err)
 		return
 	}
-	if !user_controller.UserExists(user_id) {
-		http.Error(w, "User does not exist", http.StatusNotFound)
+	if len(params) != 1 {
+		httputils.SendErrorToClient(w, httputils.NewBadRequestError("You must provide exactly one parameter (id, pseudo or partial_pseudo)"))
 		return
+	}
+	var users_json []byte
+	if params["id"] != nil {
+		users_json, err = user_controller.GetUsersJSON(params["id"].([]int))
+		if err != nil {
+			httputils.SendErrorToClient(w, err)
+			return
+		}
+	} else if params["pseudo"] != nil {
+		users_json, err = user_controller.GetUsersFromPseudos(params["pseudo"].([]string))
+		if err != nil {
+			httputils.SendErrorToClient(w, err)
+			return
+		}
+	} else if params["partial_pseudo"] != nil {
+		users_json, err = user_controller.GetUsersFromPartialPseudos(params["partial_pseudo"].([]string))
+		if err != nil {
+			httputils.SendErrorToClient(w, err)
+			return
+		}
 	}
 
-	// Get user
-	user, err := user_controller.GetUser(user_id)
-	if err != nil {
-		custom_errors.SendErrorToClient(err, w, "")
-		return
-	}
-
-	w.Write(user)
+	httputils.RespondWithJSON(w, http.StatusOK, users_json)
 }

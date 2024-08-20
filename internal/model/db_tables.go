@@ -91,6 +91,7 @@ type User struct {
 	Pseudo              string     `gorm:"type:varchar(32);unique;not null"`
 	Email               string     `gorm:"type:varchar(256);unique;not null"`
 	HashedPassword      string     `gorm:"type:varchar(64);not null"`
+	Bio                 string     `gorm:"type:text"`
 	Illustration        string     `gorm:"type:text;default:'default.jpg'"`
 	SubscribedPlaylists []Playlist `gorm:"many2many:playlists_subscribers;"`
 	Playlists           []Playlist `gorm:"many2many:playlists_owners;"`

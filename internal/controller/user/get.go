@@ -78,3 +78,37 @@ func GetUserIdFromUsername(username string) (int, error) {
 	}
 	return users[0].Id, nil
 }
+
+func GetUsersFromPseudos(usernames []string) ([]byte, error) {
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return []byte{}, err
+	}
+	defer db_model.CloseDB(db)
+	users, err := user_model.GetUsersFromPseudos(db, usernames)
+	if err != nil {
+		return []byte{}, err
+	}
+	users_ptr := make([]*db_tables.User, len(users))
+	for i, user := range users {
+		users_ptr[i] = &user
+	}
+	return ConvertUsersToJSON(users_ptr)
+}
+
+func GetUsersFromPartialPseudos(partial_usernames []string) ([]byte, error) {
+	db, err := db_model.OpenDB()
+	if err != nil {
+		return []byte{}, err
+	}
+	defer db_model.CloseDB(db)
+	users, err := user_model.GetUsersFromPartialPseudos(db, partial_usernames)
+	if err != nil {
+		return []byte{}, err
+	}
+	users_ptr := make([]*db_tables.User, len(users))
+	for i, user := range users {
+		users_ptr[i] = &user
+	}
+	return ConvertUsersToJSON(users_ptr)
+}

@@ -60,6 +60,18 @@ patch:
               type: string
               description: User illustration
               format: binary
+            username:
+              type: string
+              description: User username
+            email:
+              type: string
+              description: User email
+            new_password:
+              type: string
+              description: User new password
+            password:
+              type: string
+              description: User password confirmation (required if new_password or email is provided)
   responses:
     200:
       description: User information updated successfully

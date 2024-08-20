@@ -183,6 +183,65 @@ func ParseMultiPartFormParams(r *http.Request, strings_params []string, integers
 	return params, nil
 }
 
+func ParseFormBodyParams(r *http.Request, strings_params []string, integers []string, strings_lists []string, integers_lists []string) (map[string]interface{}, error) {
+	if r.ParseForm() != nil {
+		return nil, NewBadRequestError("Error parsing form")
+	}
+	params := make(map[string]interface{})
+	// Parse string parameters and add them to the params map
+	for _, param := range strings_params {
+		if val, ok := r.PostForm[param]; ok {
+			if len(val) == 1 {
+				params[param] = strings.TrimSpace(val[0])
+			} else if len(val) > 1 {
+				return nil, NewBadRequestError(fmt.Sprintf("Invalid form parameter: %s. Expected a single string, got %d", param, len(val)))
+			}
+		}
+	}
+	// Parse integer parameters and add them to the params map
+	for _, param := range integers {
+		if val, ok := r.PostForm[param]; ok {
+			if len(val) == 1 {
+				integer_val, err := strconv.Atoi(strings.TrimSpace(val[0]))
+				if err != nil {
+					return nil, NewBadRequestError(fmt.Sprintf("Invalid form parameter: %s. Expected an integer, got %s", param, val[0]))
+				} else if integer_val < 0 {
+					return nil, NewBadRequestError(fmt.Sprintf("Invalid form parameter: %s. Expected a positive integer, got %d", param, integer_val))
+				}
+				params[param] = integer_val
+			} else if len(val) > 1 {
+				return nil, NewBadRequestError(fmt.Sprintf("Invalid form parameter: %s. Expected a single integer, got %d", param, len(val)))
+			}
+		}
+	}
+	// Parse string list parameters and add them to the params map
+	for _, param := range strings_lists {
+		if val, ok := r.PostForm[param]; ok {
+			for i, v := range val {
+				val[i] = strings.TrimSpace(v)
+			}
+			params[param] = val
+		}
+	}
+	// Parse integer list parameters and add them to the params map
+	for _, param := range integers_lists {
+		if val, ok := r.PostForm[param]; ok {
+			int_list := make([]int, len(val))
+			for i, v := range val {
+				integer_val, err := strconv.Atoi(strings.TrimSpace(v))
+				if err != nil {
+					return nil, NewBadRequestError(fmt.Sprintf("Invalid form parameter: %s. Expected an integer, got %s", param, v))
+				} else if integer_val < 0 {
+					return nil, NewBadRequestError(fmt.Sprintf("Invalid form parameter: %s. Expected a positive integer, got %d", param, integer_val))
+				}
+				int_list[i] = integer_val
+			}
+			params[param] = int_list
+		}
+	}
+	return params, nil
+}
+
 // ValidateRequestFile validates the file by checking the file size, file name, and file format.
 func ValidateRequestFile(file_header *multipart.FileHeader, format string) error {
 	if file_header.Size > FILE_SIZE_BY_TYPE[format] {

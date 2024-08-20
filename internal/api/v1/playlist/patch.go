@@ -12,7 +12,7 @@ import (
 
 func patchPlaylistHandler(w http.ResponseWriter, r *http.Request) {
 	playlist_id, err := strconv.Atoi(mux.Vars(r)["playlist_id"])
-	if err != nil {
+	if err != nil || playlist_id < 0 {
 		httputils.SendErrorToClient(w, httputils.NewBadRequestError("invalid playlist id, must be a positive integer"))
 		return
 	}
@@ -41,7 +41,7 @@ func patchPlaylistHandler(w http.ResponseWriter, r *http.Request) {
 
 func updatePlaylistMusicsHandler(w http.ResponseWriter, r *http.Request) {
 	playlist_id, err := strconv.Atoi(mux.Vars(r)["playlist_id"])
-	if err != nil {
+	if err != nil || playlist_id < 0 {
 		httputils.SendErrorToClient(w, httputils.NewBadRequestError("invalid playlist id, must be a positive integer"))
 		return
 	}
@@ -74,7 +74,7 @@ func updatePlaylistMusicsHandler(w http.ResponseWriter, r *http.Request) {
 
 func updatePlaylistOwnersHandler(w http.ResponseWriter, r *http.Request) {
 	playlist_id, err := strconv.Atoi(mux.Vars(r)["playlist_id"])
-	if err != nil {
+	if err != nil || playlist_id < 0 {
 		httputils.SendErrorToClient(w, httputils.NewBadRequestError("invalid playlist id, must be a positive integer"))
 		return
 	}

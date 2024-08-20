@@ -3,28 +3,35 @@ package user_controller
 import (
 	db_tables "BeatBoxBox/internal/model"
 	"BeatBoxBox/pkg/db_model"
+	"encoding/json"
 	"strings"
 	"testing"
 )
 
 // POST FUNCTIONS
 func TestPostUser(t *testing.T) {
-	_, err := PostUser("Test User 31", "TestEmail31@email.com", "Password31_", nil)
+	_, err := PostUser("Test User 31", "TestEmail31@email.com", "Password31_", "", nil)
 	if err != nil {
 		t.Error(err)
 	}
 }
 
 func TestAttemptLogin(t *testing.T) {
-	user_id, err := PostUser("Test User 46", "TestEmail45@email.com", "Password45_", nil)
+	user_json, err := PostUser("Test User 46", "TestEmail45@email.com", "Password45_", "", nil)
 	if err != nil {
 		t.Error(err)
 	}
 	user_id_login, _, err := AttemptLogin("Test User 46", "Password45_")
 	if err != nil {
 		t.Error(err)
-	} else if user_id != user_id_login {
-		t.Error("Wrong user logged in")
+	} else {
+		user := db_tables.User{}
+		err = json.Unmarshal(user_json, &user)
+		if err != nil {
+			t.Error(err)
+		} else if user_id_login != user.Id {
+			t.Error("User not logged in")
+		}
 	}
 }
 
@@ -208,7 +215,7 @@ func TestUpdateUser(t *testing.T) {
 		t.Error(err)
 	}
 	user_id := user.Id
-	err = UpdateUser(user_id, map[string]interface{}{"pseudo": "Test User 39 updated"})
+	_, err = UpdateUser(user_id, map[string]interface{}{"pseudo": "Test User 39 updated"})
 	if err != nil {
 		t.Error(err)
 	}

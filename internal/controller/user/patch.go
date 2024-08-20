@@ -6,20 +6,56 @@ import (
 	playlist_model "BeatBoxBox/internal/model/playlist"
 	user_model "BeatBoxBox/internal/model/user"
 	db_model "BeatBoxBox/pkg/db_model"
+	auth_utils "BeatBoxBox/pkg/utils/authutils"
+	format_utils "BeatBoxBox/pkg/utils/formatutils"
 	httputils "BeatBoxBox/pkg/utils/httputils"
 )
 
-func UpdateUser(user_id int, user_map map[string]interface{}) error {
+func UpdateUser(user_id int, user_map map[string]interface{}) ([]byte, error) {
+	// Validate username if present
+	if user_map["pseudo"] != nil {
+		if !format_utils.CheckPseudoValidity(user_map["pseudo"].(string)) {
+			return []byte{}, httputils.NewBadRequestError("Invalid username, must be between 3 and 32 characters")
+		}
+	}
+	// Validate email if present
+	if user_map["email"] != nil {
+		if !format_utils.CheckEmailValidity(user_map["email"].(string)) {
+			return []byte{}, httputils.NewBadRequestError("Invalid email format")
+		}
+	}
+	// Validate new password if present
+	if user_map["new_password"] != nil {
+		if !format_utils.CheckRawPasswordValidity(user_map["new_password"].(string)) {
+			return []byte{}, httputils.NewBadRequestError("Invalid password, must be between 6 and 64 characters, contain at least 1 special character, at least 1 number and 1 letter")
+		}
+	}
 	db, err := db_model.OpenDB()
 	if err != nil {
-		return err
+		return []byte{}, err
 	}
 	defer db_model.CloseDB(db)
 	user, err := user_model.GetUser(db, user_id)
 	if err != nil {
-		return err
+		return []byte{}, err
 	}
-	return user_model.UpdateUser(db, &user, user_map)
+	if user_map["email"] != nil || user_map["new_password"] != nil {
+		if !auth_utils.CompareHash(user.HashedPassword, user_map["password"].(string)) {
+			return []byte{}, httputils.NewUnauthorizedError("Invalid password")
+		} else if user_map["new_password"] != nil {
+			user_map["hashed_password"], err = auth_utils.HashString(user_map["new_password"].(string))
+			if err != nil {
+				return []byte{}, err
+			}
+			delete(user_map, "new_password")
+			delete(user_map, "password")
+		}
+	}
+	err = user_model.UpdateUser(db, &user, user_map)
+	if err != nil {
+		return []byte{}, err
+	}
+	return ConvertUserToJSON(&user)
 }
 
 func AddMusicsToLikedMusics(user_id int, musics_ids []int) error {

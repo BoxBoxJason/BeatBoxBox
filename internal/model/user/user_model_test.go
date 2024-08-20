@@ -15,7 +15,7 @@ func TestUserCreate(t *testing.T) {
 	}
 	defer db_model.CloseDB(db)
 
-	_, err = CreateUser(db, "Test user 1", "Test email 1", "hashed_password", "default.jpg")
+	_, err = CreateUser(db, "Test user 1", "Test email 1", "hashed_password", "bio", "default.jpg")
 	if err != nil {
 		t.Errorf("Error creating user: %s", err)
 	}
@@ -293,7 +293,7 @@ func TestUserAlreadyExists(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error checking if user already exists: %s", err)
 	} else if exists {
-		t.Errorf("Expected user to not exist, got true")
+		t.Errorf("Expected user to not exist, got true for fields %v", fields)
 	}
 }
 

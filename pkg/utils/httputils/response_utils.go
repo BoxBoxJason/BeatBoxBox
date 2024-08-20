@@ -2,9 +2,11 @@ package httputils
 
 import (
 	"BeatBoxBox/pkg/logger"
+	auth_utils "BeatBoxBox/pkg/utils/authutils"
 	"archive/zip"
 	"net/http"
 	"os"
+	"time"
 )
 
 // RespondWithJSON sends a JSON response to the client with the given status code and content
@@ -94,4 +96,24 @@ func addFileToZipWriter(zip_writer *zip.Writer, file_path string) error {
 		return err
 	}
 	return nil
+}
+
+func SetCookie(w http.ResponseWriter, name string, value string, path string, secure bool, http_only bool, expires time.Time) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     name,
+		Value:    value,
+		Path:     path,
+		Secure:   secure,
+		HttpOnly: http_only,
+		Expires:  expires,
+	})
+}
+
+func SetAuthCookie(w http.ResponseWriter, user_id int, auth_token string) {
+	jwt, err := auth_utils.CreateAuthJWT(user_id, auth_token)
+	if err != nil {
+		logger.Error("Error creating auth JWT: ", err)
+		return
+	}
+	SetCookie(w, "session_token", jwt, "/", true, true, time.Now().Add(auth_utils.DEFAULT_TOKEN_EXPIRATION))
 }
